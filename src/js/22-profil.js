@@ -24,7 +24,7 @@
       <fieldset id="r-rappels">${htmlRappels()}</fieldset>
       <fieldset id="r-coffre">${htmlCoffre()}</fieldset>
       <p class="note" style="text-align:center">ASCEND · édition ${EDITION} · Make everyday matter.</p>
-      <p class="note diag" id="p-diag">${esc(mesuresEcran())}</p>`;
+      <p class="note diag" id="p-diag">${esc(mesuresEcran())}${derniereFeuille ? '<br>' + esc(derniereFeuille) : ''}</p>`;
   }
   // Mesures de l'écran, pour comprendre un affichage décalé sur un iPhone qu'on n'a pas sous la main
   function mesuresEcran() {

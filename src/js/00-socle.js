@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 5;                       // édition de l'app, comme le cache du service worker (ascend-5)
+  const EDITION = 6;                       // édition de l'app, comme le cache du service worker (ascend-6)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------

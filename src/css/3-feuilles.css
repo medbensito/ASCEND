@@ -10,7 +10,9 @@ dialog.feuille::before { content: ""; display: block; flex: none; width: 40px; h
 dialog::backdrop { background: rgba(2, 3, 14, .62); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 @keyframes monter { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
 @media (min-width: 640px) { dialog.feuille { margin: auto; border-radius: 26px; border-bottom: 1px solid var(--trait-fort); } }
-dialog.feuille > form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+/* Les formulaires ne forment pas de boîte : en-tête, corps et pied sont posés directement dans la feuille,
+   comme le Profil (un formulaire en flex imbriqué s'affichait mal sur iPhone) */
+#form-tache, #form-cat, #form-hab, #form-obj { display: contents; }
 .f-haut { flex: none; display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; padding: 6px 10px 8px; }
 .f-haut h2 { text-align: center; font-size: 18px; font-weight: 700; }
 .f-icone { width: 44px; height: 44px; border: 0; background: none; color: var(--texte); display: grid; place-items: center; padding: 0; border-radius: 50%; }

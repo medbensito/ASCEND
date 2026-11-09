@@ -357,7 +357,9 @@ dialog.feuille::before { content: ""; display: block; flex: none; width: 40px; h
 dialog::backdrop { background: rgba(2, 3, 14, .62); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 @keyframes monter { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
 @media (min-width: 640px) { dialog.feuille { margin: auto; border-radius: 26px; border-bottom: 1px solid var(--trait-fort); } }
-dialog.feuille > form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+/* Les formulaires ne forment pas de boîte : en-tête, corps et pied sont posés directement dans la feuille,
+   comme le Profil (un formulaire en flex imbriqué s'affichait mal sur iPhone) */
+#form-tache, #form-cat, #form-hab, #form-obj { display: contents; }
 .f-haut { flex: none; display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; padding: 6px 10px 8px; }
 .f-haut h2 { text-align: center; font-size: 18px; font-weight: 700; }
 .f-icone { width: 44px; height: 44px; border: 0; background: none; color: var(--texte); display: grid; place-items: center; padding: 0; border-radius: 50%; }
@@ -658,7 +660,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 5;                       // édition de l'app, comme le cache du service worker (ascend-5)
+  const EDITION = 6;                       // édition de l'app, comme le cache du service worker (ascend-6)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -1802,6 +1804,26 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   }
   // Ferme la feuille au toucher de « data-fermer »
   document.addEventListener('click', e => { const b = e.target.closest('[data-fermer]'); if (b) { const d = b.closest('dialog'); if (d) d.close(); } });
+  // Toucher le fond sombre, au-dessus d'une feuille, la ferme (comme sur iPhone)
+  document.addEventListener('click', e => {
+    const d = e.target;
+    if (!(d instanceof HTMLDialogElement) || !d.open || !d.classList.contains('feuille')) return;
+    const r = d.getBoundingClientRect();
+    if (e.clientY < r.top || e.clientY > r.bottom || e.clientX < r.left || e.clientX > r.right) d.close();
+  });
+  // Mesures de la dernière feuille ouverte (affichées dans Profil, pour un iPhone qu'on n'a pas sous la main)
+  let derniereFeuille = '';
+  const ouvrirModale = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal = function () {
+    ouvrirModale.call(this);
+    if (this.id === 'profil') return;
+    setTimeout(() => {
+      if (!this.open) return;
+      const m = x => { const b = x.getBoundingClientRect(); return `${Math.round(b.top)}→${Math.round(b.bottom)}`; };
+      const corps = this.querySelector('.f-corps'), pied = this.querySelector('.f-pied');
+      derniereFeuille = `Feuille ${this.id} ${m(this)}` + (corps ? ` · corps ${m(corps)}` : '') + (pied ? ` · pied ${m(pied)}` : '');
+    }, 700);
+  };
 
   // ---------- Feuille d'une tâche (maquette « Nouvelle tâche ») ----------
   const TD = $('#tache'), TF = $('#form-tache');
@@ -2330,7 +2352,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       <fieldset id="r-rappels">${htmlRappels()}</fieldset>
       <fieldset id="r-coffre">${htmlCoffre()}</fieldset>
       <p class="note" style="text-align:center">ASCEND · édition ${EDITION} · Make everyday matter.</p>
-      <p class="note diag" id="p-diag">${esc(mesuresEcran())}</p>`;
+      <p class="note diag" id="p-diag">${esc(mesuresEcran())}${derniereFeuille ? '<br>' + esc(derniereFeuille) : ''}</p>`;
   }
   // Mesures de l'écran, pour comprendre un affichage décalé sur un iPhone qu'on n'a pas sous la main
   function mesuresEcran() {

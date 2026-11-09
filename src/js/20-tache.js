@@ -36,6 +36,26 @@
   }
   // Ferme la feuille au toucher de « data-fermer »
   document.addEventListener('click', e => { const b = e.target.closest('[data-fermer]'); if (b) { const d = b.closest('dialog'); if (d) d.close(); } });
+  // Toucher le fond sombre, au-dessus d'une feuille, la ferme (comme sur iPhone)
+  document.addEventListener('click', e => {
+    const d = e.target;
+    if (!(d instanceof HTMLDialogElement) || !d.open || !d.classList.contains('feuille')) return;
+    const r = d.getBoundingClientRect();
+    if (e.clientY < r.top || e.clientY > r.bottom || e.clientX < r.left || e.clientX > r.right) d.close();
+  });
+  // Mesures de la dernière feuille ouverte (affichées dans Profil, pour un iPhone qu'on n'a pas sous la main)
+  let derniereFeuille = '';
+  const ouvrirModale = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal = function () {
+    ouvrirModale.call(this);
+    if (this.id === 'profil') return;
+    setTimeout(() => {
+      if (!this.open) return;
+      const m = x => { const b = x.getBoundingClientRect(); return `${Math.round(b.top)}→${Math.round(b.bottom)}`; };
+      const corps = this.querySelector('.f-corps'), pied = this.querySelector('.f-pied');
+      derniereFeuille = `Feuille ${this.id} ${m(this)}` + (corps ? ` · corps ${m(corps)}` : '') + (pied ? ` · pied ${m(pied)}` : '');
+    }, 700);
+  };
 
   // ---------- Feuille d'une tâche (maquette « Nouvelle tâche ») ----------
   const TD = $('#tache'), TF = $('#form-tache');
