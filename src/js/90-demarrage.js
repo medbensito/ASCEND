@@ -357,9 +357,27 @@
   }, 120));
 
   // ---------- Démarrage ----------
+  // Mises à jour : à chaque retour dans l'app, on regarde s'il existe une nouvelle édition ; quand elle prend la main,
+  // l'app se recharge d'elle-même (pendant une saisie, elle attend que la feuille se ferme).
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    navigator.serviceWorker.register('sw.js').catch(() => { /* hors ligne indisponible */ });
+    const avaitMain = !!navigator.serviceWorker.controller;
+    let recharge = false;
+    const recharger = () => {
+      if (recharge) return;
+      if (document.querySelector('dialog[open]')) { document.addEventListener('close', recharger, { capture: true, once: true }); return; }
+      recharge = true;
+      location.reload();
+    };
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (avaitMain) recharger(); });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
+    }).catch(() => { /* hors ligne indisponible */ });
   }
+  try {
+    const vue = +localStorage.getItem('ascend-edition') || 0;
+    if (vue && vue < EDITION) setTimeout(() => dire(`ASCEND est à jour (édition ${EDITION}).`), 1900);
+    if (vue !== EDITION) localStorage.setItem('ascend-edition', String(EDITION));
+  } catch (e) { /* stockage indisponible */ }
   crediter();
   if (S.minuteur) { avancerMinuteur(); demarrerTic(); }
   // Écran de lancement : le A d'ASCEND, le temps d'un souffle
@@ -372,5 +390,5 @@
   if (erreurStockage) dire('Attention : le téléphone refuse d\'enregistrer. Libère de la place.');
   synchroniser();
   if (S.coffre.actif) setTimeout(() => envoyerCoffre(), 5000);
-  window.ascend = { version: VERSION };
+  window.ascend = { version: VERSION, edition: EDITION };
 })();

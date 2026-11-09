@@ -1,7 +1,7 @@
 // ASCEND : service worker. Garde l'app disponible hors ligne et affiche les rappels.
 // Réseau d'abord : en ligne, on reçoit toujours la dernière version ; hors ligne, la copie en cache prend le relais.
 // À chaque nouvelle version de l'app, changer le nom du cache ci-dessous.
-const CACHE = 'ascend-4';
+const CACHE = 'ascend-5';
 const FICHIERS = [
   './',
   './index.html',
@@ -14,7 +14,8 @@ const FICHIERS = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FICHIERS)).then(() => self.skipWaiting()));
+  // « reload » : les copies viennent du serveur, pas du cache du navigateur (GitHub Pages le garde 10 min)
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FICHIERS.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -31,7 +32,8 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin || !url.pathname.startsWith(new URL(self.registration.scope).pathname)) return;
   e.respondWith(
-    fetch(req)
+    // « no-cache » : toujours demander au serveur si la page a changé (sinon le navigateur ressert une copie de 10 min)
+    fetch(req, { cache: 'no-cache' })
       .then(rep => {
         if (rep.ok) { const copie = rep.clone(); caches.open(CACHE).then(c => c.put(req, copie)); }
         return rep;
