@@ -165,3 +165,4 @@ dialog#verrou::backdrop { background: var(--fond); }
 .vr-corps > p { color: var(--doux); font-size: 15px; }
 .vr-aide { display: grid; gap: 10px; width: 100%; }
 .vr-aide p { color: var(--doux); font-size: 14px; }
+.note.diag { text-align: center; font-size: 11px; color: var(--pale); -webkit-user-select: text; user-select: text; margin-top: -8px; }

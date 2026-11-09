@@ -23,7 +23,24 @@
       <fieldset id="r-verrou">${htmlVerrou()}</fieldset>
       <fieldset id="r-rappels">${htmlRappels()}</fieldset>
       <fieldset id="r-coffre">${htmlCoffre()}</fieldset>
-      <p class="note" style="text-align:center">ASCEND · version ${VERSION} · Make everyday matter.</p>`;
+      <p class="note" style="text-align:center">ASCEND · édition ${EDITION} · Make everyday matter.</p>
+      <p class="note diag" id="p-diag">${esc(mesuresEcran())}</p>`;
+  }
+  // Mesures de l'écran, pour comprendre un affichage décalé sur un iPhone qu'on n'a pas sous la main
+  function mesuresEcran() {
+    const sonde = document.createElement('div');
+    sonde.style.cssText = 'position:fixed;left:0;top:0;width:0;visibility:hidden;pointer-events:none;height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)';
+    document.body.appendChild(sonde);
+    const cs = getComputedStyle(sonde);
+    const haut = Math.round(parseFloat(cs.paddingTop)), bas = Math.round(parseFloat(cs.paddingBottom)), dvh = Math.round(parseFloat(cs.height));
+    sonde.style.height = '100lvh';
+    const lvh = Math.round(parseFloat(getComputedStyle(sonde).height));
+    sonde.remove();
+    const v = window.visualViewport;
+    const ios = (navigator.userAgent.match(/OS (\d+)_(\d+)/) || []).slice(1).join('.');
+    const app = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    return `Écran ${screen.width}×${screen.height} · page ${innerWidth}×${innerHeight}` + (v ? ` · visible ${Math.round(v.height)} (+${Math.round(v.offsetTop)})` : '') +
+      ` · dvh ${dvh} · lvh ${lvh} · bords ${haut}/${bas} · ${app ? 'app' : 'navigateur'}` + (ios ? ` · iOS ${ios}` : '');
   }
   PD.addEventListener('change', e => {
     const t = e.target;
