@@ -1,9 +1,11 @@
 /* ===== Feuilles (formulaires en bas d'écran) ===== */
 dialog { color: var(--texte); }
-dialog.feuille { width: 100%; max-width: 560px; max-height: 92vh; max-height: 92dvh; margin: auto auto 0; padding: 0; border: 1px solid var(--trait-fort); border-bottom: 0;
+/* Calée sur la partie visible de l'écran : au-dessus du clavier quand il est sorti */
+dialog.feuille { top: var(--vv-haut, 0px); bottom: var(--vv-bas, 0px); width: 100%; max-width: 560px;
+  max-height: 92vh; max-height: min(92dvh, calc(var(--vv-h, 100dvh) - 12px)); margin: auto auto 0; padding: 0; border: 1px solid var(--trait-fort); border-bottom: 0;
   border-radius: 26px 26px 0 0; background: linear-gradient(180deg, #11143a, #0a0c26 40%); box-shadow: 0 -20px 60px rgba(0, 0, 0, .55); }
 dialog.feuille[open] { display: flex; flex-direction: column; animation: monter .26s ease; }
-dialog.feuille.haute { height: 92vh; height: 92dvh; }
+dialog.feuille.haute { height: 92vh; height: min(92dvh, calc(var(--vv-h, 100dvh) - 12px)); }
 dialog.feuille::before { content: ""; display: block; flex: none; width: 40px; height: 5px; border-radius: 3px; background: rgba(163, 168, 212, .35); margin: 8px auto 0; }
 dialog::backdrop { background: rgba(2, 3, 14, .62); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 @keyframes monter { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
@@ -95,7 +97,7 @@ dialog.feuille > form { display: flex; flex-direction: column; min-height: 0; fl
 .cat-liste .rang.inactive .tuile { filter: grayscale(.8); opacity: .6; }
 
 /* ===== Questions ===== */
-dialog.feuille.petite { max-height: 80vh; }
+dialog.feuille.petite { max-height: 80vh; max-height: min(80dvh, calc(var(--vv-h, 100dvh) - 12px)); }
 .q-corps { padding: 18px 18px calc(var(--bas-sur) + 18px); display: grid; gap: 12px; }
 .q-corps h2 { font-size: 19px; font-weight: 700; text-align: center; }
 .q-corps p { color: var(--doux); text-align: center; font-size: 15px; line-height: 1.45; }

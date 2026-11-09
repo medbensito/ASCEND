@@ -33,7 +33,7 @@
       <div class="f-pied"><button type="submit" class="bouton">${h ? 'Enregistrer' : 'Créer l\'habitude'}</button></div>`;
     majHabitude();
     HD.showModal();
-    if (!h) setTimeout(() => HF.elements.namedItem('titre').focus(), 60);
+    if (!h) focusDepart(() => HF.elements.namedItem('titre'));
   }
   function majHabitude() {
     const c = cat(U.habitude.cat);
@@ -114,7 +114,7 @@
       <div class="f-pied"><button type="submit" class="bouton">${ob ? 'Enregistrer' : 'Créer l\'objectif'}</button></div>`;
     majObjectif();
     OD.showModal();
-    if (!ob) setTimeout(() => OF.elements.namedItem('titre').focus(), 60);
+    if (!ob) focusDepart(() => OF.elements.namedItem('titre'));
   }
   const etapesEdition = () => U.objectif.ob ? U.objectif.ob.etapes : U.objectif.etapes;
   function majObjectif(focus) {
@@ -262,7 +262,7 @@
       </div>
       <div class="f-pied"><button type="submit" class="bouton">${c ? 'Enregistrer' : 'Créer la catégorie'}</button></div>`;
     CTD.showModal();
-    if (!c) setTimeout(() => CTF.elements.namedItem('nom').focus(), 60);
+    if (!c) focusDepart(() => CTF.elements.namedItem('nom'));
   }
   CTF.addEventListener('submit', e => {
     e.preventDefault();

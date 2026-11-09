@@ -318,6 +318,44 @@
   });
   window.addEventListener('resize', () => { if (paysage() && S.vueCal !== 'jour' && !G) render(); });
 
+  // ---------- Le clavier de l'iPhone ----------
+  // Safari place les éléments fixes sur toute la hauteur de l'écran, même quand le clavier en cache la moitié,
+  // et garde parfois un décalage après l'avoir rangé. On suit la partie réellement visible :
+  // les feuilles s'y calent (au-dessus du clavier), l'app aussi dès qu'aucun champ n'est en cours de saisie.
+  const VV = window.visualViewport;
+  const RACINE = document.documentElement;
+  const SAISIE = 'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="range"]):not([type="color"]):not([type="file"]), textarea, select, [contenteditable="true"]';
+  const enSaisie = () => { const a = document.activeElement; return !!a && a !== document.body && a.matches(SAISIE); };
+  function suivreVue() {
+    if (!VV || Math.abs(VV.scale - 1) > .01) return;          // zoom d'accessibilité : on ne touche à rien
+    const haut = Math.max(0, Math.round(VV.offsetTop));
+    const h = Math.round(VV.height);
+    const bas = Math.max(0, Math.round(window.innerHeight - haut - h));
+    const st = RACINE.style;
+    st.setProperty('--vv-haut', haut + 'px');
+    st.setProperty('--vv-bas', bas + 'px');
+    st.setProperty('--vv-h', h + 'px');
+    RACINE.classList.toggle('clavier', bas > 120);
+    if (!enSaisie()) { st.setProperty('--app-haut', haut + 'px'); st.setProperty('--app-bas', bas + 'px'); }
+  }
+  if (VV) {
+    VV.addEventListener('scroll', suivreVue);
+    VV.addEventListener('resize', () => {
+      suivreVue();
+      // Le clavier sort : le champ en cours reste en vue dans sa feuille
+      const a = document.activeElement;
+      if (enSaisie() && a.closest('dialog')) requestAnimationFrame(() => a.scrollIntoView({ block: 'nearest' }));
+    });
+    suivreVue();
+  }
+  // Le clavier rangé : l'écran revient à sa place
+  document.addEventListener('focusout', () => setTimeout(() => {
+    if (enSaisie()) return;
+    if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
+    if (document.body.scrollTop) document.body.scrollTop = 0;
+    suivreVue();
+  }, 120));
+
   // ---------- Démarrage ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(() => { /* hors ligne indisponible */ });

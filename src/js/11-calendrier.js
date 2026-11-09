@@ -155,7 +155,8 @@
     for (let i = 0; i < 42; i++) { const j = decaler(debut, i); if (i === 35 && j.slice(0, 7) !== k.slice(0, 7)) break; jours.push(j); }
     const rangs = jours.length / 7;
     // Combien de tâches tiennent dans une case : le numéro du jour (et « +N » à côté), puis une ligne par tâche
-    const place = Math.max(1, Math.floor(((window.innerHeight - 78) / rangs - 4 - 8 - 18) / 17));
+    const hApp = ($('.app') || {}).clientHeight || window.innerHeight;
+    const place = Math.max(1, Math.floor(((hApp - 78) / rangs - 4 - 8 - 18) / 17));
     const cases = jours.map(j => {
       const occs = duJour(j), charge = minutesPrevues(j) > S.reglages.plafond;
       const montrees = occs.slice(0, place);

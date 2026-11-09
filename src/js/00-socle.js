@@ -139,7 +139,10 @@
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-3);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const $ = s => document.querySelector(s);
-  const nombre = n => Math.round(n).toLocaleString('fr-FR');
+  // Sur téléphone, une feuille qui s'ouvre ne fait pas surgir le clavier : on touche le champ quand on veut écrire
+  const TACTILE = window.matchMedia('(hover: none) and (pointer: coarse)');
+  const focusDepart = champ => { if (!TACTILE.matches) setTimeout(() => { const c = champ(); if (c) c.focus(); }, 60); };
+  const nombre =n => Math.round(n).toLocaleString('fr-FR');
   const duree = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ' ' + String(m % 60).padStart(2, '0') : ''}`;
   const jourLong = k => cap(fmt(k, { weekday: 'long', day: 'numeric', month: 'long' }));
   const quandJour = k => { const a = aujourdhui(); return k === a ? "aujourd'hui" : k === decaler(a, 1) ? 'demain' : k === decaler(a, -1) ? 'hier' : 'le ' + fmt(k, { weekday: 'long', day: 'numeric', month: 'long' }); };

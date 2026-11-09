@@ -77,7 +77,7 @@
       <div class="f-pied"><button type="submit" class="bouton" id="t-ok"></button></div>`;
     majTache();
     TD.showModal();
-    if (!o) setTimeout(() => champT('titre').focus(), 60);
+    if (!o) focusDepart(() => champT('titre'));
   }
   function majTache() {
     const type = (TF.querySelector('input[name="type"]:checked') || {}).value || 'tache';

@@ -73,7 +73,10 @@ button:disabled { cursor: default; }
 h1, h2, h3, p { margin: 0; }
 
 /* ===== Structure : écran + onglets du bas ===== */
-.app { height: 100vh; height: 100dvh; width: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; max-width: 640px; margin: 0 auto; overflow: hidden; }
+/* L'app occupe la partie visible de l'écran (l'iPhone la décale parfois après le clavier : on la suit) */
+.app { position: fixed; top: var(--app-haut, 0px); bottom: var(--app-bas, 0px); left: 0; right: 0; max-width: 640px; margin: 0 auto;
+  display: grid; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; }
+html.clavier { --bas-sur: 0px; }
 .ecran { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; outline: none;
   padding: calc(var(--haut-sur) + 18px) max(18px, env(safe-area-inset-right)) 28px max(18px, env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .ecran > * { flex-shrink: 0; }
@@ -344,10 +347,12 @@ h1, h2, h3, p { margin: 0; }
 .legende-courbe { display: flex; justify-content: space-between; color: var(--pale); font-size: 11.5px; margin-top: 4px; }
 /* ===== Feuilles (formulaires en bas d'écran) ===== */
 dialog { color: var(--texte); }
-dialog.feuille { width: 100%; max-width: 560px; max-height: 92vh; max-height: 92dvh; margin: auto auto 0; padding: 0; border: 1px solid var(--trait-fort); border-bottom: 0;
+/* Calée sur la partie visible de l'écran : au-dessus du clavier quand il est sorti */
+dialog.feuille { top: var(--vv-haut, 0px); bottom: var(--vv-bas, 0px); width: 100%; max-width: 560px;
+  max-height: 92vh; max-height: min(92dvh, calc(var(--vv-h, 100dvh) - 12px)); margin: auto auto 0; padding: 0; border: 1px solid var(--trait-fort); border-bottom: 0;
   border-radius: 26px 26px 0 0; background: linear-gradient(180deg, #11143a, #0a0c26 40%); box-shadow: 0 -20px 60px rgba(0, 0, 0, .55); }
 dialog.feuille[open] { display: flex; flex-direction: column; animation: monter .26s ease; }
-dialog.feuille.haute { height: 92vh; height: 92dvh; }
+dialog.feuille.haute { height: 92vh; height: min(92dvh, calc(var(--vv-h, 100dvh) - 12px)); }
 dialog.feuille::before { content: ""; display: block; flex: none; width: 40px; height: 5px; border-radius: 3px; background: rgba(163, 168, 212, .35); margin: 8px auto 0; }
 dialog::backdrop { background: rgba(2, 3, 14, .62); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 @keyframes monter { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
@@ -439,7 +444,7 @@ dialog.feuille > form { display: flex; flex-direction: column; min-height: 0; fl
 .cat-liste .rang.inactive .tuile { filter: grayscale(.8); opacity: .6; }
 
 /* ===== Questions ===== */
-dialog.feuille.petite { max-height: 80vh; }
+dialog.feuille.petite { max-height: 80vh; max-height: min(80dvh, calc(var(--vv-h, 100dvh) - 12px)); }
 .q-corps { padding: 18px 18px calc(var(--bas-sur) + 18px); display: grid; gap: 12px; }
 .q-corps h2 { font-size: 19px; font-weight: 700; text-align: center; }
 .q-corps p { color: var(--doux); text-align: center; font-size: 15px; line-height: 1.45; }
@@ -544,8 +549,8 @@ html.paysage .bloc .b-texte b { font-size: 14px; }
 html.paysage .bloc .b-texte small { font-size: 12px; }
 /* Feuilles et minuteur, téléphone couché */
 @media (orientation: landscape) and (max-height: 520px) {
-  dialog.feuille { max-height: 96vh; max-height: 96dvh; }
-  dialog.feuille.haute { height: 96vh; height: 96dvh; }
+  dialog.feuille { max-height: 96vh; max-height: min(96dvh, calc(var(--vv-h, 100dvh) - 8px)); }
+  dialog.feuille.haute { height: 96vh; height: min(96dvh, calc(var(--vv-h, 100dvh) - 8px)); }
   .f-corps, .f-pied, .f-haut { padding-left: max(18px, env(safe-area-inset-left)); padding-right: max(18px, env(safe-area-inset-right)); }
   dialog.minuteur { overflow-y: auto; }
   .m-corps { grid-template-rows: auto auto auto; gap: 10px; padding-top: 10px; }
@@ -789,7 +794,10 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-3);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const $ = s => document.querySelector(s);
-  const nombre = n => Math.round(n).toLocaleString('fr-FR');
+  // Sur téléphone, une feuille qui s'ouvre ne fait pas surgir le clavier : on touche le champ quand on veut écrire
+  const TACTILE = window.matchMedia('(hover: none) and (pointer: coarse)');
+  const focusDepart = champ => { if (!TACTILE.matches) setTimeout(() => { const c = champ(); if (c) c.focus(); }, 60); };
+  const nombre =n => Math.round(n).toLocaleString('fr-FR');
   const duree = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ' ' + String(m % 60).padStart(2, '0') : ''}`;
   const jourLong = k => cap(fmt(k, { weekday: 'long', day: 'numeric', month: 'long' }));
   const quandJour = k => { const a = aujourdhui(); return k === a ? "aujourd'hui" : k === decaler(a, 1) ? 'demain' : k === decaler(a, -1) ? 'hier' : 'le ' + fmt(k, { weekday: 'long', day: 'numeric', month: 'long' }); };
@@ -1569,7 +1577,8 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     for (let i = 0; i < 42; i++) { const j = decaler(debut, i); if (i === 35 && j.slice(0, 7) !== k.slice(0, 7)) break; jours.push(j); }
     const rangs = jours.length / 7;
     // Combien de tâches tiennent dans une case : le numéro du jour (et « +N » à côté), puis une ligne par tâche
-    const place = Math.max(1, Math.floor(((window.innerHeight - 78) / rangs - 4 - 8 - 18) / 17));
+    const hApp = ($('.app') || {}).clientHeight || window.innerHeight;
+    const place = Math.max(1, Math.floor(((hApp - 78) / rangs - 4 - 8 - 18) / 17));
     const cases = jours.map(j => {
       const occs = duJour(j), charge = minutesPrevues(j) > S.reglages.plafond;
       const montrees = occs.slice(0, place);
@@ -1832,7 +1841,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       <div class="f-pied"><button type="submit" class="bouton" id="t-ok"></button></div>`;
     majTache();
     TD.showModal();
-    if (!o) setTimeout(() => champT('titre').focus(), 60);
+    if (!o) focusDepart(() => champT('titre'));
   }
   function majTache() {
     const type = (TF.querySelector('input[name="type"]:checked') || {}).value || 'tache';
@@ -2026,7 +2035,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       <div class="f-pied"><button type="submit" class="bouton">${h ? 'Enregistrer' : 'Créer l\'habitude'}</button></div>`;
     majHabitude();
     HD.showModal();
-    if (!h) setTimeout(() => HF.elements.namedItem('titre').focus(), 60);
+    if (!h) focusDepart(() => HF.elements.namedItem('titre'));
   }
   function majHabitude() {
     const c = cat(U.habitude.cat);
@@ -2107,7 +2116,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       <div class="f-pied"><button type="submit" class="bouton">${ob ? 'Enregistrer' : 'Créer l\'objectif'}</button></div>`;
     majObjectif();
     OD.showModal();
-    if (!ob) setTimeout(() => OF.elements.namedItem('titre').focus(), 60);
+    if (!ob) focusDepart(() => OF.elements.namedItem('titre'));
   }
   const etapesEdition = () => U.objectif.ob ? U.objectif.ob.etapes : U.objectif.etapes;
   function majObjectif(focus) {
@@ -2255,7 +2264,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       </div>
       <div class="f-pied"><button type="submit" class="bouton">${c ? 'Enregistrer' : 'Créer la catégorie'}</button></div>`;
     CTD.showModal();
-    if (!c) setTimeout(() => CTF.elements.namedItem('nom').focus(), 60);
+    if (!c) focusDepart(() => CTF.elements.namedItem('nom'));
   }
   CTF.addEventListener('submit', e => {
     e.preventDefault();
@@ -3482,6 +3491,44 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     render();
   });
   window.addEventListener('resize', () => { if (paysage() && S.vueCal !== 'jour' && !G) render(); });
+
+  // ---------- Le clavier de l'iPhone ----------
+  // Safari place les éléments fixes sur toute la hauteur de l'écran, même quand le clavier en cache la moitié,
+  // et garde parfois un décalage après l'avoir rangé. On suit la partie réellement visible :
+  // les feuilles s'y calent (au-dessus du clavier), l'app aussi dès qu'aucun champ n'est en cours de saisie.
+  const VV = window.visualViewport;
+  const RACINE = document.documentElement;
+  const SAISIE = 'input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="range"]):not([type="color"]):not([type="file"]), textarea, select, [contenteditable="true"]';
+  const enSaisie = () => { const a = document.activeElement; return !!a && a !== document.body && a.matches(SAISIE); };
+  function suivreVue() {
+    if (!VV || Math.abs(VV.scale - 1) > .01) return;          // zoom d'accessibilité : on ne touche à rien
+    const haut = Math.max(0, Math.round(VV.offsetTop));
+    const h = Math.round(VV.height);
+    const bas = Math.max(0, Math.round(window.innerHeight - haut - h));
+    const st = RACINE.style;
+    st.setProperty('--vv-haut', haut + 'px');
+    st.setProperty('--vv-bas', bas + 'px');
+    st.setProperty('--vv-h', h + 'px');
+    RACINE.classList.toggle('clavier', bas > 120);
+    if (!enSaisie()) { st.setProperty('--app-haut', haut + 'px'); st.setProperty('--app-bas', bas + 'px'); }
+  }
+  if (VV) {
+    VV.addEventListener('scroll', suivreVue);
+    VV.addEventListener('resize', () => {
+      suivreVue();
+      // Le clavier sort : le champ en cours reste en vue dans sa feuille
+      const a = document.activeElement;
+      if (enSaisie() && a.closest('dialog')) requestAnimationFrame(() => a.scrollIntoView({ block: 'nearest' }));
+    });
+    suivreVue();
+  }
+  // Le clavier rangé : l'écran revient à sa place
+  document.addEventListener('focusout', () => setTimeout(() => {
+    if (enSaisie()) return;
+    if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
+    if (document.body.scrollTop) document.body.scrollTop = 0;
+    suivreVue();
+  }, 120));
 
   // ---------- Démarrage ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {

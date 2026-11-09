@@ -35,8 +35,8 @@ html.paysage .bloc .b-texte b { font-size: 14px; }
 html.paysage .bloc .b-texte small { font-size: 12px; }
 /* Feuilles et minuteur, téléphone couché */
 @media (orientation: landscape) and (max-height: 520px) {
-  dialog.feuille { max-height: 96vh; max-height: 96dvh; }
-  dialog.feuille.haute { height: 96vh; height: 96dvh; }
+  dialog.feuille { max-height: 96vh; max-height: min(96dvh, calc(var(--vv-h, 100dvh) - 8px)); }
+  dialog.feuille.haute { height: 96vh; height: min(96dvh, calc(var(--vv-h, 100dvh) - 8px)); }
   .f-corps, .f-pied, .f-haut { padding-left: max(18px, env(safe-area-inset-left)); padding-right: max(18px, env(safe-area-inset-right)); }
   dialog.minuteur { overflow-y: auto; }
   .m-corps { grid-template-rows: auto auto auto; gap: 10px; padding-top: 10px; }

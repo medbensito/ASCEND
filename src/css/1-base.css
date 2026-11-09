@@ -56,7 +56,10 @@ button:disabled { cursor: default; }
 h1, h2, h3, p { margin: 0; }
 
 /* ===== Structure : écran + onglets du bas ===== */
-.app { height: 100vh; height: 100dvh; width: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; max-width: 640px; margin: 0 auto; overflow: hidden; }
+/* L'app occupe la partie visible de l'écran (l'iPhone la décale parfois après le clavier : on la suit) */
+.app { position: fixed; top: var(--app-haut, 0px); bottom: var(--app-bas, 0px); left: 0; right: 0; max-width: 640px; margin: 0 auto;
+  display: grid; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; }
+html.clavier { --bas-sur: 0px; }
 .ecran { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; outline: none;
   padding: calc(var(--haut-sur) + 18px) max(18px, env(safe-area-inset-right)) 28px max(18px, env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .ecran > * { flex-shrink: 0; }
