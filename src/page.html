@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ASCEND</title>
+<meta name="description" content="ASCEND : ton développement personnel et ton JOMO, jour après jour. Make everyday matter.">
+<meta name="theme-color" content="#050616">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ASCEND">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icones/favicon-32.png">
+<link rel="apple-touch-icon" href="icones/apple-touch-icon.png">
+<style>
+/*@CSS@*/
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="ecran" id="ecran" tabindex="-1"></main>
+  <nav class="onglets" id="onglets" aria-label="Sections"></nav>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="lancement" id="lancement" aria-hidden="true"></div>
+
+<dialog class="feuille" id="tache" aria-labelledby="t-titre">
+  <form id="form-tache" novalidate></form>
+</dialog>
+
+<dialog class="feuille petite" id="choix-cat" aria-labelledby="cc-titre">
+  <div class="f-haut"><button type="button" class="f-icone" data-fermer aria-label="Fermer"></button><h2 id="cc-titre">Catégorie</h2><span></span></div>
+  <div class="f-corps" id="cc-corps" role="radiogroup" aria-labelledby="cc-titre"></div>
+</dialog>
+
+<dialog class="feuille haute" id="profil" aria-labelledby="p-titre">
+  <div class="f-haut"><span></span><h2 id="p-titre">Profil</h2><button type="button" class="f-ok" data-fermer>OK</button></div>
+  <div class="f-corps" id="p-corps"></div>
+</dialog>
+
+<dialog class="feuille haute" id="categories" aria-labelledby="cs-titre">
+  <div class="f-haut"><button type="button" class="f-icone retour" data-fermer aria-label="Retour"></button><h2 id="cs-titre">Catégories</h2><span></span></div>
+  <div class="f-corps" id="cs-corps"></div>
+</dialog>
+
+<dialog class="feuille" id="categorie" aria-labelledby="ct-titre">
+  <form id="form-cat" novalidate></form>
+</dialog>
+
+<dialog class="feuille" id="habitude" aria-labelledby="h-titre">
+  <form id="form-hab" novalidate></form>
+</dialog>
+
+<dialog class="feuille haute" id="objectif" aria-labelledby="o-titre">
+  <form id="form-obj" novalidate></form>
+</dialog>
+
+<dialog class="minuteur" id="minuteur" aria-labelledby="m-titre">
+  <div class="m-corps" id="m-corps"></div>
+</dialog>
+
+<dialog class="feuille petite" id="question" aria-labelledby="q-titre" aria-describedby="q-texte">
+  <div class="q-corps">
+    <h2 id="q-titre"></h2>
+    <p id="q-texte"></p>
+    <div class="q-choix" id="q-choix"></div>
+  </div>
+</dialog>
+
+<dialog class="feuille haute" id="loupe" aria-labelledby="lp-titre">
+  <h2 class="masque" id="lp-titre">Chercher</h2>
+  <form class="lp-haut" role="search" id="form-loupe" novalidate>
+    <div class="lp-champ">
+      <span class="lp-icone" aria-hidden="true"></span>
+      <label class="masque" for="lp-q">Chercher une tâche, une habitude, un objectif</label>
+      <input type="search" id="lp-q" name="q" maxlength="80" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"
+        placeholder="Sport, lecture…" aria-controls="lp-resultats" aria-describedby="lp-compte">
+      <button type="button" class="lp-effacer" data-lp="effacer" aria-label="Effacer la recherche" hidden></button>
+    </div>
+    <button type="button" class="f-ok" data-lp="fermer">Fermer</button>
+  </form>
+  <div class="lp-filtres" id="lp-filtres" role="group" aria-label="Filtres"></div>
+  <p class="f-msg" id="lp-msg" role="status" aria-live="polite"></p>
+  <p class="masque" id="lp-compte" aria-live="polite"></p>
+  <div class="lp-resultats" id="lp-resultats"></div>
+</dialog>
+
+<dialog class="feuille" id="coffre" aria-labelledby="cf-titre">
+  <div class="f-haut"><button type="button" class="f-icone" data-cf="fermer" aria-label="Fermer"></button><h2 id="cf-titre"></h2><span></span></div>
+  <p class="f-msg" id="cf-msg" role="status" aria-live="polite"></p>
+  <div class="f-corps" id="cf-corps"></div>
+</dialog>
+
+<dialog id="verrou" aria-labelledby="vr-titre" aria-describedby="vr-texte">
+  <div class="vr-corps">
+    <div class="vr-logo" id="vr-logo" aria-hidden="true"></div>
+    <h2 id="vr-titre">ASCEND est verrouillé</h2>
+    <p id="vr-texte">Make everyday matter.</p>
+    <button type="button" class="bouton" data-vr="ouvrir" id="vr-ouvrir"></button>
+    <p class="erreur" id="vr-erreur" role="alert"></p>
+    <button type="button" class="lien" data-vr="aide" id="vr-lien-aide" aria-expanded="false" aria-controls="vr-aide"></button>
+    <div class="vr-aide" id="vr-aide" hidden>
+      <p id="vr-aide-texte"></p>
+      <button type="button" class="bouton secondaire" data-vr="nouvelle">Créer une nouvelle clé</button>
+    </div>
+  </div>
+</dialog>
+
+<input type="file" id="fichier-import" accept="application/json,.json" hidden>
+<script>
+/*@JS@*/
+</script>
+</body>
+</html>
