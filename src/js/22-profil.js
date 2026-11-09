@@ -11,8 +11,8 @@
         <span class="embleme-p" aria-hidden="true">${embleme(P.id)}</span>
       </div>
       <fieldset><legend>Toi</legend><div class="groupe">
-        <label class="rang"><span>Prénom</span><input type="text" data-profil="prenom" maxlength="24" autocomplete="given-name" value="${esc(S.profil.prenom || '')}" style="max-width:55%;text-align:right;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px"></label>
-        <label class="rang"><span>Initiales</span><input type="text" data-profil="initiales" maxlength="2" autocomplete="off" value="${esc(S.profil.initiales || '')}" style="width:64px;text-align:center;text-transform:uppercase;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px"></label>
+        <label class="rang"><span>Prénom</span><input type="text" data-profil="prenom" maxlength="24" autocomplete="given-name" value="${esc(S.profil.prenom || '')}" style="max-width:55%;text-align:right;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
+        <label class="rang"><span>Initiales</span><input type="text" data-profil="initiales" maxlength="2" autocomplete="off" value="${esc(S.profil.initiales || '')}" style="width:64px;text-align:center;text-transform:uppercase;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
       </div></fieldset>
       <fieldset><legend>Ton univers</legend><div class="groupe">
         <button type="button" class="rang" data-p="categories"><span><span class="ic">🗂️</span><span>Catégories<span class="sous">${S.categories.filter(c => c.active).length} actives · points et objectifs par semaine</span></span></span><span class="val">${ICONE.droite}</span></button>

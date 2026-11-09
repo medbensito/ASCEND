@@ -30,7 +30,9 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html, body { margin: 0; height: 100%; }
+html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
+/* Une app, pas une page : on ne pince pas pour zoomer, le double toucher ne zoome pas */
+html { touch-action: pan-x pan-y; }
 body {
   font-family: var(--police);
   color: var(--texte);
@@ -54,9 +56,9 @@ button:disabled { cursor: default; }
 h1, h2, h3, p { margin: 0; }
 
 /* ===== Structure : écran + onglets du bas ===== */
-.app { height: 100vh; height: 100dvh; display: grid; grid-template-rows: minmax(0, 1fr) auto; max-width: 640px; margin: 0 auto; }
+.app { height: 100vh; height: 100dvh; width: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; max-width: 640px; margin: 0 auto; overflow: hidden; }
 .ecran { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; outline: none;
-  padding: calc(var(--haut-sur) + 18px) 18px 28px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+  padding: calc(var(--haut-sur) + 18px) max(18px, env(safe-area-inset-right)) 28px max(18px, env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .ecran > * { flex-shrink: 0; }
 .ecran.plein { overflow: hidden; padding-bottom: 0; }
 .ecran.plein > .cal-jour { flex-shrink: 1; }
@@ -142,10 +144,11 @@ h1, h2, h3, p { margin: 0; }
 .puce-cat { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 6px; vertical-align: 1px; }
 
 /* ===== Toast ===== */
-.toast { position: fixed; left: 50%; top: calc(var(--haut-sur) + 12px); transform: translate(-50%, -140%); z-index: 50; max-width: min(92vw, 520px);
+.toast { position: fixed; left: 50%; top: calc(var(--haut-sur) + 12px); transform: translate(-50%, calc(-100% - 40px)); z-index: 50; max-width: min(92vw, 520px);
   background: rgba(24, 27, 66, .96); border: 1px solid var(--trait-fort); color: var(--texte); padding: 12px 16px; border-radius: 14px; font-weight: 600; font-size: 14px;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, .45); transition: transform .3s ease; pointer-events: none; text-align: center; }
-.toast.visible { transform: translate(-50%, 0); }
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .45); transition: transform .3s ease, opacity .3s ease, visibility .3s; pointer-events: none; text-align: center; opacity: 0; visibility: hidden; }
+.toast:empty { display: none; }
+.toast.visible { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
 
 /* ===== Lancement ===== */
 .lancement { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: var(--fond);

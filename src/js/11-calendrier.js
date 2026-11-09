@@ -144,3 +144,48 @@
       <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>
     </div>`;
   }
+
+  // ---------- Paysage : le calendrier seul, en plein écran (la vue en cours, en grand) ----------
+  const MQ_PAYSAGE = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
+  const paysage = () => MQ_PAYSAGE.matches;
+  function moisPaysage() {
+    const k = U.date, d = parse(k), auj = aujourdhui();
+    const debut = lundiDe(dk(new Date(d.getFullYear(), d.getMonth(), 1)));
+    const jours = [];
+    for (let i = 0; i < 42; i++) { const j = decaler(debut, i); if (i === 35 && j.slice(0, 7) !== k.slice(0, 7)) break; jours.push(j); }
+    const rangs = jours.length / 7;
+    // Combien de tâches tiennent dans une case : le numéro du jour (et « +N » à côté), puis une ligne par tâche
+    const place = Math.max(1, Math.floor(((window.innerHeight - 78) / rangs - 4 - 8 - 18) / 17));
+    const cases = jours.map(j => {
+      const occs = duJour(j), charge = minutesPrevues(j) > S.reglages.plafond;
+      const montrees = occs.slice(0, place);
+      const reste = occs.length - montrees.length;
+      return `<button type="button" class="case-m${j.slice(0, 7) !== k.slice(0, 7) ? ' dehors' : ''}${j === auj ? ' auj' : ''}"${j === k ? ' aria-current="date"' : ''} data-ouvrir-jour="${j}" data-focus="pm${j}"
+          aria-label="${jourLong(j)}${j === auj ? ", aujourd'hui" : ''}${occs.length ? ' : ' + occs.map(o => `${o.el.titre} à ${hhmm(o.el.debut)}${o.fait ? ', faite' : ''}`).join(' ; ') : ', rien de prévu'}${charge ? ', journée chargée' : ''}. Voir la journée">
+        <span class="n" aria-hidden="true"><span>${parse(j).getDate()}</span>${reste ? `<em class="encore">+${reste}</em>` : ''}${charge ? '<i>⚠︎</i>' : ''}</span>
+        ${montrees.map(o => `<span class="chip${o.fait ? ' fait' : ''}" style="--c:${look(o.el).couleur}" aria-hidden="true">${o.el.type === 'tache' ? '' : look(o.el).icone + ' '}${esc(o.el.titre)}</span>`).join('')}</button>`;
+    }).join('');
+    return `<div class="pay-mois" style="--rangs:${rangs}" data-balayage="mois">${JOURS_LONGS.map(n => `<span class="jsem" aria-hidden="true">${n.slice(0, 3)}</span>`).join('')}${cases}</div>`;
+  }
+  function vuePaysage() {
+    const jour = S.vueCal === 'jour', k = U.date, auj = aujourdhui();
+    const titre = jour ? (k === auj ? "Aujourd'hui · " : '') + jourLong(k) : cap(parse(k).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
+    const m = minutesPrevues(k), pl = S.reglages.plafond;
+    return `<h1 class="masque">Calendrier</h1>
+      <div class="pay"${jour ? ' data-balayage="jour"' : ''}>
+        <div class="pay-barre">
+          <button type="button" class="icone-bouton" data-nav="-1" aria-label="${jour ? 'Jour précédent' : 'Mois précédent'}" data-focus="nav-1">${ICONE.gauche}</button>
+          <h2 aria-live="polite">${esc(titre)}</h2>
+          <button type="button" class="icone-bouton" data-nav="1" aria-label="${jour ? 'Jour suivant' : 'Mois suivant'}" data-focus="nav1">${ICONE.droite}</button>
+          ${jour ? `<div class="jauge${m > pl ? ' depasse' : ''}" role="img" aria-label="${duree(m)} de tâches prévues sur un plafond de ${duree(pl)}${m > pl ? ' : journée chargée' : ''}"><small aria-hidden="true"><b>${duree(m)}</b> / ${duree(pl)}</small><span class="barre" aria-hidden="true"><i style="width:${Math.min(100, m / pl * 100)}%"></i></span></div>` : ''}
+          <div class="segments" role="group" aria-label="Affichage">
+            <button type="button" aria-pressed="${!jour}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
+            <button type="button" aria-pressed="${jour}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+          </div>
+          <button type="button" class="icone-bouton" data-action="aujourdhui" aria-label="Aujourd'hui" data-focus="auj">${ICONE.calendrier}</button>
+          <button type="button" class="icone-bouton" data-action="chercher" aria-label="Chercher" data-focus="chercher">${ICONE.loupe}</button>
+        </div>
+        ${jour ? `<div class="defile" data-defile="jour">${grille([k])}</div>
+          <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>` : moisPaysage()}
+      </div>`;
+  }

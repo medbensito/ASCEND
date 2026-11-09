@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>ASCEND</title>
 <meta name="description" content="ASCEND : ton développement personnel et ton JOMO, jour après jour. Make everyday matter.">
 <meta name="theme-color" content="#050616">
@@ -47,7 +47,9 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html, body { margin: 0; height: 100%; }
+html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
+/* Une app, pas une page : on ne pince pas pour zoomer, le double toucher ne zoome pas */
+html { touch-action: pan-x pan-y; }
 body {
   font-family: var(--police);
   color: var(--texte);
@@ -71,9 +73,9 @@ button:disabled { cursor: default; }
 h1, h2, h3, p { margin: 0; }
 
 /* ===== Structure : écran + onglets du bas ===== */
-.app { height: 100vh; height: 100dvh; display: grid; grid-template-rows: minmax(0, 1fr) auto; max-width: 640px; margin: 0 auto; }
+.app { height: 100vh; height: 100dvh; width: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; max-width: 640px; margin: 0 auto; overflow: hidden; }
 .ecran { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; outline: none;
-  padding: calc(var(--haut-sur) + 18px) 18px 28px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+  padding: calc(var(--haut-sur) + 18px) max(18px, env(safe-area-inset-right)) 28px max(18px, env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .ecran > * { flex-shrink: 0; }
 .ecran.plein { overflow: hidden; padding-bottom: 0; }
 .ecran.plein > .cal-jour { flex-shrink: 1; }
@@ -159,10 +161,11 @@ h1, h2, h3, p { margin: 0; }
 .puce-cat { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 6px; vertical-align: 1px; }
 
 /* ===== Toast ===== */
-.toast { position: fixed; left: 50%; top: calc(var(--haut-sur) + 12px); transform: translate(-50%, -140%); z-index: 50; max-width: min(92vw, 520px);
+.toast { position: fixed; left: 50%; top: calc(var(--haut-sur) + 12px); transform: translate(-50%, calc(-100% - 40px)); z-index: 50; max-width: min(92vw, 520px);
   background: rgba(24, 27, 66, .96); border: 1px solid var(--trait-fort); color: var(--texte); padding: 12px 16px; border-radius: 14px; font-weight: 600; font-size: 14px;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, .45); transition: transform .3s ease; pointer-events: none; text-align: center; }
-.toast.visible { transform: translate(-50%, 0); }
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .45); transition: transform .3s ease, opacity .3s ease, visibility .3s; pointer-events: none; text-align: center; opacity: 0; visibility: hidden; }
+.toast:empty { display: none; }
+.toast.visible { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
 
 /* ===== Lancement ===== */
 .lancement { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: var(--fond);
@@ -378,7 +381,7 @@ dialog.feuille > form { display: flex; flex-direction: column; min-height: 0; fl
 .rang .ic { width: 28px; height: 28px; display: grid; place-items: center; color: var(--doux); flex: none; font-size: 18px; }
 .rang .ic svg { width: 22px; height: 22px; }
 .rang input[type="date"], .rang input[type="time"], .rang select, .rang input[type="number"] { border: 1px solid var(--trait-fort); background: rgba(10, 12, 34, .8); border-radius: 10px; padding: 8px 10px;
-  color: var(--texte); font-size: 15px; min-height: 40px; color-scheme: dark; max-width: 58%; }
+  color: var(--texte); font-size: 16px; min-height: 40px; color-scheme: dark; max-width: 58%; }
 .rang input[type="number"] { width: 84px; text-align: center; }
 .rang select { -webkit-appearance: none; appearance: none; padding-right: 28px; background-image: linear-gradient(45deg, transparent 50%, #a3a8d4 50%), linear-gradient(135deg, #a3a8d4 50%, transparent 50%);
   background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
@@ -464,6 +467,7 @@ dialog.minuteur[open] { display: grid; }
 
 /* ===== Profil ===== */
 .profil-tete { display: flex; align-items: center; gap: 14px; }
+input, select, textarea { font-size: 16px; }
 .profil-tete .avatar { width: 64px; height: 64px; font-size: 20px; }
 .profil-tete .embleme-p { width: 64px; height: 64px; margin-left: auto; }
 fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 10px; }
@@ -503,6 +507,52 @@ dialog#verrou::backdrop { background: var(--fond); }
 .vr-corps > p { color: var(--doux); font-size: 15px; }
 .vr-aide { display: grid; gap: 10px; width: 100%; }
 .vr-aide p { color: var(--doux); font-size: 14px; }
+/* ===== Paysage (téléphone tourné) : le calendrier seul, en plein écran ===== */
+html.paysage .onglets { display: none; }
+html.paysage .app { max-width: none; grid-template-rows: minmax(0, 1fr); }
+html.paysage .ecran { overflow: hidden; gap: 0;
+  padding: 6px max(14px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 4px) max(14px, env(safe-area-inset-left)); }
+.pay { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.pay-barre { flex: none; display: flex; align-items: center; gap: 8px; min-height: 46px; }
+.pay-barre h2 { flex: 1; min-width: 0; font-size: 19px; font-weight: 700; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pay-barre .icone-bouton { width: 42px; height: 42px; border-radius: 12px; }
+.pay-barre .segments { flex: none; width: 170px; padding: 3px; }
+.pay-barre .segments button { min-height: 36px; font-size: 13.5px; }
+.pay-barre .jauge { min-width: 110px; }
+/* Mois : chaque case montre ses tâches */
+.pay-mois { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: auto repeat(var(--rangs, 5), minmax(0, 1fr)); gap: 4px; touch-action: pan-y; }
+.pay-mois .jsem { text-align: center; color: var(--doux); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding-bottom: 2px; }
+.case-m { min-height: 0; overflow: hidden; display: flex; flex-direction: column; align-items: stretch; gap: 2px; padding: 4px 5px; border-radius: 10px; text-align: left;
+  border: 1px solid var(--trait); background: rgba(16, 18, 50, .75); color: var(--texte); }
+.case-m .n { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 16px; display: flex; justify-content: space-between; gap: 4px; }
+.case-m .n i { font-style: normal; color: var(--orange); font-size: 11px; }
+.case-m.dehors { background: rgba(10, 12, 34, .5); }
+.case-m.dehors .n { color: var(--pale); }
+.case-m.auj { border-color: rgba(143, 155, 255, .7); }
+.case-m.auj .n { color: #9fb0ff; }
+.case-m[aria-current="date"] .n span { background: var(--accent); color: #fff; border-radius: 8px; padding: 0 6px; box-shadow: 0 0 10px rgba(110, 100, 255, .7); }
+.case-m .chip { display: block; font-size: 12px; line-height: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding: 0 3px 0 5px; border-left: 3px solid var(--c); border-radius: 3px; background: color-mix(in srgb, var(--c) 16%, transparent); }
+.case-m .chip.fait { color: var(--doux); text-decoration: line-through; }
+.case-m .n .encore { font-style: normal; font-size: 11.5px; color: var(--doux); font-weight: 700; margin-left: auto; }
+.case-m .n i { margin-left: 2px; }
+/* Jour : la grille prend toute la largeur */
+html.paysage .defile { margin: 0; padding: 0 0 0 12px; }
+html.paysage .bas-espace { height: 64px; }
+html.paysage .fab { right: 4px; bottom: 6px; width: 52px; height: 52px; }
+html.paysage .bloc .b-texte b { font-size: 14px; }
+html.paysage .bloc .b-texte small { font-size: 12px; }
+/* Feuilles et minuteur, téléphone couché */
+@media (orientation: landscape) and (max-height: 520px) {
+  dialog.feuille { max-height: 96vh; max-height: 96dvh; }
+  dialog.feuille.haute { height: 96vh; height: 96dvh; }
+  .f-corps, .f-pied, .f-haut { padding-left: max(18px, env(safe-area-inset-left)); padding-right: max(18px, env(safe-area-inset-right)); }
+  dialog.minuteur { overflow-y: auto; }
+  .m-corps { grid-template-rows: auto auto auto; gap: 10px; padding-top: 10px; }
+  .m-anneau { width: min(52vh, 220px); }
+  .m-anneau .temps b { font-size: 44px; }
+  .boutons { grid-auto-flow: column; }
+}
 
 </style>
 </head>
@@ -1508,6 +1558,51 @@ dialog#verrou::backdrop { background: var(--fond); }
       <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>
     </div>`;
   }
+
+  // ---------- Paysage : le calendrier seul, en plein écran (la vue en cours, en grand) ----------
+  const MQ_PAYSAGE = window.matchMedia('(orientation: landscape) and (max-height: 520px)');
+  const paysage = () => MQ_PAYSAGE.matches;
+  function moisPaysage() {
+    const k = U.date, d = parse(k), auj = aujourdhui();
+    const debut = lundiDe(dk(new Date(d.getFullYear(), d.getMonth(), 1)));
+    const jours = [];
+    for (let i = 0; i < 42; i++) { const j = decaler(debut, i); if (i === 35 && j.slice(0, 7) !== k.slice(0, 7)) break; jours.push(j); }
+    const rangs = jours.length / 7;
+    // Combien de tâches tiennent dans une case : le numéro du jour (et « +N » à côté), puis une ligne par tâche
+    const place = Math.max(1, Math.floor(((window.innerHeight - 78) / rangs - 4 - 8 - 18) / 17));
+    const cases = jours.map(j => {
+      const occs = duJour(j), charge = minutesPrevues(j) > S.reglages.plafond;
+      const montrees = occs.slice(0, place);
+      const reste = occs.length - montrees.length;
+      return `<button type="button" class="case-m${j.slice(0, 7) !== k.slice(0, 7) ? ' dehors' : ''}${j === auj ? ' auj' : ''}"${j === k ? ' aria-current="date"' : ''} data-ouvrir-jour="${j}" data-focus="pm${j}"
+          aria-label="${jourLong(j)}${j === auj ? ", aujourd'hui" : ''}${occs.length ? ' : ' + occs.map(o => `${o.el.titre} à ${hhmm(o.el.debut)}${o.fait ? ', faite' : ''}`).join(' ; ') : ', rien de prévu'}${charge ? ', journée chargée' : ''}. Voir la journée">
+        <span class="n" aria-hidden="true"><span>${parse(j).getDate()}</span>${reste ? `<em class="encore">+${reste}</em>` : ''}${charge ? '<i>⚠︎</i>' : ''}</span>
+        ${montrees.map(o => `<span class="chip${o.fait ? ' fait' : ''}" style="--c:${look(o.el).couleur}" aria-hidden="true">${o.el.type === 'tache' ? '' : look(o.el).icone + ' '}${esc(o.el.titre)}</span>`).join('')}</button>`;
+    }).join('');
+    return `<div class="pay-mois" style="--rangs:${rangs}" data-balayage="mois">${JOURS_LONGS.map(n => `<span class="jsem" aria-hidden="true">${n.slice(0, 3)}</span>`).join('')}${cases}</div>`;
+  }
+  function vuePaysage() {
+    const jour = S.vueCal === 'jour', k = U.date, auj = aujourdhui();
+    const titre = jour ? (k === auj ? "Aujourd'hui · " : '') + jourLong(k) : cap(parse(k).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
+    const m = minutesPrevues(k), pl = S.reglages.plafond;
+    return `<h1 class="masque">Calendrier</h1>
+      <div class="pay"${jour ? ' data-balayage="jour"' : ''}>
+        <div class="pay-barre">
+          <button type="button" class="icone-bouton" data-nav="-1" aria-label="${jour ? 'Jour précédent' : 'Mois précédent'}" data-focus="nav-1">${ICONE.gauche}</button>
+          <h2 aria-live="polite">${esc(titre)}</h2>
+          <button type="button" class="icone-bouton" data-nav="1" aria-label="${jour ? 'Jour suivant' : 'Mois suivant'}" data-focus="nav1">${ICONE.droite}</button>
+          ${jour ? `<div class="jauge${m > pl ? ' depasse' : ''}" role="img" aria-label="${duree(m)} de tâches prévues sur un plafond de ${duree(pl)}${m > pl ? ' : journée chargée' : ''}"><small aria-hidden="true"><b>${duree(m)}</b> / ${duree(pl)}</small><span class="barre" aria-hidden="true"><i style="width:${Math.min(100, m / pl * 100)}%"></i></span></div>` : ''}
+          <div class="segments" role="group" aria-label="Affichage">
+            <button type="button" aria-pressed="${!jour}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
+            <button type="button" aria-pressed="${jour}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+          </div>
+          <button type="button" class="icone-bouton" data-action="aujourdhui" aria-label="Aujourd'hui" data-focus="auj">${ICONE.calendrier}</button>
+          <button type="button" class="icone-bouton" data-action="chercher" aria-label="Chercher" data-focus="chercher">${ICONE.loupe}</button>
+        </div>
+        ${jour ? `<div class="defile" data-defile="jour">${grille([k])}</div>
+          <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>` : moisPaysage()}
+      </div>`;
+  }
   // ---------- Objectifs : habitudes et long terme ----------
   function joursTexte(h) {
     const j = h.jours.slice().sort();
@@ -2211,8 +2306,8 @@ dialog#verrou::backdrop { background: var(--fond); }
         <span class="embleme-p" aria-hidden="true">${embleme(P.id)}</span>
       </div>
       <fieldset><legend>Toi</legend><div class="groupe">
-        <label class="rang"><span>Prénom</span><input type="text" data-profil="prenom" maxlength="24" autocomplete="given-name" value="${esc(S.profil.prenom || '')}" style="max-width:55%;text-align:right;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px"></label>
-        <label class="rang"><span>Initiales</span><input type="text" data-profil="initiales" maxlength="2" autocomplete="off" value="${esc(S.profil.initiales || '')}" style="width:64px;text-align:center;text-transform:uppercase;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px"></label>
+        <label class="rang"><span>Prénom</span><input type="text" data-profil="prenom" maxlength="24" autocomplete="given-name" value="${esc(S.profil.prenom || '')}" style="max-width:55%;text-align:right;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
+        <label class="rang"><span>Initiales</span><input type="text" data-profil="initiales" maxlength="2" autocomplete="off" value="${esc(S.profil.initiales || '')}" style="width:64px;text-align:center;text-transform:uppercase;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
       </div></fieldset>
       <fieldset><legend>Ton univers</legend><div class="groupe">
         <button type="button" class="rang" data-p="categories"><span><span class="ic">🗂️</span><span>Catégories<span class="sous">${S.categories.filter(c => c.active).length} actives · points et objectifs par semaine</span></span></span><span class="val">${ICONE.droite}</span></button>
@@ -3080,10 +3175,13 @@ dialog#verrou::backdrop { background: var(--fond); }
     const ancien = $('#ecran .defile');
     if (ancien) U.defile[ancien.dataset.defile] = ancien.scrollTop;
     if (U.recentrer) { U.defile = {}; U.recentrer = false; }
-    const plein = U.onglet === 'calendrier' && S.vueCal === 'jour';
+    // Téléphone couché : le calendrier seul, quel que soit l'onglet ; redressé, on retrouve l'onglet
+    const couche = paysage();
+    document.documentElement.classList.toggle('paysage', couche);
+    const plein = couche || (U.onglet === 'calendrier' && S.vueCal === 'jour');
     E.classList.toggle('plein', plein);
     const haut = E.scrollTop;
-    E.innerHTML = { accueil: vueAccueil, calendrier: vueCalendrier, objectifs: vueObjectifs, progression: vueProgression }[U.onglet]();
+    E.innerHTML = couche ? vuePaysage() : { accueil: vueAccueil, calendrier: vueCalendrier, objectifs: vueObjectifs, progression: vueProgression }[U.onglet]();
     if (U.garderDefilement) E.scrollTop = haut;
     U.garderDefilement = false;
     renderOnglets();
@@ -3253,7 +3351,7 @@ dialog#verrou::backdrop { background: var(--fond); }
     const cols = e.target.closest('.colonnes');
     if (!cols) {
       // Ailleurs : seul le balayage horizontal compte (grille du mois, vue Jour)
-      const zone = e.target.closest('[data-balayage], .cal-jour');
+      const zone = e.target.closest('[data-balayage], .cal-jour, .pay');
       if (zone) G = { id: e.pointerId, depart: e, x0: e.clientX, y0: e.clientY, mode: 'attente', libreSeul: true, tactile };
       return;
     }
@@ -3280,7 +3378,7 @@ dialog#verrou::backdrop { background: var(--fond); }
     if (actifG()) { terminerG(); return; }
     const dx = e.clientX - G.x0, dy = e.clientY - G.y0, g = G;
     G = null;
-    if (g.tactile && g.mode === 'libre' && Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy) && U.onglet === 'calendrier') { U.avaler = Date.now(); naviguer(dx < 0 ? 1 : -1); }
+    if (g.tactile && g.mode === 'libre' && Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy) && (U.onglet === 'calendrier' || paysage())) { U.avaler = Date.now(); naviguer(dx < 0 ? 1 : -1); }
   });
   window.addEventListener('pointercancel', e => {
     if (!G || e.pointerId !== G.id) return;
@@ -3353,7 +3451,7 @@ dialog#verrou::backdrop { background: var(--fond); }
     const t = e.target;
     if (t.closest && t.closest('input, select, textarea')) return;
     if ((e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) || ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'k' || e.key === 'K'))) { e.preventDefault(); ouvrirLoupe(); return; }
-    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && U.onglet === 'calendrier' && !e.altKey && !e.metaKey && !e.ctrlKey && !(t.closest && t.closest('.segments, .onglets'))) {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && (U.onglet === 'calendrier' || paysage()) && !e.altKey && !e.metaKey && !e.ctrlKey && !(t.closest && t.closest('.segments, .onglets'))) {
       e.preventDefault();
       naviguer(e.key === 'ArrowLeft' ? -1 : 1);
     }
@@ -3373,6 +3471,17 @@ dialog#verrou::backdrop { background: var(--fond); }
     synchroniser();
     planifierCoffre();
   });
+
+  // ---------- Une app, pas une page ----------
+  // Safari : pas de zoom au pincement (le réglage du viewport ne suffit pas toujours sur iPhone)
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+  // Tourner le téléphone : plein écran calendrier, ou retour à l'onglet
+  MQ_PAYSAGE.addEventListener('change', () => {
+    U.selection = null; U.brouillon = null;
+    delete U.defile.jour;
+    render();
+  });
+  window.addEventListener('resize', () => { if (paysage() && S.vueCal !== 'jour' && !G) render(); });
 
   // ---------- Démarrage ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {

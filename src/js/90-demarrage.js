@@ -10,10 +10,13 @@
     const ancien = $('#ecran .defile');
     if (ancien) U.defile[ancien.dataset.defile] = ancien.scrollTop;
     if (U.recentrer) { U.defile = {}; U.recentrer = false; }
-    const plein = U.onglet === 'calendrier' && S.vueCal === 'jour';
+    // Téléphone couché : le calendrier seul, quel que soit l'onglet ; redressé, on retrouve l'onglet
+    const couche = paysage();
+    document.documentElement.classList.toggle('paysage', couche);
+    const plein = couche || (U.onglet === 'calendrier' && S.vueCal === 'jour');
     E.classList.toggle('plein', plein);
     const haut = E.scrollTop;
-    E.innerHTML = { accueil: vueAccueil, calendrier: vueCalendrier, objectifs: vueObjectifs, progression: vueProgression }[U.onglet]();
+    E.innerHTML = couche ? vuePaysage() : { accueil: vueAccueil, calendrier: vueCalendrier, objectifs: vueObjectifs, progression: vueProgression }[U.onglet]();
     if (U.garderDefilement) E.scrollTop = haut;
     U.garderDefilement = false;
     renderOnglets();
@@ -183,7 +186,7 @@
     const cols = e.target.closest('.colonnes');
     if (!cols) {
       // Ailleurs : seul le balayage horizontal compte (grille du mois, vue Jour)
-      const zone = e.target.closest('[data-balayage], .cal-jour');
+      const zone = e.target.closest('[data-balayage], .cal-jour, .pay');
       if (zone) G = { id: e.pointerId, depart: e, x0: e.clientX, y0: e.clientY, mode: 'attente', libreSeul: true, tactile };
       return;
     }
@@ -210,7 +213,7 @@
     if (actifG()) { terminerG(); return; }
     const dx = e.clientX - G.x0, dy = e.clientY - G.y0, g = G;
     G = null;
-    if (g.tactile && g.mode === 'libre' && Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy) && U.onglet === 'calendrier') { U.avaler = Date.now(); naviguer(dx < 0 ? 1 : -1); }
+    if (g.tactile && g.mode === 'libre' && Math.abs(dx) > 60 && Math.abs(dx) > 2 * Math.abs(dy) && (U.onglet === 'calendrier' || paysage())) { U.avaler = Date.now(); naviguer(dx < 0 ? 1 : -1); }
   });
   window.addEventListener('pointercancel', e => {
     if (!G || e.pointerId !== G.id) return;
@@ -283,7 +286,7 @@
     const t = e.target;
     if (t.closest && t.closest('input, select, textarea')) return;
     if ((e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) || ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'k' || e.key === 'K'))) { e.preventDefault(); ouvrirLoupe(); return; }
-    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && U.onglet === 'calendrier' && !e.altKey && !e.metaKey && !e.ctrlKey && !(t.closest && t.closest('.segments, .onglets'))) {
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && (U.onglet === 'calendrier' || paysage()) && !e.altKey && !e.metaKey && !e.ctrlKey && !(t.closest && t.closest('.segments, .onglets'))) {
       e.preventDefault();
       naviguer(e.key === 'ArrowLeft' ? -1 : 1);
     }
@@ -303,6 +306,17 @@
     synchroniser();
     planifierCoffre();
   });
+
+  // ---------- Une app, pas une page ----------
+  // Safari : pas de zoom au pincement (le réglage du viewport ne suffit pas toujours sur iPhone)
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+  // Tourner le téléphone : plein écran calendrier, ou retour à l'onglet
+  MQ_PAYSAGE.addEventListener('change', () => {
+    U.selection = null; U.brouillon = null;
+    delete U.defile.jour;
+    render();
+  });
+  window.addEventListener('resize', () => { if (paysage() && S.vueCal !== 'jour' && !G) render(); });
 
   // ---------- Démarrage ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
