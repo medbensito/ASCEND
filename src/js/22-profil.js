@@ -24,7 +24,8 @@
       <fieldset id="r-rappels">${htmlRappels()}</fieldset>
       <fieldset id="r-coffre">${htmlCoffre()}</fieldset>
       <p class="note" style="text-align:center">ASCEND · édition ${EDITION} · Make everyday matter.</p>
-      <p class="note diag" id="p-diag">${esc(mesuresEcran())}${derniereFeuille ? '<br>' + esc(derniereFeuille) : ''}</p>`;
+      <p class="note diag" id="p-diag">${esc(mesuresEcran())}${derniereFeuille ? '<br>' + esc(derniereFeuille) : ''}</p>
+      <button type="button" class="lien" data-p="copier-mesures" style="justify-self:center">Copier les mesures</button>`;
   }
   // Mesures de l'écran, pour comprendre un affichage décalé sur un iPhone qu'on n'a pas sous la main
   function mesuresEcran() {
@@ -56,6 +57,11 @@
   PD.addEventListener('click', e => {
     const b = e.target.closest('[data-p]');
     if (b && b.dataset.p === 'categories') ouvrirCategories();
+    if (b && b.dataset.p === 'copier-mesures') {
+      const t = `ASCEND édition ${EDITION} · ` + $('#p-diag').innerText.replace(/\n/g, ' · ');
+      const fini = ok => dire(ok ? 'Mesures copiées : colle-les dans la conversation avec Claude.' : 'Copie impossible : fais une capture d\'écran de ces lignes.');
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => fini(true), () => fini(false)); else fini(false);
+    }
     const r = e.target.closest('[data-r]');
     if (r && r.dataset.r === 'exporter') exporter();
     if (r && r.dataset.r === 'importer') $('#fichier-import').click();

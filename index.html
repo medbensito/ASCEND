@@ -360,6 +360,23 @@ dialog::backdrop { background: rgba(2, 3, 14, .62); -webkit-backdrop-filter: blu
 /* Les formulaires ne forment pas de boîte : en-tête, corps et pied sont posés directement dans la feuille,
    comme le Profil (un formulaire en flex imbriqué s'affichait mal sur iPhone) */
 #form-tache, #form-cat, #form-hab, #form-obj { display: contents; }
+/* Sur téléphone, créer ou modifier une tâche, un objectif, une habitude ou une catégorie ouvre une page entière :
+   toute la fenêtre se voit, de l'en-tête (sous l'heure et l'encoche) au bouton du bas (au-dessus du clavier s'il est sorti) */
+@media (max-width: 639px), (orientation: landscape) and (max-height: 520px) {
+  html dialog.feuille.page { top: var(--vv-haut, 0px); bottom: var(--vv-bas, 0px); left: 0; right: 0; width: 100%; max-width: none; height: auto; max-height: none;
+    margin: 0; border: 0; border-radius: 0; box-shadow: none; background: radial-gradient(120% 50% at 110% -10%, rgba(123, 77, 255, .22), transparent 60%), linear-gradient(180deg, #0d1034, #070818 45%); }
+  html dialog.feuille.page::before { display: none; }
+  html dialog.feuille.page[open] { animation: page-monte .28s cubic-bezier(.2, .8, .2, 1); }
+  html dialog.feuille.page .f-haut { padding-top: calc(var(--haut-sur) + 8px); border-bottom: 1px solid var(--trait); }
+  html dialog.feuille.page .f-corps { padding-top: 14px; }
+  html dialog.feuille.page::backdrop { background: #050616; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+/* Téléphone couché : le ✓ de l'en-tête suffit, le grand bouton du bas laisse la place au contenu */
+@media (orientation: landscape) and (max-height: 520px) {
+  html dialog.feuille.page .f-pied { display: none; }
+  html dialog.feuille.page .f-haut { padding-top: 4px; padding-bottom: 4px; }
+}
+@keyframes page-monte { from { transform: translateY(60px); opacity: 0; } to { transform: none; opacity: 1; } }
 .f-haut { flex: none; display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; padding: 6px 10px 8px; }
 .f-haut h2 { text-align: center; font-size: 18px; font-weight: 700; }
 .f-icone { width: 44px; height: 44px; border: 0; background: none; color: var(--texte); display: grid; place-items: center; padding: 0; border-radius: 50%; }
@@ -572,7 +589,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="lancement" id="lancement" aria-hidden="true"></div>
 
-<dialog class="feuille" id="tache" aria-labelledby="t-titre">
+<dialog class="feuille page" id="tache" aria-labelledby="t-titre">
   <form id="form-tache" novalidate></form>
 </dialog>
 
@@ -591,15 +608,15 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   <div class="f-corps" id="cs-corps"></div>
 </dialog>
 
-<dialog class="feuille" id="categorie" aria-labelledby="ct-titre">
+<dialog class="feuille page" id="categorie" aria-labelledby="ct-titre">
   <form id="form-cat" novalidate></form>
 </dialog>
 
-<dialog class="feuille" id="habitude" aria-labelledby="h-titre">
+<dialog class="feuille page" id="habitude" aria-labelledby="h-titre">
   <form id="form-hab" novalidate></form>
 </dialog>
 
-<dialog class="feuille haute" id="objectif" aria-labelledby="o-titre">
+<dialog class="feuille haute page" id="objectif" aria-labelledby="o-titre">
   <form id="form-obj" novalidate></form>
 </dialog>
 
@@ -660,7 +677,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 6;                       // édition de l'app, comme le cache du service worker (ascend-6)
+  const EDITION = 7;                       // édition de l'app, comme le cache du service worker (ascend-7)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -2352,7 +2369,8 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       <fieldset id="r-rappels">${htmlRappels()}</fieldset>
       <fieldset id="r-coffre">${htmlCoffre()}</fieldset>
       <p class="note" style="text-align:center">ASCEND · édition ${EDITION} · Make everyday matter.</p>
-      <p class="note diag" id="p-diag">${esc(mesuresEcran())}${derniereFeuille ? '<br>' + esc(derniereFeuille) : ''}</p>`;
+      <p class="note diag" id="p-diag">${esc(mesuresEcran())}${derniereFeuille ? '<br>' + esc(derniereFeuille) : ''}</p>
+      <button type="button" class="lien" data-p="copier-mesures" style="justify-self:center">Copier les mesures</button>`;
   }
   // Mesures de l'écran, pour comprendre un affichage décalé sur un iPhone qu'on n'a pas sous la main
   function mesuresEcran() {
@@ -2384,6 +2402,11 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   PD.addEventListener('click', e => {
     const b = e.target.closest('[data-p]');
     if (b && b.dataset.p === 'categories') ouvrirCategories();
+    if (b && b.dataset.p === 'copier-mesures') {
+      const t = `ASCEND édition ${EDITION} · ` + $('#p-diag').innerText.replace(/\n/g, ' · ');
+      const fini = ok => dire(ok ? 'Mesures copiées : colle-les dans la conversation avec Claude.' : 'Copie impossible : fais une capture d\'écran de ces lignes.');
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => fini(true), () => fini(false)); else fini(false);
+    }
     const r = e.target.closest('[data-r]');
     if (r && r.dataset.r === 'exporter') exporter();
     if (r && r.dataset.r === 'importer') $('#fichier-import').click();
