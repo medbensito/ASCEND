@@ -21,7 +21,7 @@
   }
   const libreA = (k, debut, fin, sans) => !duJour(k).some(o => o.cle !== sans && debut < o.el.fin && fin > o.el.debut);
   // Propositions pour reporter : aujourd'hui (même heure si elle est encore à venir et libre, sinon le prochain créneau libre),
-  // demain (même heure si libre, sinon le premier créneau libre)
+  // demain (même heure si libre, sinon le créneau libre qui suit)
   function propositions(o) {
     const auj = aujourdhui(), dem = decaler(auj, 1), d = o.el.debut, f = o.el.fin, du = f - d;
     const tot = Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas;
@@ -146,3 +146,53 @@
   // La feuille d'une tâche ouverte par « Choisir… » se ferme : la liste se met à jour
   $('#tache').addEventListener('close', () => { if (PF.open) setTimeout(() => renderPasFaites(), 0); });
   PF.addEventListener('close', () => { P.ouverte = null; render(); });
+
+  // ---------- Jour difficile ----------
+  async function jourDifficile() {
+    const auj = aujourdhui();
+    if (difficilesSemaine(auj) >= CONFIG.difficilesParSemaine) return dire(`Déjà ${CONFIG.difficilesParSemaine} jours difficiles cette semaine. Fais ce que tu peux : ta série pardonne un jour raté.`);
+    const oui = await demander('Journée difficile ?', `Ça arrive. Aujourd'hui, tes habitudes passent en version minimale : moitié des points, et ta série continue. ${CONFIG.difficilesParSemaine} jours par semaine au plus.`,
+      [{ texte: 'Passer en version mini', valeur: true }, { texte: 'Non, ça va', valeur: false, clair: true }]);
+    if (!oui) return;
+    S.difficiles[auj] = true;
+    sauver();
+    $('#ecran').scrollTop = 0;
+    render('dur');
+    dire('Jour difficile : le minimum suffit. 🌧️');
+  }
+  // Reporter à demain les tâches d'aujourd'hui pas encore commencées (même heure si libre, sinon le créneau libre qui suit)
+  function allegerJournee() {
+    const auj = aujourdhui(), dem = decaler(auj, 1);
+    let n = 0;
+    duJour(auj).filter(o => o.el.type === 'tache' && !o.fait && o.el.debut > minNow()).forEach(o => {
+      const d = o.el.debut, f = o.el.fin;
+      const p = libreA(dem, d, f, o.cle) ? { debut: d, fin: f } : (creneauLibre(dem, f - d, o.cle, d) || creneauLibre(dem, f - d, o.cle));
+      if (!p) return;
+      appliquer(o, { date: dem, debut: p.debut, fin: p.fin }, 'une');
+      n++;
+    });
+    sauver();
+    U.garderDefilement = true;
+    render('dur');
+    dire(n ? `${pluriel(n, 'tâche reportée', 'tâches reportées')} à demain. Souffle. 🌿` : 'Demain est déjà plein : rien n\'a bougé.');
+  }
+
+  // ---------- Retour après une absence : sans reproche ----------
+  let accueilEnCours = false;
+  async function accueillir() {
+    if (accueilEnCours || V.etat !== 'ouvert' || document.querySelector('dialog[open]')) return;
+    const auj = aujourdhui(), absence = S.vu ? ecart(S.vu, auj) : 0;
+    if (S.vu !== auj) { S.vu = auj; ecrire(); }
+    if (absence >= CONFIG.absence) {
+      accueilEnCours = true;
+      const n = pasFaites().length, best = S.meilleureSerie;
+      const texte = `${absence} jours loin d'ASCEND : ça arrive à tout le monde, et rien n'est perdu. Tes ${nombre(S.points)} points sont là${best ? `, ta meilleure série (${pluriel(best, 'jour')}) aussi` : ''}. Ce qui compte, c'est aujourd'hui : une seule chose suffit pour repartir.`
+        + (n ? ` ${pluriel(n, 'tâche t\'attendait', 'tâches t\'attendaient')} : tu peux les laisser partir d'un geste.` : '');
+      const r = await demander(`Content de te revoir${S.profil.prenom ? ', ' + S.profil.prenom : ''}`, texte,
+        n ? [{ texte: 'Repartir à neuf', valeur: 'neuf' }, { texte: 'Voir ce que j\'ai manqué', valeur: 'voir', clair: true }] : [{ texte: 'C\'est reparti', valeur: 'ok' }]);
+      accueilEnCours = false;
+      if (r === 'neuf') { pasFaites().forEach(o => { S.partis[o.cle] = auj; }); sauver(); render(); dire('Page tournée. On repart d\'ici. 🍃'); }
+      if (r === 'voir') return ouvrirPasFaites();
+    }
+    proposerBilan();
+  }

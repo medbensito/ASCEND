@@ -105,3 +105,11 @@
 .pf-fini p { color: var(--doux); font-size: 15px; display: grid; gap: 4px; }
 .pf-fini p b { color: var(--texte); font-size: 19px; }
 #bilan .pf-entree { margin-bottom: 12px; }
+
+/* ===== Jour difficile ===== */
+.difficile { display: grid; gap: 10px; padding: 16px; border-color: rgba(160, 190, 255, .3); background: linear-gradient(135deg, rgba(150, 175, 255, .14), rgba(255, 255, 255, .03)); }
+.difficile h2 { font-size: 16px; font-weight: 600; }
+.difficile p { font-size: 14px; color: var(--doux); line-height: 1.45; }
+.difficile .bouton.petit { font-size: 13.5px; padding: 0 12px; line-height: 1.15; text-align: center; }
+.dur-lien { align-self: center; margin: 6px auto 0; display: flex; color: var(--doux); min-height: 44px; }
+.etiquette .sous { color: var(--pale); font-weight: 500; }

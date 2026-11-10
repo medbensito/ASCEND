@@ -145,7 +145,7 @@
     }
     h.faits[k] = true;
     const c = cat(h.cat);
-    const pts = gagner(cle, c.points, k, 'habitude', c.id);
+    const pts = gagner(cle, ptsHabitude(h, k), k, 'habitude', c.id);
     const s = serie();
     if (s > S.meilleureSerie) S.meilleureSerie = s;
     const toutes = S.habitudes.filter(x => habitudeDue(x, k));
@@ -158,29 +158,38 @@
     if (!d.length) return null;
     return d.every(h => h.faits[k]);
   }
-  // Série actuelle : aujourd'hui compte dès qu'il est complet ; une journée ratée la casse
-  function serie() {
-    if (!S.habitudes.length) return 0;
-    const premier = S.habitudes.reduce((m, h) => (h.debut < m ? h.debut : m), '9999-12-31');
-    const auj = aujourdhui();
-    let n = jourComplet(auj) === true ? 1 : 0;
+  // Série actuelle : aujourd'hui compte dès qu'il est complet.
+  // Elle pardonne : un jour raté ne la casse pas, s'il n'y en a pas eu d'autre dans les 7 jours (il ne compte pas, c'est tout).
+  // Deux ratés en 7 jours, et elle repart de zéro.
+  function parcourirSerie(premier, etat) {
+    const auj = aujourdhui(), pardons = [];
+    let n = etat(auj) === true ? 1 : 0, dernier = null;
     for (let k = decaler(auj, -1), i = 0; k >= premier && i < 3700; k = decaler(k, -1), i++) {
-      const c = jourComplet(k);
-      if (c === false) break;
-      if (c === true) n++;
+      const c = etat(k);
+      if (c === true) { n++; continue; }
+      if (c !== false) continue;
+      if (dernier && ecart(k, dernier) < CONFIG.pardon) break;
+      dernier = k; pardons.push(k);
     }
-    return n;
+    // Un pardon tout au bout (rien de fait avant lui) n'en est pas un
+    while (pardons.length) { const k = pardons[pardons.length - 1]; let avant = false; for (let q = decaler(k, -1), i = 0; q >= premier && i < 3700; q = decaler(q, -1), i++) { const c = etat(q); if (c === true) { avant = true; break; } if (c === false) break; } if (avant) break; pardons.pop(); }
+    return { n, pardons: n ? pardons : [] };
   }
-  function serieHabitude(h) {
-    const auj = aujourdhui();
-    let n = habitudeDue(h, auj) && h.faits[auj] ? 1 : 0;
-    for (let k = decaler(auj, -1), i = 0; k >= h.debut && i < 3700; k = decaler(k, -1), i++) {
-      if (!habitudeDue(h, k)) continue;
-      if (!h.faits[k]) break;
-      n++;
-    }
-    return n;
+  function serieDetail() {
+    if (!S.habitudes.length) return { n: 0, pardons: [] };
+    return parcourirSerie(S.habitudes.reduce((m, h) => (h.debut < m ? h.debut : m), '9999-12-31'), jourComplet);
   }
+  const serie = () => serieDetail().n;
+  const serieHabitude = h => parcourirSerie(h.debut, k => habitudeDue(h, k) ? !!h.faits[k] : null).n;
+  // Le joker de la semaine est-il encore là ? (aucun jour pardonné dans les 7 derniers jours)
+  const jokerDispo = () => !serieDetail().pardons.some(k => ecart(k, aujourdhui()) < CONFIG.pardon);
+
+  // ---------- Jour difficile ----------
+  // Un mauvais jour : les habitudes passent en version minimale (moitié des points, la série continue). 2 par semaine au plus.
+  const difficile = k => !!S.difficiles[k];
+  const ptsHabitude = (h, k) => { const p = cat(h.cat).points; return difficile(k) ? Math.max(5, Math.round(p / 10) * 5) : p; };
+  const titreHabitude = (h, k) => difficile(k) ? (h.mini || h.titre + ' (version mini)') : h.titre;
+  function difficilesSemaine(k) { const l = lundiDe(k); return Object.keys(S.difficiles).filter(x => x >= l && x <= decaler(l, 6)).length; }
 
   // ---------- Objectifs à long terme ----------
   // Avancement : étapes cochées + tâches rattachées faites. Une tâche répétée compte ses fois jusqu'à l'échéance

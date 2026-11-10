@@ -700,6 +700,14 @@ html.paysage .pay:has(.ajuste) .fab { width: 46px; height: 46px; right: 2px; bot
 .pf-fini p { color: var(--doux); font-size: 15px; display: grid; gap: 4px; }
 .pf-fini p b { color: var(--texte); font-size: 19px; }
 #bilan .pf-entree { margin-bottom: 12px; }
+
+/* ===== Jour difficile ===== */
+.difficile { display: grid; gap: 10px; padding: 16px; border-color: rgba(160, 190, 255, .3); background: linear-gradient(135deg, rgba(150, 175, 255, .14), rgba(255, 255, 255, .03)); }
+.difficile h2 { font-size: 16px; font-weight: 600; }
+.difficile p { font-size: 14px; color: var(--doux); line-height: 1.45; }
+.difficile .bouton.petit { font-size: 13.5px; padding: 0 12px; line-height: 1.15; text-align: center; }
+.dur-lien { align-self: center; margin: 6px auto 0; display: flex; color: var(--doux); min-height: 44px; }
+.etiquette .sous { color: var(--pale); font-weight: 500; }
 /* ===== Refonte (édition 11) : noir profond, verre, platine, arcs de lumière ===== */
 :root {
   --fond: #050506;
@@ -994,11 +1002,14 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 12;                      // édition de l'app, comme le cache du service worker (ascend-12)
+  const EDITION = 13;                      // édition de l'app, comme le cache du service worker (ascend-13)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
   const CONFIG = {
+    pardon: 7,             // la série pardonne un jour raté tous les 7 jours
+    difficilesParSemaine: 2,
+    absence: 3,            // jours sans ouvrir l'app avant l'accueil « content de te revoir »
     heure: 60,             // px par heure dans la grille (= --H)
     pas: 15,               // minutes : les plages se calent au quart d'heure
     duree: 60,             // durée proposée pour une nouvelle plage
@@ -1046,6 +1057,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   // payes : { clé : { pts, jour, type, cat, raison? } } ; gains : { jour : { total, cats: { id: pts }, src: { type: pts } } }
   // priorites : { lundi : [{ id, titre, fait }] } (1 à 3 par semaine) ; bilanVu : lundi de la semaine où le bilan s'est ouvert de lui-même
   // partis : { clé d'une tâche pas faite : jour où on l'a laissée partir }
+  // difficiles : { jour : true } (jours difficiles : habitudes en version minimale) ; vu : dernier jour où l'app a été ouverte
   function rappelsVides() {
     return { actif: false, jeton: null, service: null, avant: true, delai: 30, matin: true, heureMatin: 8 * 60, sauvegarde: true, signature: null, majLe: null, erreur: null };
   }
@@ -1060,7 +1072,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null, partis: {},
+    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null,
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -1071,13 +1083,14 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   const estObjet = v => v && typeof v === 'object' && !Array.isArray(v);
   function nettoyer() {
     ['elements', 'habitudes', 'objectifs', 'focus'].forEach(c => { if (!Array.isArray(S[c])) S[c] = []; });
-    ['tenus', 'payes', 'gains', 'priorites', 'partis'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    ['tenus', 'payes', 'gains', 'priorites', 'partis', 'difficiles'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
     Object.keys(S.priorites).forEach(k => {
       const l = Array.isArray(S.priorites[k]) ? S.priorites[k].filter(p => p && p.id && typeof p.titre === 'string' && p.titre.trim()).slice(0, 3) : [];
       l.forEach(p => { p.titre = p.titre.slice(0, 60); p.fait = !!p.fait; });
       if (l.length && /^\d{4}-\d{2}-\d{2}$/.test(k)) S.priorites[k] = l; else delete S.priorites[k];
     });
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
+    if (typeof S.vu !== 'string') S.vu = null;
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.categories.forEach(c => {
       c.points = Math.max(0, Math.min(1000, Math.round(Number(c.points) || 0)));
@@ -1416,7 +1429,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     }
     h.faits[k] = true;
     const c = cat(h.cat);
-    const pts = gagner(cle, c.points, k, 'habitude', c.id);
+    const pts = gagner(cle, ptsHabitude(h, k), k, 'habitude', c.id);
     const s = serie();
     if (s > S.meilleureSerie) S.meilleureSerie = s;
     const toutes = S.habitudes.filter(x => habitudeDue(x, k));
@@ -1429,29 +1442,38 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (!d.length) return null;
     return d.every(h => h.faits[k]);
   }
-  // Série actuelle : aujourd'hui compte dès qu'il est complet ; une journée ratée la casse
-  function serie() {
-    if (!S.habitudes.length) return 0;
-    const premier = S.habitudes.reduce((m, h) => (h.debut < m ? h.debut : m), '9999-12-31');
-    const auj = aujourdhui();
-    let n = jourComplet(auj) === true ? 1 : 0;
+  // Série actuelle : aujourd'hui compte dès qu'il est complet.
+  // Elle pardonne : un jour raté ne la casse pas, s'il n'y en a pas eu d'autre dans les 7 jours (il ne compte pas, c'est tout).
+  // Deux ratés en 7 jours, et elle repart de zéro.
+  function parcourirSerie(premier, etat) {
+    const auj = aujourdhui(), pardons = [];
+    let n = etat(auj) === true ? 1 : 0, dernier = null;
     for (let k = decaler(auj, -1), i = 0; k >= premier && i < 3700; k = decaler(k, -1), i++) {
-      const c = jourComplet(k);
-      if (c === false) break;
-      if (c === true) n++;
+      const c = etat(k);
+      if (c === true) { n++; continue; }
+      if (c !== false) continue;
+      if (dernier && ecart(k, dernier) < CONFIG.pardon) break;
+      dernier = k; pardons.push(k);
     }
-    return n;
+    // Un pardon tout au bout (rien de fait avant lui) n'en est pas un
+    while (pardons.length) { const k = pardons[pardons.length - 1]; let avant = false; for (let q = decaler(k, -1), i = 0; q >= premier && i < 3700; q = decaler(q, -1), i++) { const c = etat(q); if (c === true) { avant = true; break; } if (c === false) break; } if (avant) break; pardons.pop(); }
+    return { n, pardons: n ? pardons : [] };
   }
-  function serieHabitude(h) {
-    const auj = aujourdhui();
-    let n = habitudeDue(h, auj) && h.faits[auj] ? 1 : 0;
-    for (let k = decaler(auj, -1), i = 0; k >= h.debut && i < 3700; k = decaler(k, -1), i++) {
-      if (!habitudeDue(h, k)) continue;
-      if (!h.faits[k]) break;
-      n++;
-    }
-    return n;
+  function serieDetail() {
+    if (!S.habitudes.length) return { n: 0, pardons: [] };
+    return parcourirSerie(S.habitudes.reduce((m, h) => (h.debut < m ? h.debut : m), '9999-12-31'), jourComplet);
   }
+  const serie = () => serieDetail().n;
+  const serieHabitude = h => parcourirSerie(h.debut, k => habitudeDue(h, k) ? !!h.faits[k] : null).n;
+  // Le joker de la semaine est-il encore là ? (aucun jour pardonné dans les 7 derniers jours)
+  const jokerDispo = () => !serieDetail().pardons.some(k => ecart(k, aujourdhui()) < CONFIG.pardon);
+
+  // ---------- Jour difficile ----------
+  // Un mauvais jour : les habitudes passent en version minimale (moitié des points, la série continue). 2 par semaine au plus.
+  const difficile = k => !!S.difficiles[k];
+  const ptsHabitude = (h, k) => { const p = cat(h.cat).points; return difficile(k) ? Math.max(5, Math.round(p / 10) * 5) : p; };
+  const titreHabitude = (h, k) => difficile(k) ? (h.mini || h.titre + ' (version mini)') : h.titre;
+  function difficilesSemaine(k) { const l = lundiDe(k); return Object.keys(S.difficiles).filter(x => x >= l && x <= decaler(l, 6)).length; }
 
   // ---------- Objectifs à long terme ----------
   // Avancement : étapes cochées + tâches rattachées faites. Une tâche répétée compte ses fois jusqu'à l'échéance
@@ -1722,13 +1744,13 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   function ligneHabitude(h, k, cocheGauche) {
     const fait = !!h.faits[k], c = cat(h.cat), s = serieHabitude(h);
     const p = S.payes[cleHab(h, k)];
-    const pts = p && p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts" aria-hidden="true">+${c.points} pts</span>`;
-    const coche = rondCoche(h.id + '|' + k, fait, `${h.titre}, habitude : ${fait ? 'faite' : 'à faire'}`, 'data-habitude');
+    const pts = p && p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts" aria-hidden="true">+${ptsHabitude(h, k)} pts</span>`;
+    const coche = rondCoche(h.id + '|' + k, fait, `${titreHabitude(h, k)}, habitude : ${fait ? 'faite' : 'à faire'}`, 'data-habitude');
     return `<div class="carte ligne${fait ? ' faite' : ''}" style="--c:${c.couleur}">
       ${cocheGauche ? coche : ''}
       <button type="button" class="ouvrir" data-ouvrir-hab="${h.id}" aria-label="${esc(h.titre)}, habitude ${esc(c.nom)}, série de ${pluriel(s, 'jour')}, ${fait ? 'faite' : 'à faire'} : ouvrir" data-focus="oh${h.id}">
         ${cocheGauche ? '' : `<span class="tuile" style="--c:${c.couleur}" aria-hidden="true">${c.icone}</span>`}
-        <span class="quoi" aria-hidden="true"><b>${esc(h.titre)}</b><small>Habitude · ${esc(c.nom)}${s ? ` · 🔥 ${s} j` : ''}</small></span>${pts}</button>
+        <span class="quoi" aria-hidden="true"><b>${esc(titreHabitude(h, k))}</b><small>${difficile(k) ? 'Version mini' : 'Habitude'} · ${esc(c.nom)}${s ? ` · 🔥 ${s} j` : ''}</small></span>${pts}</button>
       ${cocheGauche ? '' : coche}</div>`;
   }
 
@@ -1773,7 +1795,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const auj = aujourdhui(), P = palier(), suiv = palierSuivant(), g = gainDuJour(auj);
     const occs = duJour(auj), habs = S.habitudes.filter(h => habitudeDue(h, auj));
     const prevues = minutesPrevues(auj), plafond = S.reglages.plafond;
-    const M = S.minuteur, s = serie(), foc = focusEntre(auj, auj);
+    const M = S.minuteur, sd = serieDetail(), s = sd.n, foc = focusEntre(auj, auj);
+    const dur = difficile(auj), resteT = occs.filter(o => o.el.type === 'tache' && !o.fait && o.el.debut > minNow()).length;
     const val = aValider();
     return `
       <header class="tete salut">
@@ -1792,6 +1815,10 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
         <div class="boutons deux"><button type="button" class="bouton petit" data-tenu="${o.cle}" data-focus="tenu${o.cle}">Tenu</button><button type="button" class="bouton petit secondaire" data-pas-tenu="${o.cle}" data-focus="pas${o.cle}">Pas tenu</button></div></div>`).join('')}
+      ${dur ? `<section class="carte difficile" aria-labelledby="dur-titre"><h2 id="dur-titre"><span aria-hidden="true">🌧️</span> Jour difficile</h2>
+        <p>Fais le minimum : tes habitudes sont en version mini, et ta série continue. Le reste peut attendre.</p>
+        <div class="boutons${resteT ? ' deux' : ''}">${resteT ? `<button type="button" class="bouton petit" data-action="alleger" data-focus="alleger">Reporter ${resteT > 1 ? 'mes ' + resteT + ' tâches' : 'ma tâche'} à demain</button>` : ''}
+          <button type="button" class="bouton petit secondaire" data-action="fin-difficile" data-focus="dur">Finalement, ça va</button></div></section>` : ''}
       ${cartePasFaites()}
       ${cartePriorites()}
       <section aria-labelledby="auj-titre">
@@ -1801,10 +1828,11 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
           ${habs.map(h => ligneHabitude(h, auj, true)).join('')}
           ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
         </div>
+        ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
       </section>
       <div class="duo">
         <button type="button" class="carte mini" data-action="serie" data-focus="serie" aria-label="Série actuelle : ${pluriel(s, 'jour')} d'affilée avec toutes tes habitudes. Meilleure : ${pluriel(Math.max(S.meilleureSerie, s), 'jour')}.">
-          <span class="titre-mini" aria-hidden="true">🔥 Série</span><b aria-hidden="true">${s} j</b><small aria-hidden="true">Meilleure : ${Math.max(S.meilleureSerie, s)} j</small></button>
+          <span class="titre-mini" aria-hidden="true">🔥 Série</span><b aria-hidden="true">${s} j</b><small aria-hidden="true">${sd.pardons.length && ecart(sd.pardons[0], auj) < CONFIG.pardon ? '🛟 1 jour pardonné' : 'Meilleure : ' + Math.max(S.meilleureSerie, s) + ' j'}</small></button>
         <button type="button" class="carte mini" data-action="minuteur" data-focus="minuteur" aria-label="${M ? 'Concentration en cours : ouvrir le minuteur' : `Concentration : ${duree(foc.total)} aujourd'hui. Lancer une session`}">
           <span class="titre-mini" aria-hidden="true">⏱️ Concentration</span>
           <b aria-hidden="true" ${M ? 'data-reste-mini' : ''}>${M ? texteMinuteurCourt() : duree(foc.total)}</b>
@@ -2062,7 +2090,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   }
   function vueObjectifs() {
     const hab = S.vueObj !== 'long';
-    const s = serie(), best = Math.max(S.meilleureSerie, s), auj = aujourdhui();
+    const sd = serieDetail(), s = sd.n, best = Math.max(S.meilleureSerie, s), auj = aujourdhui();
+    const recent = sd.pardons.find(k => ecart(k, auj) < CONFIG.pardon);
     const habs = habitudesActives();
     const dues = habs.filter(h => habitudeDue(h, auj)), faites = dues.filter(h => h.faits[auj]).length;
     return `
@@ -2074,6 +2103,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       ${hab ? `
         <div class="carte serie-carte"><span class="flamme" aria-hidden="true">🔥</span>
           <div><b>${pluriel(s, 'jour')}</b><small>Série actuelle : toutes tes habitudes faites, jour après jour. Meilleure : ${pluriel(best, 'jour')}.</small>
+          <small style="margin-top:4px">${recent ? `🛟 ${cap(quandJour(recent))} est pardonné : ta série continue. Prochain joker ${quandJour(decaler(recent, CONFIG.pardon))}.` : habs.length ? '🛟 Joker prêt : un jour raté par semaine ne casse pas ta série.' : ''}</small>
           ${dues.length ? `<small style="margin-top:4px">Aujourd'hui : ${faites} / ${dues.length}${faites === dues.length ? ' · journée gagnée ✓' : ''}</small>` : ''}</div></div>
         <div class="lignes">${habs.length ? habs.map(ligneHabitudeGestion).join('') : '<p class="carte vide">Pas encore d\'habitude. Méditer, lire 10 pages, marcher… Commence petit, tiens longtemps.</p>'}</div>
         <button type="button" class="bouton" data-action="nouvelle-habitude" data-focus="nh">${ICONE.plus} Nouvelle habitude</button>`
@@ -2442,7 +2472,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   }
   const libreA = (k, debut, fin, sans) => !duJour(k).some(o => o.cle !== sans && debut < o.el.fin && fin > o.el.debut);
   // Propositions pour reporter : aujourd'hui (même heure si elle est encore à venir et libre, sinon le prochain créneau libre),
-  // demain (même heure si libre, sinon le premier créneau libre)
+  // demain (même heure si libre, sinon le créneau libre qui suit)
   function propositions(o) {
     const auj = aujourdhui(), dem = decaler(auj, 1), d = o.el.debut, f = o.el.fin, du = f - d;
     const tot = Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas;
@@ -2567,6 +2597,56 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   // La feuille d'une tâche ouverte par « Choisir… » se ferme : la liste se met à jour
   $('#tache').addEventListener('close', () => { if (PF.open) setTimeout(() => renderPasFaites(), 0); });
   PF.addEventListener('close', () => { P.ouverte = null; render(); });
+
+  // ---------- Jour difficile ----------
+  async function jourDifficile() {
+    const auj = aujourdhui();
+    if (difficilesSemaine(auj) >= CONFIG.difficilesParSemaine) return dire(`Déjà ${CONFIG.difficilesParSemaine} jours difficiles cette semaine. Fais ce que tu peux : ta série pardonne un jour raté.`);
+    const oui = await demander('Journée difficile ?', `Ça arrive. Aujourd'hui, tes habitudes passent en version minimale : moitié des points, et ta série continue. ${CONFIG.difficilesParSemaine} jours par semaine au plus.`,
+      [{ texte: 'Passer en version mini', valeur: true }, { texte: 'Non, ça va', valeur: false, clair: true }]);
+    if (!oui) return;
+    S.difficiles[auj] = true;
+    sauver();
+    $('#ecran').scrollTop = 0;
+    render('dur');
+    dire('Jour difficile : le minimum suffit. 🌧️');
+  }
+  // Reporter à demain les tâches d'aujourd'hui pas encore commencées (même heure si libre, sinon le créneau libre qui suit)
+  function allegerJournee() {
+    const auj = aujourdhui(), dem = decaler(auj, 1);
+    let n = 0;
+    duJour(auj).filter(o => o.el.type === 'tache' && !o.fait && o.el.debut > minNow()).forEach(o => {
+      const d = o.el.debut, f = o.el.fin;
+      const p = libreA(dem, d, f, o.cle) ? { debut: d, fin: f } : (creneauLibre(dem, f - d, o.cle, d) || creneauLibre(dem, f - d, o.cle));
+      if (!p) return;
+      appliquer(o, { date: dem, debut: p.debut, fin: p.fin }, 'une');
+      n++;
+    });
+    sauver();
+    U.garderDefilement = true;
+    render('dur');
+    dire(n ? `${pluriel(n, 'tâche reportée', 'tâches reportées')} à demain. Souffle. 🌿` : 'Demain est déjà plein : rien n\'a bougé.');
+  }
+
+  // ---------- Retour après une absence : sans reproche ----------
+  let accueilEnCours = false;
+  async function accueillir() {
+    if (accueilEnCours || V.etat !== 'ouvert' || document.querySelector('dialog[open]')) return;
+    const auj = aujourdhui(), absence = S.vu ? ecart(S.vu, auj) : 0;
+    if (S.vu !== auj) { S.vu = auj; ecrire(); }
+    if (absence >= CONFIG.absence) {
+      accueilEnCours = true;
+      const n = pasFaites().length, best = S.meilleureSerie;
+      const texte = `${absence} jours loin d'ASCEND : ça arrive à tout le monde, et rien n'est perdu. Tes ${nombre(S.points)} points sont là${best ? `, ta meilleure série (${pluriel(best, 'jour')}) aussi` : ''}. Ce qui compte, c'est aujourd'hui : une seule chose suffit pour repartir.`
+        + (n ? ` ${pluriel(n, 'tâche t\'attendait', 'tâches t\'attendaient')} : tu peux les laisser partir d'un geste.` : '');
+      const r = await demander(`Content de te revoir${S.profil.prenom ? ', ' + S.profil.prenom : ''}`, texte,
+        n ? [{ texte: 'Repartir à neuf', valeur: 'neuf' }, { texte: 'Voir ce que j\'ai manqué', valeur: 'voir', clair: true }] : [{ texte: 'C\'est reparti', valeur: 'ok' }]);
+      accueilEnCours = false;
+      if (r === 'neuf') { pasFaites().forEach(o => { S.partis[o.cle] = auj; }); sauver(); render(); dire('Page tournée. On repart d\'ici. 🍃'); }
+      if (r === 'voir') return ouvrirPasFaites();
+    }
+    proposerBilan();
+  }
   // ---------- Questions (remplacent confirm) ----------
   function demander(titreQ, texte, options) {
     return new Promise(resoudre => {
@@ -2852,6 +2932,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <div><span class="etiquette" id="h-cat-lib">Catégorie</span><div class="groupe"><button type="button" class="rang" data-h="cat" id="h-cat" aria-describedby="h-cat-lib"></button></div></div>
         <fieldset><legend id="h-jours">Quels jours</legend>
           <div class="choix-jours" role="group" aria-labelledby="h-jours">${JOURS_COURTS.map((j, i) => `<label title="${JOURS_LONGS[i]}"><input type="checkbox" name="jour" value="${i}"${jours.includes(i) ? ' checked' : ''} aria-label="${JOURS_LONGS[i]}"><span aria-hidden="true">${j}</span></label>`).join('')}</div></fieldset>
+        <div><label class="etiquette" for="h-mini">Version minimale <span class="sous">pour les jours difficiles</span></label>
+          <label class="champ-nom"><span aria-hidden="true">🌧️</span><input id="h-mini" name="mini" maxlength="60" autocomplete="off" placeholder="2 minutes, 1 page, 5 pompes…" value="${h && h.mini ? esc(h.mini) : ''}"></label></div>
         <p class="note" id="h-regle"></p>
         ${mois}
         <p class="erreur" id="h-erreur" role="alert"></p>
@@ -2875,8 +2957,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (!titre) { $('#h-erreur').textContent = 'Donne un nom à l\'habitude.'; HF.elements.namedItem('titre').focus(); return; }
     if (!jours.length) { $('#h-erreur').textContent = 'Choisis au moins un jour.'; HF.querySelector('input[name="jour"]').focus(); return; }
     const h = U.habitude.h;
-    if (h) Object.assign(h, { titre, jours, cat: U.habitude.cat });
-    else S.habitudes.push({ id: uid(), titre, cat: U.habitude.cat, jours, debut: aujourdhui(), fin: null, faits: {}, creeLe: Date.now() });
+    const mini = HF.elements.namedItem('mini').value.trim().slice(0, 60) || null;
+    if (h) Object.assign(h, { titre, jours, cat: U.habitude.cat, mini });
+    else S.habitudes.push({ id: uid(), titre, mini, cat: U.habitude.cat, jours, debut: aujourdhui(), fin: null, faits: {}, creeLe: Date.now() });
     sauver();
     HD.close();
     render();
@@ -3832,7 +3915,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   function deverrouiller(msg) {
     V.etat = 'ouvert';
     if (VR.open) VR.close();
-    if (!document.querySelector('dialog[open]')) { render(); if (msg) dire(msg); else setTimeout(proposerBilan, 300); }
+    if (!document.querySelector('dialog[open]')) { render(); if (msg) dire(msg); else setTimeout(accueillir, 300); }
     else if (msg) dire(msg);
   }
   VR.addEventListener('cancel', e => e.preventDefault());
@@ -4303,6 +4386,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (a === 'bilan-semaine') return ouvrirBilan(lundiDe(aujourdhui()));
     if (a === 'priorites') return ouvrirPriorites();
     if (a === 'pas-faites') return ouvrirPasFaites();
+    if (a === 'difficile') return jourDifficile();
+    if (a === 'fin-difficile') { delete S.difficiles[aujourdhui()]; sauver(); U.garderDefilement = true; render('dur'); return dire('Mode jour difficile retiré.'); }
+    if (a === 'alleger') return allegerJournee();
     if (a === 'nouvelle-habitude') return ouvrirHabitude(null);
     if (a === 'nouvel-objectif') return ouvrirObjectif(null);
     if (b.classList.contains('colonne')) {
@@ -4330,7 +4416,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   function rafraichir() {
     crediter();
     const libre = !G && !document.querySelector('dialog[open]');
-    if (libre) { U.garderDefilement = true; render(); proposerBilan(); }
+    if (libre) { U.garderDefilement = true; render(); accueillir(); }
   }
   setInterval(rafraichir, 60000);
   document.addEventListener('visibilitychange', () => {
@@ -4421,7 +4507,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   render();
   setTimeout(() => L0.classList.add('parti'), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 1100);
   setTimeout(() => L0.remove(), 1800);
-  setTimeout(proposerBilan, 1300);
+  setTimeout(accueillir, 1300);
   if (erreurStockage) dire('Attention : le téléphone refuse d\'enregistrer. Libère de la place.');
   synchroniser();
   if (S.coffre.actif) setTimeout(() => envoyerCoffre(), 5000);

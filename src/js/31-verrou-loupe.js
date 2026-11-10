@@ -81,7 +81,7 @@
   function deverrouiller(msg) {
     V.etat = 'ouvert';
     if (VR.open) VR.close();
-    if (!document.querySelector('dialog[open]')) { render(); if (msg) dire(msg); else setTimeout(proposerBilan, 300); }
+    if (!document.querySelector('dialog[open]')) { render(); if (msg) dire(msg); else setTimeout(accueillir, 300); }
     else if (msg) dire(msg);
   }
   VR.addEventListener('cancel', e => e.preventDefault());

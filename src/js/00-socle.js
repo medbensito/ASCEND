@@ -2,11 +2,14 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 12;                      // édition de l'app, comme le cache du service worker (ascend-12)
+  const EDITION = 13;                      // édition de l'app, comme le cache du service worker (ascend-13)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
   const CONFIG = {
+    pardon: 7,             // la série pardonne un jour raté tous les 7 jours
+    difficilesParSemaine: 2,
+    absence: 3,            // jours sans ouvrir l'app avant l'accueil « content de te revoir »
     heure: 60,             // px par heure dans la grille (= --H)
     pas: 15,               // minutes : les plages se calent au quart d'heure
     duree: 60,             // durée proposée pour une nouvelle plage
@@ -54,6 +57,7 @@
   // payes : { clé : { pts, jour, type, cat, raison? } } ; gains : { jour : { total, cats: { id: pts }, src: { type: pts } } }
   // priorites : { lundi : [{ id, titre, fait }] } (1 à 3 par semaine) ; bilanVu : lundi de la semaine où le bilan s'est ouvert de lui-même
   // partis : { clé d'une tâche pas faite : jour où on l'a laissée partir }
+  // difficiles : { jour : true } (jours difficiles : habitudes en version minimale) ; vu : dernier jour où l'app a été ouverte
   function rappelsVides() {
     return { actif: false, jeton: null, service: null, avant: true, delai: 30, matin: true, heureMatin: 8 * 60, sauvegarde: true, signature: null, majLe: null, erreur: null };
   }
@@ -68,7 +72,7 @@
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null, partis: {},
+    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null,
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -79,13 +83,14 @@
   const estObjet = v => v && typeof v === 'object' && !Array.isArray(v);
   function nettoyer() {
     ['elements', 'habitudes', 'objectifs', 'focus'].forEach(c => { if (!Array.isArray(S[c])) S[c] = []; });
-    ['tenus', 'payes', 'gains', 'priorites', 'partis'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    ['tenus', 'payes', 'gains', 'priorites', 'partis', 'difficiles'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
     Object.keys(S.priorites).forEach(k => {
       const l = Array.isArray(S.priorites[k]) ? S.priorites[k].filter(p => p && p.id && typeof p.titre === 'string' && p.titre.trim()).slice(0, 3) : [];
       l.forEach(p => { p.titre = p.titre.slice(0, 60); p.fait = !!p.fait; });
       if (l.length && /^\d{4}-\d{2}-\d{2}$/.test(k)) S.priorites[k] = l; else delete S.priorites[k];
     });
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
+    if (typeof S.vu !== 'string') S.vu = null;
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.categories.forEach(c => {
       c.points = Math.max(0, Math.min(1000, Math.round(Number(c.points) || 0)));

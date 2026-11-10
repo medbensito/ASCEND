@@ -41,7 +41,8 @@
   }
   function vueObjectifs() {
     const hab = S.vueObj !== 'long';
-    const s = serie(), best = Math.max(S.meilleureSerie, s), auj = aujourdhui();
+    const sd = serieDetail(), s = sd.n, best = Math.max(S.meilleureSerie, s), auj = aujourdhui();
+    const recent = sd.pardons.find(k => ecart(k, auj) < CONFIG.pardon);
     const habs = habitudesActives();
     const dues = habs.filter(h => habitudeDue(h, auj)), faites = dues.filter(h => h.faits[auj]).length;
     return `
@@ -53,6 +54,7 @@
       ${hab ? `
         <div class="carte serie-carte"><span class="flamme" aria-hidden="true">🔥</span>
           <div><b>${pluriel(s, 'jour')}</b><small>Série actuelle : toutes tes habitudes faites, jour après jour. Meilleure : ${pluriel(best, 'jour')}.</small>
+          <small style="margin-top:4px">${recent ? `🛟 ${cap(quandJour(recent))} est pardonné : ta série continue. Prochain joker ${quandJour(decaler(recent, CONFIG.pardon))}.` : habs.length ? '🛟 Joker prêt : un jour raté par semaine ne casse pas ta série.' : ''}</small>
           ${dues.length ? `<small style="margin-top:4px">Aujourd'hui : ${faites} / ${dues.length}${faites === dues.length ? ' · journée gagnée ✓' : ''}</small>` : ''}</div></div>
         <div class="lignes">${habs.length ? habs.map(ligneHabitudeGestion).join('') : '<p class="carte vide">Pas encore d\'habitude. Méditer, lire 10 pages, marcher… Commence petit, tiens longtemps.</p>'}</div>
         <button type="button" class="bouton" data-action="nouvelle-habitude" data-focus="nh">${ICONE.plus} Nouvelle habitude</button>`

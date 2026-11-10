@@ -25,6 +25,8 @@
         <div><span class="etiquette" id="h-cat-lib">Catégorie</span><div class="groupe"><button type="button" class="rang" data-h="cat" id="h-cat" aria-describedby="h-cat-lib"></button></div></div>
         <fieldset><legend id="h-jours">Quels jours</legend>
           <div class="choix-jours" role="group" aria-labelledby="h-jours">${JOURS_COURTS.map((j, i) => `<label title="${JOURS_LONGS[i]}"><input type="checkbox" name="jour" value="${i}"${jours.includes(i) ? ' checked' : ''} aria-label="${JOURS_LONGS[i]}"><span aria-hidden="true">${j}</span></label>`).join('')}</div></fieldset>
+        <div><label class="etiquette" for="h-mini">Version minimale <span class="sous">pour les jours difficiles</span></label>
+          <label class="champ-nom"><span aria-hidden="true">🌧️</span><input id="h-mini" name="mini" maxlength="60" autocomplete="off" placeholder="2 minutes, 1 page, 5 pompes…" value="${h && h.mini ? esc(h.mini) : ''}"></label></div>
         <p class="note" id="h-regle"></p>
         ${mois}
         <p class="erreur" id="h-erreur" role="alert"></p>
@@ -48,8 +50,9 @@
     if (!titre) { $('#h-erreur').textContent = 'Donne un nom à l\'habitude.'; HF.elements.namedItem('titre').focus(); return; }
     if (!jours.length) { $('#h-erreur').textContent = 'Choisis au moins un jour.'; HF.querySelector('input[name="jour"]').focus(); return; }
     const h = U.habitude.h;
-    if (h) Object.assign(h, { titre, jours, cat: U.habitude.cat });
-    else S.habitudes.push({ id: uid(), titre, cat: U.habitude.cat, jours, debut: aujourdhui(), fin: null, faits: {}, creeLe: Date.now() });
+    const mini = HF.elements.namedItem('mini').value.trim().slice(0, 60) || null;
+    if (h) Object.assign(h, { titre, jours, cat: U.habitude.cat, mini });
+    else S.habitudes.push({ id: uid(), titre, mini, cat: U.habitude.cat, jours, debut: aujourdhui(), fin: null, faits: {}, creeLe: Date.now() });
     sauver();
     HD.close();
     render();

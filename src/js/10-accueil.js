@@ -44,13 +44,13 @@
   function ligneHabitude(h, k, cocheGauche) {
     const fait = !!h.faits[k], c = cat(h.cat), s = serieHabitude(h);
     const p = S.payes[cleHab(h, k)];
-    const pts = p && p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts" aria-hidden="true">+${c.points} pts</span>`;
-    const coche = rondCoche(h.id + '|' + k, fait, `${h.titre}, habitude : ${fait ? 'faite' : 'à faire'}`, 'data-habitude');
+    const pts = p && p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts" aria-hidden="true">+${ptsHabitude(h, k)} pts</span>`;
+    const coche = rondCoche(h.id + '|' + k, fait, `${titreHabitude(h, k)}, habitude : ${fait ? 'faite' : 'à faire'}`, 'data-habitude');
     return `<div class="carte ligne${fait ? ' faite' : ''}" style="--c:${c.couleur}">
       ${cocheGauche ? coche : ''}
       <button type="button" class="ouvrir" data-ouvrir-hab="${h.id}" aria-label="${esc(h.titre)}, habitude ${esc(c.nom)}, série de ${pluriel(s, 'jour')}, ${fait ? 'faite' : 'à faire'} : ouvrir" data-focus="oh${h.id}">
         ${cocheGauche ? '' : `<span class="tuile" style="--c:${c.couleur}" aria-hidden="true">${c.icone}</span>`}
-        <span class="quoi" aria-hidden="true"><b>${esc(h.titre)}</b><small>Habitude · ${esc(c.nom)}${s ? ` · 🔥 ${s} j` : ''}</small></span>${pts}</button>
+        <span class="quoi" aria-hidden="true"><b>${esc(titreHabitude(h, k))}</b><small>${difficile(k) ? 'Version mini' : 'Habitude'} · ${esc(c.nom)}${s ? ` · 🔥 ${s} j` : ''}</small></span>${pts}</button>
       ${cocheGauche ? '' : coche}</div>`;
   }
 
@@ -95,7 +95,8 @@
     const auj = aujourdhui(), P = palier(), suiv = palierSuivant(), g = gainDuJour(auj);
     const occs = duJour(auj), habs = S.habitudes.filter(h => habitudeDue(h, auj));
     const prevues = minutesPrevues(auj), plafond = S.reglages.plafond;
-    const M = S.minuteur, s = serie(), foc = focusEntre(auj, auj);
+    const M = S.minuteur, sd = serieDetail(), s = sd.n, foc = focusEntre(auj, auj);
+    const dur = difficile(auj), resteT = occs.filter(o => o.el.type === 'tache' && !o.fait && o.el.debut > minNow()).length;
     const val = aValider();
     return `
       <header class="tete salut">
@@ -114,6 +115,10 @@
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
         <div class="boutons deux"><button type="button" class="bouton petit" data-tenu="${o.cle}" data-focus="tenu${o.cle}">Tenu</button><button type="button" class="bouton petit secondaire" data-pas-tenu="${o.cle}" data-focus="pas${o.cle}">Pas tenu</button></div></div>`).join('')}
+      ${dur ? `<section class="carte difficile" aria-labelledby="dur-titre"><h2 id="dur-titre"><span aria-hidden="true">🌧️</span> Jour difficile</h2>
+        <p>Fais le minimum : tes habitudes sont en version mini, et ta série continue. Le reste peut attendre.</p>
+        <div class="boutons${resteT ? ' deux' : ''}">${resteT ? `<button type="button" class="bouton petit" data-action="alleger" data-focus="alleger">Reporter ${resteT > 1 ? 'mes ' + resteT + ' tâches' : 'ma tâche'} à demain</button>` : ''}
+          <button type="button" class="bouton petit secondaire" data-action="fin-difficile" data-focus="dur">Finalement, ça va</button></div></section>` : ''}
       ${cartePasFaites()}
       ${cartePriorites()}
       <section aria-labelledby="auj-titre">
@@ -123,10 +128,11 @@
           ${habs.map(h => ligneHabitude(h, auj, true)).join('')}
           ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
         </div>
+        ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
       </section>
       <div class="duo">
         <button type="button" class="carte mini" data-action="serie" data-focus="serie" aria-label="Série actuelle : ${pluriel(s, 'jour')} d'affilée avec toutes tes habitudes. Meilleure : ${pluriel(Math.max(S.meilleureSerie, s), 'jour')}.">
-          <span class="titre-mini" aria-hidden="true">🔥 Série</span><b aria-hidden="true">${s} j</b><small aria-hidden="true">Meilleure : ${Math.max(S.meilleureSerie, s)} j</small></button>
+          <span class="titre-mini" aria-hidden="true">🔥 Série</span><b aria-hidden="true">${s} j</b><small aria-hidden="true">${sd.pardons.length && ecart(sd.pardons[0], auj) < CONFIG.pardon ? '🛟 1 jour pardonné' : 'Meilleure : ' + Math.max(S.meilleureSerie, s) + ' j'}</small></button>
         <button type="button" class="carte mini" data-action="minuteur" data-focus="minuteur" aria-label="${M ? 'Concentration en cours : ouvrir le minuteur' : `Concentration : ${duree(foc.total)} aujourd'hui. Lancer une session`}">
           <span class="titre-mini" aria-hidden="true">⏱️ Concentration</span>
           <b aria-hidden="true" ${M ? 'data-reste-mini' : ''}>${M ? texteMinuteurCourt() : duree(foc.total)}</b>

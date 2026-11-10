@@ -280,6 +280,9 @@
     if (a === 'bilan-semaine') return ouvrirBilan(lundiDe(aujourdhui()));
     if (a === 'priorites') return ouvrirPriorites();
     if (a === 'pas-faites') return ouvrirPasFaites();
+    if (a === 'difficile') return jourDifficile();
+    if (a === 'fin-difficile') { delete S.difficiles[aujourdhui()]; sauver(); U.garderDefilement = true; render('dur'); return dire('Mode jour difficile retiré.'); }
+    if (a === 'alleger') return allegerJournee();
     if (a === 'nouvelle-habitude') return ouvrirHabitude(null);
     if (a === 'nouvel-objectif') return ouvrirObjectif(null);
     if (b.classList.contains('colonne')) {
@@ -307,7 +310,7 @@
   function rafraichir() {
     crediter();
     const libre = !G && !document.querySelector('dialog[open]');
-    if (libre) { U.garderDefilement = true; render(); proposerBilan(); }
+    if (libre) { U.garderDefilement = true; render(); accueillir(); }
   }
   setInterval(rafraichir, 60000);
   document.addEventListener('visibilitychange', () => {
@@ -398,7 +401,7 @@
   render();
   setTimeout(() => L0.classList.add('parti'), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 1100);
   setTimeout(() => L0.remove(), 1800);
-  setTimeout(proposerBilan, 1300);
+  setTimeout(accueillir, 1300);
   if (erreurStockage) dire('Attention : le téléphone refuse d\'enregistrer. Libère de la place.');
   synchroniser();
   if (S.coffre.actif) setTimeout(() => envoyerCoffre(), 5000);
