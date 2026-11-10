@@ -732,6 +732,33 @@ html.paysage .pay:has(.ajuste) .fab { width: 46px; height: 46px; right: 2px; bot
 .idt-revue li > span:last-child { display: grid; gap: 2px; }
 .idt-revue li small { color: var(--doux); font-size: 12.5px; }
 .idt-revue li:not(.faite) .tuile { opacity: .5; filter: grayscale(.6); }
+
+/* ===== Énergie, réflexion, coach ===== */
+.energie { display: grid; gap: 12px; }
+.energie h2 { font-size: 15px; font-weight: 600; }
+.en-choix { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.en-choix button { display: grid; justify-items: center; gap: 3px; min-height: 60px; padding: 8px 2px; border-radius: 16px; border: 1px solid var(--trait); background: rgba(255, 255, 255, .04); color: var(--doux); transition: transform .12s ease; }
+.en-choix button span { font-size: 22px; line-height: 1.1; }
+.en-choix button small { font-size: 10.5px; font-weight: 550; white-space: nowrap; }
+.en-choix button[aria-checked="true"] { background: rgba(255, 255, 255, .16); border-color: #fff; color: #fff; box-shadow: 0 0 16px rgba(255, 255, 255, .22); }
+.en-choix button:active { transform: scale(.94); }
+.energie.notee .en-choix button:not([aria-checked="true"]) { opacity: .55; }
+.coach { display: grid; gap: 12px; padding: 16px; border-color: rgba(228, 211, 179, .38); background: linear-gradient(135deg, rgba(228, 211, 179, .14), rgba(255, 255, 255, .03) 65%); }
+.coach h2 { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 650; text-transform: uppercase; letter-spacing: .1em; color: var(--accent-texte); }
+.coach h2 .tuile { --c: #e4d3b3; text-transform: none; letter-spacing: 0; }
+.coach h2 small { margin-left: auto; color: var(--doux); font-size: 12px; letter-spacing: 0; font-weight: 550; }
+.coach p { font-size: 15px; line-height: 1.5; }
+.coach .bouton.petit { font-size: 13.5px; padding: 0 12px; line-height: 1.15; text-align: center; }
+.refl-champ { display: grid; gap: 6px; padding: 12px 14px; border-bottom: 1px solid var(--trait); }
+.refl-champ:last-child { border-bottom: 0; }
+.refl-champ > span { font-size: 13px; font-weight: 650; color: var(--accent-texte); }
+.refl-champ textarea { width: 100%; border: 0; background: none; outline: none; resize: none; font-size: 16px; line-height: 1.4; padding: 0; color: var(--texte); font-family: inherit; }
+.refl-champ textarea::placeholder { color: var(--pale); opacity: 1; }
+.refl-champ:focus-within { background: rgba(255, 255, 255, .05); }
+.refl-champ p { font-size: 15px; line-height: 1.45; }
+.refl-rappel { display: flex; gap: 12px; align-items: center; padding: 12px 16px; font-size: 15px; }
+.refl-rappel > span:last-child { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.refl-rappel small { color: var(--accent-texte); font-size: 12px; font-weight: 650; }
 /* ===== Refonte (édition 11) : noir profond, verre, platine, arcs de lumière ===== */
 :root {
   --fond: #050506;
@@ -1033,7 +1060,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 14;                      // édition de l'app, comme le cache du service worker (ascend-14)
+  const EDITION = 15;                      // édition de l'app, comme le cache du service worker (ascend-15)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -1103,7 +1130,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [],
+    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], energie: {}, reflexions: {}, conseilsVus: {},
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -1114,7 +1141,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   const estObjet = v => v && typeof v === 'object' && !Array.isArray(v);
   function nettoyer() {
     ['elements', 'habitudes', 'objectifs', 'focus'].forEach(c => { if (!Array.isArray(S[c])) S[c] = []; });
-    ['tenus', 'payes', 'gains', 'priorites', 'partis', 'difficiles'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    ['tenus', 'payes', 'gains', 'priorites', 'partis', 'difficiles', 'energie', 'reflexions', 'conseilsVus'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
     Object.keys(S.priorites).forEach(k => {
       const l = Array.isArray(S.priorites[k]) ? S.priorites[k].filter(p => p && p.id && typeof p.titre === 'string' && p.titre.trim()).slice(0, 3) : [];
       l.forEach(p => { p.titre = p.titre.slice(0, 60); p.fait = !!p.fait; });
@@ -1122,6 +1149,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     });
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (typeof S.vu !== 'string') S.vu = null;
+    Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.identites = (Array.isArray(S.identites) ? S.identites : []).filter(x => x && x.id && typeof x.nom === 'string' && x.nom.trim()).slice(0, 4);
     S.identites.forEach(x => { x.icone = typeof x.icone === 'string' && x.icone ? x.icone : '🎯'; x.phrase = typeof x.phrase === 'string' ? x.phrase : ''; });
@@ -1845,6 +1873,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
       </section>
       ${carteSemaine()}
+      ${carteEnergie(false)}
+      ${carteCoach()}
       ${carteIdentites()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
@@ -1856,6 +1886,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
           <button type="button" class="bouton petit secondaire" data-action="fin-difficile" data-focus="dur">Finalement, ça va</button></div></section>` : ''}
       ${cartePasFaites()}
       ${cartePriorites()}
+      ${rappelChange()}
       <section aria-labelledby="auj-titre">
         <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
         <div class="lignes">
@@ -1872,7 +1903,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
           <span class="titre-mini" aria-hidden="true">⏱️ Concentration</span>
           <b aria-hidden="true" ${M ? 'data-reste-mini' : ''}>${M ? texteMinuteurCourt() : duree(foc.total)}</b>
           <small aria-hidden="true">${M ? ({ travail: 'Session en cours', pause: 'Pause', pret: 'Prêt à reprendre' }[M.phase]) : 'Lancer une session'}</small></button>
-      </div>`;
+      </div>
+      ${carteEnergie(true)}`;
   }
   // ---------- Calendrier ----------
   function vueCalendrier() {
@@ -2441,7 +2473,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <div class="section-tete"><h3 id="b-cible">${st.enCours ? 'Tes priorités de la semaine' : 'Ta semaine qui commence'}</h3></div>${st.enCours ? '' : lienPf}
         <p class="note">${st.enCours ? 'Coche-les sur l\'accueil quand elles sont tenues.' : `Choisis 1 à 3 priorités, ${texteSemaine(lundiAuj)}. Elles t'attendent sur l'accueil.`}</p>
         ${editeurPriorites(B.cible)}</section>` : '';
-    corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + bilanIdentites(B.lundi) + stats + (st.enCours ? '' : edit);
+    corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + bilanIdentites(B.lundi) + stats + reflexionBilan(B.lundi) + (st.enCours ? '' : edit);
     pied.innerHTML = B.cible ? `<button type="button" class="bouton" data-b="fermer">${B.auto ? 'C\'est parti !' : 'Enregistrer'}</button>`
       : `<button type="button" class="bouton secondaire" data-b="fermer">Fermer</button>`;
     if (focus) { const c = BD.querySelector(`[data-focus="${focus}"]`); if (c && !c.disabled) c.focus(); else { const t = BD.querySelector('[data-fermer]'); if (t) t.focus(); } }
@@ -2824,6 +2856,129 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     }
   });
   ID.addEventListener('close', () => { I.edit = null; render(); });
+  // ---------- Énergie du jour ----------
+  // Une note de 1 à 5, une fois par jour : S.energie = { jour : 1..5 }. Elle nourrit le coach.
+  const ENERGIES = [['😴', 'À plat'], ['😕', 'Basse'], ['😐', 'Moyenne'], ['🙂', 'Bonne'], ['⚡', 'Au top']];
+  function carteEnergie(bas) {
+    const auj = aujourdhui(), e = S.energie[auj];
+    if (bas ? !e : e) return '';
+    return `<section class="carte pad energie${e ? ' notee' : ''}" aria-labelledby="en-titre">
+        <h2 id="en-titre">${e ? 'Ton énergie aujourd\'hui' : 'Ton énergie aujourd\'hui ?'}</h2>
+        <div class="en-choix" role="radiogroup" aria-labelledby="en-titre">${ENERGIES.map((x, i) => `<button type="button" role="radio" aria-checked="${e === i + 1}" aria-label="${x[1]} (${i + 1} sur 5)" data-energie="${i + 1}" data-focus="en${i + 1}"><span aria-hidden="true">${x[0]}</span><small aria-hidden="true">${x[1]}</small></button>`).join('')}</div></section>`;
+  }
+  function noterEnergie(n) {
+    const auj = aujourdhui();
+    if (S.energie[auj] === n) delete S.energie[auj]; else S.energie[auj] = n;
+    sauver();
+    U.garderDefilement = true;
+    render('en' + n);
+    if (S.energie[auj]) dire(n <= 2 ? `Énergie ${ENERGIES[n - 1][1].toLowerCase()} : noté. Ménage-toi. 🌿` : `Énergie ${ENERGIES[n - 1][1].toLowerCase()} : noté.`);
+  }
+
+  // ---------- Réflexion de la semaine (dans le bilan) ----------
+  // S.reflexions = { lundi : { marche, change } } ; modifiable pour la semaine en cours et la précédente.
+  function reflexionBilan(lundi) {
+    const r = S.reflexions[lundi] || {}, modifiable = lundi >= decaler(lundiDe(aujourdhui()), -7);
+    if (!modifiable && !r.marche && !r.change) return '';
+    const champ = (cle, titre, aide) => modifiable
+      ? `<label class="refl-champ"><span>${titre}</span><textarea data-refl="${cle}" rows="2" maxlength="200" placeholder="${aide}">${esc(r[cle] || '')}</textarea></label>`
+      : (r[cle] ? `<div class="refl-champ"><span>${titre}</span><p>${esc(r[cle])}</p></div>` : '');
+    return `<section aria-labelledby="b-refl" class="refl"><div class="section-tete"><h3 id="b-refl">Deux phrases pour toi</h3></div>
+        <div class="groupe">${champ('marche', 'Ce qui a marché', 'Le sport le matin, couper le téléphone…')}${champ('change', 'Ce que je change', 'Une seule chose, concrète.')}</div></section>`;
+  }
+  function lireReflexion() {
+    const champs = [...BD.querySelectorAll('[data-refl]')];
+    if (!champs.length || !B.lundi) return;
+    const r = {};
+    champs.forEach(c => { const t = c.value.trim().slice(0, 200); if (t) r[c.dataset.refl] = t; });
+    const avant = JSON.stringify(S.reflexions[B.lundi] || {});
+    if (JSON.stringify(r) === avant) return;
+    if (Object.keys(r).length) S.reflexions[B.lundi] = r; else delete S.reflexions[B.lundi];
+    sauver();
+  }
+  BD.addEventListener('change', e => { if (e.target.matches('[data-refl]')) lireReflexion(); });
+  BD.addEventListener('click', e => { if (e.target.closest('[data-b-nav], [data-b]')) lireReflexion(); }, true);
+  BD.addEventListener('close', lireReflexion);
+  // Ce que tu as décidé de changer (dernière réflexion), rappelé sur l'accueil
+  function rappelChange() {
+    const l = lundiDe(aujourdhui()), r = S.reflexions[decaler(l, -7)];
+    return r && r.change ? `<p class="carte refl-rappel"><span aria-hidden="true">🔁</span><span><small>Cette semaine, je change</small>${esc(r.change)}</span></p>` : '';
+  }
+
+  // ---------- Le coach : des remarques tirées de tes propres données ----------
+  // Chaque conseil : { id, icone, texte, action?: { nom, type, arg } }. « Compris » le masque 7 jours (S.conseilsVus).
+  const virgule = n => String(Math.round(n * 10) / 10).replace('.', ',');
+  function conseils() {
+    const auj = aujourdhui(), lundi = lundiDe(auj), dim = decaler(lundi, 6), res = [];
+    const depuis = S.depuis || auj;
+    // 1. Énergie basse plusieurs jours de suite
+    const e3 = [0, 1, 2].map(i => S.energie[decaler(auj, -i)]);
+    if (e3.every(x => x && x <= 2) && !difficile(auj)) res.push({ id: 'energie-basse', icone: '🌧️', texte: 'Ton énergie est basse depuis 3 jours. Ce n\'est pas le moment de forcer : passe en version mini aujourd\'hui, et protège un temps pour toi.', action: { nom: 'Jour difficile', type: 'difficile' } });
+    // 2. Un jour à venir dépasse le plafond
+    for (let i = 0; i < 7; i++) { const k = decaler(auj, i), m = minutesPrevues(k);
+      if (m > S.reglages.plafond) { res.push({ id: 'charge-' + k, icone: '⚖️', texte: `${cap(quandJour(k))} dépasse ton plafond : ${duree(m)} prévues pour ${duree(S.reglages.plafond)}. Allège-le tant qu'il est encore temps.`, action: { nom: 'Voir la journée', type: 'jour', arg: k } }); break; } }
+    // 3. Une identité en sommeil
+    const dort = S.identites.find(enSommeil);
+    if (dort) { const c = catsIdentite(dort.id).find(x => x.active); res.push({ id: 'sommeil-' + dort.id, icone: dort.icone, texte: `« ${dort.nom} » dort depuis 7 jours. Pas besoin d'un exploit : un seul petit acte la réveille.`, action: c ? { nom: `Prévoir ${c.nom}`, type: 'ajouter', arg: c.id } : null }); }
+    // 4. Un objectif jamais atteint sur 3 semaines : le baisser
+    if (decaler(lundi, -21) >= lundiDe(depuis)) S.categories.filter(c => c.active && c.objectif > 1).some(c => {
+      const faits = [1, 2, 3].map(i => faitsCat(c.id, decaler(lundi, -7 * i), decaler(lundi, -7 * i + 6)));
+      if (faits.some(n => n >= c.objectif)) return false;
+      const moy = (faits[0] + faits[1] + faits[2]) / 3, vise = Math.max(1, Math.ceil(moy));
+      if (!moy || vise >= c.objectif) return false;       // une catégorie jamais utilisée n'est pas un objectif raté
+      res.push({ id: 'objectif-' + c.id, icone: c.icone, texte: `${c.nom} : ${c.objectif} par semaine, jamais atteint en 3 semaines (${virgule(moy)} en moyenne). Vise ${vise} : un objectif tenu vaut mieux qu'un objectif rêvé.`, action: { nom: `Passer à ${vise} / semaine`, type: 'objectif', arg: c.id + '|' + vise } });
+      return true;
+    });
+    // 5. Le meilleur moment pour une catégorie (4 dernières semaines)
+    const debut = decaler(auj, -28) > depuis ? decaler(auj, -28) : depuis;
+    const moments = {};
+    for (let k = debut; k < auj; k = decaler(k, 1)) duJour(k).forEach(o => { if (o.el.type !== 'tache') return;
+      const m = o.el.debut < 720 ? 0 : o.el.debut < 1080 ? 1 : 2, x = (moments[o.el.cat] = moments[o.el.cat] || [[0, 0], [0, 0], [0, 0]]); x[m][1]++; if (o.fait) x[m][0]++; });
+    const NOMS = ['le matin', 'l\'après-midi', 'le soir'];
+    let meilleur = null;
+    Object.keys(moments).forEach(id => { const x = moments[id].map((v, i) => ({ i, f: v[0], n: v[1], t: v[1] ? v[0] / v[1] : 0 })).filter(v => v.n >= 3);
+      if (x.length < 2) return; x.sort((a, b) => b.t - a.t); const haut = x[0], bas = x[x.length - 1], d = haut.t - bas.t;
+      if (d >= .4 && (!meilleur || d > meilleur.d)) meilleur = { d, id, haut, bas }; });
+    if (meilleur) { const c = cat(meilleur.id); res.push({ id: 'moment-' + c.id, icone: c.icone, texte: `Tu tiens ${c.nom} ${NOMS[meilleur.haut.i]} (${meilleur.haut.f} sur ${meilleur.haut.n}), rarement ${NOMS[meilleur.bas.i]} (${meilleur.bas.f} sur ${meilleur.bas.n}). Planifie-le ${NOMS[meilleur.haut.i]}.`, action: { nom: `Prévoir ${c.nom}`, type: 'ajouter', arg: c.id + '|' + [8 * 60, 14 * 60, 19 * 60][meilleur.haut.i] } }); }
+    // 6. Ce qui te donne de l'énergie
+    const notes = Object.keys(S.energie).filter(k => k >= decaler(auj, -60));
+    if (notes.length >= 8) { let top = null;
+      S.categories.filter(c => c.active).map(c => ({ nom: c.nom, icone: c.icone, test: k => faitsCat(c.id, k, k) > 0 }))
+        .concat([{ nom: 'un temps pour toi', icone: '🌿', test: k => duJour(k).some(o => o.el.type === 'libre' && S.payes[o.cle] && S.payes[o.cle].pts > 0) }]).forEach(x => {
+        const avec = notes.filter(x.test), sans = notes.filter(k => !x.test(k));
+        if (avec.length < 4 || sans.length < 4) return;
+        const a = avec.reduce((t, k) => t + S.energie[k], 0) / avec.length, s = sans.reduce((t, k) => t + S.energie[k], 0) / sans.length;
+        if (a - s >= .5 && (!top || a - s > top.d)) top = { d: a - s, a, s, x };
+      });
+      if (top) res.push({ id: 'energie-' + top.x.nom, icone: top.x.icone, texte: `Les jours avec ${top.x.nom}, ton énergie est à ${virgule(top.a)} sur 5, contre ${virgule(top.s)} les autres jours. Ce n'est pas un hasard : garde-lui sa place.` }); }
+    // 7. Aucun temps pour toi cette semaine (à partir du mercredi)
+    if (indexJour(auj) >= 2) { let libre = false; for (let k = lundi; k <= dim; k = decaler(k, 1)) if (duJour(k).some(o => o.el.type === 'libre')) libre = true;
+      if (!libre) res.push({ id: 'libre-' + lundi, icone: '🌿', texte: 'Aucun temps pour toi cette semaine. Choisir ses priorités, c\'est aussi se choisir : bloque un créneau.', action: { nom: 'Protéger un moment', type: 'libre' } }); }
+    return res.filter(c => { const v = S.conseilsVus[c.id]; return !v || ecart(v, auj) >= 7; });
+  }
+  function carteCoach() {
+    const l = conseils();
+    if (!l.length) return '';
+    const c = l[0];
+    return `<section class="carte coach" aria-labelledby="coach-titre">
+        <h2 id="coach-titre"><span class="tuile petite" aria-hidden="true">${c.icone}</span>Ton coach${l.length > 1 ? `<small>1 / ${l.length}</small>` : ''}</h2>
+        <p>${esc(c.texte)}</p>
+        <div class="boutons${c.action ? ' deux' : ''}">${c.action ? `<button type="button" class="bouton petit" data-coach="agir" data-focus="coach-agir">${esc(c.action.nom)}</button>` : ''}
+          <button type="button" class="bouton petit secondaire" data-coach="compris" data-focus="coach">${l.length > 1 ? 'Compris, suivant' : 'Compris'}</button></div></section>`;
+  }
+  function actionCoach(quoi) {
+    const c = conseils()[0];
+    if (!c) return;
+    const auj = aujourdhui();
+    if (quoi === 'compris') { S.conseilsVus[c.id] = auj; sauver(); U.garderDefilement = true; return render('coach'); }
+    const a = c.action;
+    if (!a) return;
+    if (a.type === 'difficile') return jourDifficile();
+    if (a.type === 'libre') return ouvrirTache(null, { type: 'libre' });
+    if (a.type === 'ajouter') { const [id, debut] = String(a.arg).split('|'); return ouvrirTache(null, debut ? { cat: id, debut: +debut, fin: +debut + 60, date: decaler(auj, 1) } : { cat: id }); }
+    if (a.type === 'jour') { U.onglet = S.onglet = 'calendrier'; S.vueCal = 'jour'; U.date = a.arg; U.recentrer = true; ecrire(); return render('tab-calendrier'); }
+    if (a.type === 'objectif') { const [id, n] = a.arg.split('|'), k = S.categories.find(x => x.id === id); if (!k) return; k.objectif = +n; S.conseilsVus[c.id] = auj; sauver(); U.garderDefilement = true; render('coach'); return dire(`${k.nom} : ${n} par semaine. Tiens-le, puis remonte. 💪`); }
+  }
   // ---------- Questions (remplacent confirm) ----------
   function demander(titreQ, texte, options) {
     return new Promise(resoudre => {
@@ -4530,6 +4685,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (d.cocher) return cocher(d.cocher);
     if (d.habitude) { U.garderDefilement = true; return cocherHabitude(d.habitude); }
     if (d.priorite) return cocherPriorite(d.priorite);
+    if (d.energie) return noterEnergie(+d.energie);
+    if (d.coach) return actionCoach(d.coach);
     if (d.identite) return ouvrirIdentites(d.identite);
     if (d.tenu || d.pasTenu) {
       const o = trouver(d.tenu || d.pasTenu);

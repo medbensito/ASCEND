@@ -137,3 +137,30 @@
 .idt-revue li > span:last-child { display: grid; gap: 2px; }
 .idt-revue li small { color: var(--doux); font-size: 12.5px; }
 .idt-revue li:not(.faite) .tuile { opacity: .5; filter: grayscale(.6); }
+
+/* ===== Énergie, réflexion, coach ===== */
+.energie { display: grid; gap: 12px; }
+.energie h2 { font-size: 15px; font-weight: 600; }
+.en-choix { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.en-choix button { display: grid; justify-items: center; gap: 3px; min-height: 60px; padding: 8px 2px; border-radius: 16px; border: 1px solid var(--trait); background: rgba(255, 255, 255, .04); color: var(--doux); transition: transform .12s ease; }
+.en-choix button span { font-size: 22px; line-height: 1.1; }
+.en-choix button small { font-size: 10.5px; font-weight: 550; white-space: nowrap; }
+.en-choix button[aria-checked="true"] { background: rgba(255, 255, 255, .16); border-color: #fff; color: #fff; box-shadow: 0 0 16px rgba(255, 255, 255, .22); }
+.en-choix button:active { transform: scale(.94); }
+.energie.notee .en-choix button:not([aria-checked="true"]) { opacity: .55; }
+.coach { display: grid; gap: 12px; padding: 16px; border-color: rgba(228, 211, 179, .38); background: linear-gradient(135deg, rgba(228, 211, 179, .14), rgba(255, 255, 255, .03) 65%); }
+.coach h2 { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 650; text-transform: uppercase; letter-spacing: .1em; color: var(--accent-texte); }
+.coach h2 .tuile { --c: #e4d3b3; text-transform: none; letter-spacing: 0; }
+.coach h2 small { margin-left: auto; color: var(--doux); font-size: 12px; letter-spacing: 0; font-weight: 550; }
+.coach p { font-size: 15px; line-height: 1.5; }
+.coach .bouton.petit { font-size: 13.5px; padding: 0 12px; line-height: 1.15; text-align: center; }
+.refl-champ { display: grid; gap: 6px; padding: 12px 14px; border-bottom: 1px solid var(--trait); }
+.refl-champ:last-child { border-bottom: 0; }
+.refl-champ > span { font-size: 13px; font-weight: 650; color: var(--accent-texte); }
+.refl-champ textarea { width: 100%; border: 0; background: none; outline: none; resize: none; font-size: 16px; line-height: 1.4; padding: 0; color: var(--texte); font-family: inherit; }
+.refl-champ textarea::placeholder { color: var(--pale); opacity: 1; }
+.refl-champ:focus-within { background: rgba(255, 255, 255, .05); }
+.refl-champ p { font-size: 15px; line-height: 1.45; }
+.refl-rappel { display: flex; gap: 12px; align-items: center; padding: 12px 16px; font-size: 15px; }
+.refl-rappel > span:last-child { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.refl-rappel small { color: var(--accent-texte); font-size: 12px; font-weight: 650; }

@@ -203,7 +203,7 @@
         <div class="section-tete"><h3 id="b-cible">${st.enCours ? 'Tes priorités de la semaine' : 'Ta semaine qui commence'}</h3></div>${st.enCours ? '' : lienPf}
         <p class="note">${st.enCours ? 'Coche-les sur l\'accueil quand elles sont tenues.' : `Choisis 1 à 3 priorités, ${texteSemaine(lundiAuj)}. Elles t'attendent sur l'accueil.`}</p>
         ${editeurPriorites(B.cible)}</section>` : '';
-    corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + bilanIdentites(B.lundi) + stats + (st.enCours ? '' : edit);
+    corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + bilanIdentites(B.lundi) + stats + reflexionBilan(B.lundi) + (st.enCours ? '' : edit);
     pied.innerHTML = B.cible ? `<button type="button" class="bouton" data-b="fermer">${B.auto ? 'C\'est parti !' : 'Enregistrer'}</button>`
       : `<button type="button" class="bouton secondaire" data-b="fermer">Fermer</button>`;
     if (focus) { const c = BD.querySelector(`[data-focus="${focus}"]`); if (c && !c.disabled) c.focus(); else { const t = BD.querySelector('[data-fermer]'); if (t) t.focus(); } }

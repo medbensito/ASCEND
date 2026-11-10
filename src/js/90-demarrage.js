@@ -245,6 +245,8 @@
     if (d.cocher) return cocher(d.cocher);
     if (d.habitude) { U.garderDefilement = true; return cocherHabitude(d.habitude); }
     if (d.priorite) return cocherPriorite(d.priorite);
+    if (d.energie) return noterEnergie(+d.energie);
+    if (d.coach) return actionCoach(d.coach);
     if (d.identite) return ouvrirIdentites(d.identite);
     if (d.tenu || d.pasTenu) {
       const o = trouver(d.tenu || d.pasTenu);

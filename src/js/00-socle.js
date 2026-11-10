@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 14;                      // édition de l'app, comme le cache du service worker (ascend-14)
+  const EDITION = 15;                      // édition de l'app, comme le cache du service worker (ascend-15)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -72,7 +72,7 @@
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [],
+    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], energie: {}, reflexions: {}, conseilsVus: {},
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -83,7 +83,7 @@
   const estObjet = v => v && typeof v === 'object' && !Array.isArray(v);
   function nettoyer() {
     ['elements', 'habitudes', 'objectifs', 'focus'].forEach(c => { if (!Array.isArray(S[c])) S[c] = []; });
-    ['tenus', 'payes', 'gains', 'priorites', 'partis', 'difficiles'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    ['tenus', 'payes', 'gains', 'priorites', 'partis', 'difficiles', 'energie', 'reflexions', 'conseilsVus'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
     Object.keys(S.priorites).forEach(k => {
       const l = Array.isArray(S.priorites[k]) ? S.priorites[k].filter(p => p && p.id && typeof p.titre === 'string' && p.titre.trim()).slice(0, 3) : [];
       l.forEach(p => { p.titre = p.titre.slice(0, 60); p.fait = !!p.fait; });
@@ -91,6 +91,7 @@
     });
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (typeof S.vu !== 'string') S.vu = null;
+    Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.identites = (Array.isArray(S.identites) ? S.identites : []).filter(x => x && x.id && typeof x.nom === 'string' && x.nom.trim()).slice(0, 4);
     S.identites.forEach(x => { x.icone = typeof x.icone === 'string' && x.icone ? x.icone : '🎯'; x.phrase = typeof x.phrase === 'string' ? x.phrase : ''; });

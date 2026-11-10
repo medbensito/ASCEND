@@ -111,6 +111,8 @@
         <p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
       </section>
       ${carteSemaine()}
+      ${carteEnergie(false)}
+      ${carteCoach()}
       ${carteIdentites()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
@@ -122,6 +124,7 @@
           <button type="button" class="bouton petit secondaire" data-action="fin-difficile" data-focus="dur">Finalement, ça va</button></div></section>` : ''}
       ${cartePasFaites()}
       ${cartePriorites()}
+      ${rappelChange()}
       <section aria-labelledby="auj-titre">
         <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
         <div class="lignes">
@@ -138,5 +141,6 @@
           <span class="titre-mini" aria-hidden="true">⏱️ Concentration</span>
           <b aria-hidden="true" ${M ? 'data-reste-mini' : ''}>${M ? texteMinuteurCourt() : duree(foc.total)}</b>
           <small aria-hidden="true">${M ? ({ travail: 'Session en cours', pause: 'Pause', pret: 'Prêt à reprendre' }[M.phase]) : 'Lancer une session'}</small></button>
-      </div>`;
+      </div>
+      ${carteEnergie(true)}`;
   }
