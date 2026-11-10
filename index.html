@@ -360,7 +360,8 @@ dialog::backdrop { background: rgba(2, 3, 14, .62); -webkit-backdrop-filter: blu
 /* Les formulaires ne forment pas de boîte : en-tête, corps et pied sont posés directement dans la feuille,
    comme le Profil (un formulaire en flex imbriqué s'affichait mal sur iPhone) */
 #form-tache, #form-cat, #form-hab, #form-obj { display: contents; }
-/* Sur téléphone, créer ou modifier une tâche, un objectif, une habitude ou une catégorie ouvre une page entière :
+/* Sur téléphone, créer ou modifier une tâche, un objectif, une habitude ou une catégorie, la liste des catégories
+   et le choix d'une catégorie ouvrent une page entière :
    toute la fenêtre se voit, de l'en-tête (sous l'heure et l'encoche) au bouton du bas (au-dessus du clavier s'il est sorti) */
 @media (max-width: 639px), (orientation: landscape) and (max-height: 520px) {
   html dialog.feuille.page { top: var(--vv-haut, 0px); bottom: var(--vv-bas, 0px); left: 0; right: 0; width: 100%; max-width: none; height: auto; max-height: none;
@@ -593,7 +594,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   <form id="form-tache" novalidate></form>
 </dialog>
 
-<dialog class="feuille petite" id="choix-cat" aria-labelledby="cc-titre">
+<dialog class="feuille petite page" id="choix-cat" aria-labelledby="cc-titre">
   <div class="f-haut"><button type="button" class="f-icone" data-fermer aria-label="Fermer"></button><h2 id="cc-titre">Catégorie</h2><span></span></div>
   <div class="f-corps" id="cc-corps" role="radiogroup" aria-labelledby="cc-titre"></div>
 </dialog>
@@ -603,7 +604,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   <div class="f-corps" id="p-corps"></div>
 </dialog>
 
-<dialog class="feuille haute" id="categories" aria-labelledby="cs-titre">
+<dialog class="feuille haute page" id="categories" aria-labelledby="cs-titre">
   <div class="f-haut"><button type="button" class="f-icone retour" data-fermer aria-label="Retour"></button><h2 id="cs-titre">Catégories</h2><span></span></div>
   <div class="f-corps" id="cs-corps"></div>
 </dialog>
@@ -677,7 +678,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 7;                       // édition de l'app, comme le cache du service worker (ascend-7)
+  const EDITION = 8;                       // édition de l'app, comme le cache du service worker (ascend-8)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------

@@ -13,7 +13,8 @@ dialog::backdrop { background: rgba(2, 3, 14, .62); -webkit-backdrop-filter: blu
 /* Les formulaires ne forment pas de boîte : en-tête, corps et pied sont posés directement dans la feuille,
    comme le Profil (un formulaire en flex imbriqué s'affichait mal sur iPhone) */
 #form-tache, #form-cat, #form-hab, #form-obj { display: contents; }
-/* Sur téléphone, créer ou modifier une tâche, un objectif, une habitude ou une catégorie ouvre une page entière :
+/* Sur téléphone, créer ou modifier une tâche, un objectif, une habitude ou une catégorie, la liste des catégories
+   et le choix d'une catégorie ouvrent une page entière :
    toute la fenêtre se voit, de l'en-tête (sous l'heure et l'encoche) au bouton du bas (au-dessus du clavier s'il est sorti) */
 @media (max-width: 639px), (orientation: landscape) and (max-height: 520px) {
   html dialog.feuille.page { top: var(--vv-haut, 0px); bottom: var(--vv-bas, 0px); left: 0; right: 0; width: 100%; max-width: none; height: auto; max-height: none;
