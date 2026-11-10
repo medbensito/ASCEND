@@ -1,7 +1,8 @@
   // ---------- Rendu ----------
   const ONGLETS = [['accueil', 'Accueil'], ['calendrier', 'Calendrier'], ['objectifs', 'Objectifs'], ['progression', 'Progression']];
   function renderOnglets() {
-    $('#onglets').innerHTML = ONGLETS.map(([id, nom]) => `<button type="button" class="onglet" data-onglet="${id}"${U.onglet === id ? ' aria-current="page"' : ''} data-focus="tab-${id}">${ICONE[id]}<span>${nom}</span></button>`).join('');
+    const onglet = ([id, nom]) => `<button type="button" class="onglet" data-onglet="${id}"${U.onglet === id ? ' aria-current="page"' : ''} data-focus="tab-${id}">${ICONE[id]}<span>${nom}</span></button>`;
+    $('#onglets').innerHTML = ONGLETS.slice(0, 2).map(onglet).join('') + `<button type="button" class="onglet-plus" data-action="ajouter" data-focus="plus" aria-label="Ajouter une tâche">${ICONE.plus}</button>` + ONGLETS.slice(2).map(onglet).join('');
   }
   function signatureFocus() { const a = document.activeElement; return a && a.dataset && a.dataset.focus ? a.dataset.focus : null; }
   function render(focus) {
@@ -271,6 +272,7 @@
     if (a === 'serie') { U.onglet = 'objectifs'; S.onglet = 'objectifs'; S.vueObj = 'habitudes'; ecrire(); $('#ecran').scrollTop = 0; return render('tab-objectifs'); }
     if (a === 'minuteur') return ouvrirMinuteur();
     if (a === 'bilan') return ouvrirBilan();
+    if (a === 'bilan-semaine') return ouvrirBilan(lundiDe(aujourdhui()));
     if (a === 'priorites') return ouvrirPriorites();
     if (a === 'pas-faites') return ouvrirPasFaites();
     if (a === 'nouvelle-habitude') return ouvrirHabitude(null);
@@ -386,7 +388,7 @@
   if (S.minuteur) { avancerMinuteur(); demarrerTic(); }
   // Écran de lancement : le A d'ASCEND, le temps d'un souffle
   const L0 = $('#lancement');
-  L0.innerHTML = `<div class="marque">${logo()}<b>ASCEND</b><small>Make everyday matter.</small></div>`;
+  L0.innerHTML = `${sceneLancement()}<div class="marque">${logo()}<b>ASCEND</b><small>Make everyday matter.</small></div>`;
   if (V.conf.actif) verrouiller(true);
   render();
   setTimeout(() => L0.classList.add('parti'), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 1100);

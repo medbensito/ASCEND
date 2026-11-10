@@ -14,14 +14,14 @@ html.paysage .ecran { overflow: hidden; gap: 0;
 .pay-mois { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: auto repeat(var(--rangs, 5), minmax(0, 1fr)); gap: 4px; touch-action: pan-y; }
 .pay-mois .jsem { text-align: center; color: var(--doux); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding-bottom: 2px; }
 .case-m { min-height: 0; overflow: hidden; display: flex; flex-direction: column; align-items: stretch; gap: 2px; padding: 4px 5px; border-radius: 10px; text-align: left;
-  border: 1px solid var(--trait); background: rgba(16, 18, 50, .75); color: var(--texte); }
+  border: 1px solid var(--trait); background: rgba(18, 18, 20, .75); color: var(--texte); }
 .case-m .n { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 16px; display: flex; justify-content: space-between; gap: 4px; }
 .case-m .n i { font-style: normal; color: var(--orange); font-size: 11px; }
-.case-m.dehors { background: rgba(10, 12, 34, .5); }
+.case-m.dehors { background: rgba(12, 12, 14, .5); }
 .case-m.dehors .n { color: var(--pale); }
-.case-m.auj { border-color: rgba(143, 155, 255, .7); }
-.case-m.auj .n { color: #9fb0ff; }
-.case-m[aria-current="date"] .n span { background: var(--accent); color: #fff; border-radius: 8px; padding: 0 6px; box-shadow: 0 0 10px rgba(110, 100, 255, .7); }
+.case-m.auj { border-color: rgba(255, 255, 255, .35); }
+.case-m.auj .n { color: #f1ebe2; }
+.case-m[aria-current="date"] .n span { background: var(--accent); color: var(--sur-accent); border-radius: 8px; padding: 0 6px; box-shadow: 0 0 10px rgba(255, 255, 255, .35); }
 .case-m .chip { display: block; font-size: 12px; line-height: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   padding: 0 3px 0 5px; border-left: 3px solid var(--c); border-radius: 3px; background: color-mix(in srgb, var(--c) 16%, transparent); }
 .case-m .chip.fait { color: var(--doux); text-decoration: line-through; }

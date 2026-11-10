@@ -1,9 +1,9 @@
   // ---------- Progression ----------
   function anneau(fraction, taille) {
     const r = 64, c = 2 * Math.PI * r, f = fraction == null ? 0 : Math.max(0, Math.min(1, fraction));
-    return `<svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="ga${taille || ''}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f6bff"/><stop offset="1" stop-color="#9a5cff"/></linearGradient></defs>
-      <circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(129,140,255,.16)" stroke-width="13"/>
-      <circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#ga${taille || ''})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}"${f > 0 ? '' : ' opacity="0"'} style="filter:drop-shadow(0 0 6px rgba(110,100,255,.7))"/></svg>`;
+    return `<svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="ga${taille || ''}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6e0d5"/><stop offset="1" stop-color="#e8e2d8"/></linearGradient></defs>
+      <circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(255, 255, 255, .08)" stroke-width="13"/>
+      <circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#ga${taille || ''})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}"${f > 0 ? '' : ' opacity="0"'} style="filter:drop-shadow(0 0 6px rgba(255, 255, 255, .35))"/></svg>`;
   }
   // Points gagnés jour par jour (ou semaine par semaine sur 90 jours) : barres, valeur la plus haute écrite
   function graphePoints(jours) {
@@ -21,9 +21,9 @@
       const h = Math.max(g.v > 0 ? 3 : 0, g.v / max * 92);
       return `<rect x="${(i * l + l * .18).toFixed(1)}" y="${(104 - h).toFixed(1)}" width="${(l * .64).toFixed(1)}" height="${h.toFixed(1)}" rx="${Math.min(4, l * .3).toFixed(1)}" fill="url(#gb)"/>`;
     }).join('');
-    const etiquette = max > 1 && iMax >= 0 ? `<text x="${Math.min(280, Math.max(20, iMax * l + l / 2)).toFixed(1)}" y="${(104 - groupes[iMax].v / max * 92 - 5).toFixed(1)}" text-anchor="middle" fill="#a3a8d4" font-size="11" font-weight="600">${nombre(max)}</text>` : '';
-    return `<svg class="courbe-pts" viewBox="0 0 300 108" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6bff"/><stop offset="1" stop-color="#4f6bff"/></linearGradient></defs>
-        <line x1="0" y1="104.5" x2="300" y2="104.5" stroke="rgba(129,140,255,.25)"/>${barres}${etiquette}</svg>
+    const etiquette = max > 1 && iMax >= 0 ? `<text x="${Math.min(280, Math.max(20, iMax * l + l / 2)).toFixed(1)}" y="${(104 - groupes[iMax].v / max * 92 - 5).toFixed(1)}" text-anchor="middle" fill="#efe9e0" font-size="11" font-weight="600">${nombre(max)}</text>` : '';
+    return `<svg class="courbe-pts" viewBox="0 0 300 108" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9e3d9"/><stop offset="1" stop-color="#e6e0d5"/></linearGradient></defs>
+        <line x1="0" y1="104.5" x2="300" y2="104.5" stroke="rgba(255, 255, 255, .125)"/>${barres}${etiquette}</svg>
       <div class="legende-courbe" aria-hidden="true"><span>${fmt(groupes[0].de, { day: 'numeric', month: 'short' })}</span><span>${parSemaine ? 'par semaine' : 'par jour'}</span><span>aujourd'hui</span></div>
       <table class="masque"><caption>Points gagnés ${parSemaine ? 'par semaine' : 'par jour'}</caption><tbody>${groupes.map(g => `<tr><th scope="row">${esc(g.nom)}</th><td>${g.v} points</td></tr>`).join('')}</tbody></table>`;
   }
@@ -49,9 +49,9 @@
     const libelleCat = id => id === 'jomo' ? { icone: '🌿', nom: 'JOMO', couleur: JOMO.libre.couleur } : { icone: cat(id).icone, nom: cat(id).nom, couleur: cat(id).couleur };
     return `
       <header class="tete"><div><h1>Progression</h1><p>Deviens la meilleure version.</p></div>
-        <span class="icone-bouton" aria-hidden="true" style="border:0;background:none;color:#8fa2ff">${ICONE.progression}</span></header>
+        <span class="icone-bouton" aria-hidden="true" style="border:0;background:none;color:#efe9df">${ICONE.progression}</span></header>
       <button type="button" class="carte b-entree" data-action="bilan" data-focus="bilan">
-        <span class="tuile" style="--c:#7b6cff" aria-hidden="true">🗓️</span><span class="quoi"><b>Bilan de la semaine</b><small>${lundiParDefaut() === lundiDe(auj) ? 'Semaine en cours' : 'Semaine'} ${texteSemaine(lundiParDefaut())}</small></span>${ICONE.droite}</button>
+        <span class="tuile" style="--c:#e8e2d8" aria-hidden="true">🗓️</span><span class="quoi"><b>Bilan de la semaine</b><small>${lundiParDefaut() === lundiDe(auj) ? 'Semaine en cours' : 'Semaine'} ${texteSemaine(lundiParDefaut())}</small></span>${ICONE.droite}</button>
       <div class="segments" role="group" aria-label="Période">
         ${[7, 30, 90].map(n => `<button type="button" aria-pressed="${n === j}" data-periode="${n}" data-focus="per${n}">${n} j</button>`).join('')}
       </div>

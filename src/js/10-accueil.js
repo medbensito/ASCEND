@@ -62,17 +62,34 @@
     const valeurs = [];
     for (let i = jours.length - 1; i >= 0; i--) { valeurs[i] = total; total -= gainDuJour(jours[i]); }
     const min = Math.min(...valeurs), max = Math.max(...valeurs), et = max - min || 1;
-    const pts = valeurs.map((v, i) => [i / 13 * 200, 62 - (v - min) / et * 46]);
+    const plat = max === min;
+    const pts = valeurs.map((v, i) => [3 + i / 13 * 194, plat ? 46 - 10 * Math.sin(i / 13 * Math.PI * 1.6) - i * 1.2 : 62 - (v - min) / et * 46]);
     const ligne = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('');
-    return `<svg class="courbe" viewBox="0 0 200 70" preserveAspectRatio="none" aria-hidden="true"><defs>
-      <linearGradient id="cp-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cff" stop-opacity=".55"/><stop offset="1" stop-color="#7a5cff" stop-opacity="0"/></linearGradient>
-      <linearGradient id="cp-l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4f6bff"/><stop offset="1" stop-color="#b38bff"/></linearGradient></defs>
-      <path d="${ligne}L200 70L0 70z" fill="url(#cp-f)"/><path d="${ligne}" fill="none" stroke="url(#cp-l)" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>`;
+    const doux = pts.map((p, i) => { if (!i) return `M${p[0].toFixed(1)} ${p[1].toFixed(1)}`; const q = pts[i - 1], m = (q[0] + p[0]) / 2; return `C${m.toFixed(1)} ${q[1].toFixed(1)} ${m.toFixed(1)} ${p[1].toFixed(1)} ${p[0].toFixed(1)} ${p[1].toFixed(1)}`; }).join('');
+    const fin = pts[13];
+    return `<svg class="courbe" viewBox="0 -8 200 86" preserveAspectRatio="none" aria-hidden="true"><defs>
+      <linearGradient id="cp-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <linearGradient id="cp-l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".35" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff"/></linearGradient>
+      <filter id="cp-g" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+      <path d="${doux}L197 78L3 78z" fill="url(#cp-f)"/>
+      <path d="${doux}" fill="none" stroke="url(#cp-l)" stroke-width="5" filter="url(#cp-g)" opacity=".8" vector-effect="non-scaling-stroke"/>
+      <path d="${doux}" fill="none" stroke="url(#cp-l)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+      <circle cx="${fin[0].toFixed(1)}" cy="${fin[1].toFixed(1)}" r="1.6" fill="#fff"/></svg>`;
   }
   function aValider() {
     const auj = aujourdhui(), res = [];
     for (let i = CONFIG.validation; i >= 0; i--) duJour(decaler(auj, -i)).forEach(o => { if (o.el.type === 'sansecran' && etatSansEcran(o) === 'a-valider') res.push(o); });
     return res;
+  }
+  // « Ta progression cette semaine » : part des objectifs de la semaine déjà atteinte ; ouvre le bilan en cours
+  function carteSemaine() {
+    const st = statsSemaine(lundiDe(aujourdhui()));
+    if (st.taux == null) return '';
+    const pc = Math.round(st.taux * 100), d = st.diff;
+    return `<button type="button" class="carte sem-carte" data-action="bilan-semaine" data-focus="sem" aria-label="Ta progression cette semaine : ${pc} % de tes objectifs${d == null ? '' : `, ${d > 0 ? '+' : ''}${Math.round(d * 100)} % de points par rapport à la semaine dernière`}. Ouvrir le bilan">
+        <span class="sem-haut" aria-hidden="true"><span>Ta progression cette semaine</span><b>${pc}<small>%</small></b></span>
+        <span class="sem-barre" aria-hidden="true"><i style="width:${Math.max(pc, 2)}%"></i></span>
+        ${d == null ? '<span class="sem-bas" aria-hidden="true">Objectifs de la semaine</span>' : `<span class="sem-bas" aria-hidden="true"><b class="${d > .005 ? 'hausse' : d < -.005 ? 'baisse' : ''}">${d > 0 ? '+' : ''}${Math.round(d * 100)} %</b> vs semaine dernière</span>`}</button>`;
   }
   function vueAccueil() {
     const auj = aujourdhui(), P = palier(), suiv = palierSuivant(), g = gainDuJour(auj);
@@ -82,17 +99,17 @@
     const val = aValider();
     return `
       <header class="tete salut">
-        <div><h1>Bonjour ${esc(S.profil.prenom || '')} 👋</h1><p>Continue d'avancer.</p></div>
+        <div><h1>Bonjour ${esc(S.profil.prenom || '')}</h1><p>Continue d'avancer.</p></div>
         <button type="button" class="avatar" data-action="profil" aria-label="Profil et réglages" data-focus="profil">${esc((S.profil.initiales || '?').slice(0, 2))}</button>
       </header>
-      <section class="carte points" aria-labelledby="tes-points">
-        <h2 class="libelle" id="tes-points"><span class="etoile" aria-hidden="true">${ICONE.etoile}</span>Tes points</h2>
-        <p class="total"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b>
+      <section class="points" aria-labelledby="tes-points">
+        <h2 class="masque" id="tes-points">Tes points</h2>
+        <p class="total"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b><small>pts</small>
           <span class="${g ? '' : 'zero'}">${g > 0 ? ICONE.hausse : ''}${g ? (g > 0 ? '+' : '') + nombre(g) : '+0'}<span class="masque"> aujourd'hui</span></span></p>
-        <p class="palier"><b>${P.nom}</b>${suiv ? ` · encore ${nombre(suiv.seuil - S.points)} pts avant ${suiv.nom}` : ' · palier ultime'}</p>
-        ${embleme(P.id)}
         ${courbePoints()}
+        <p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
       </section>
+      ${carteSemaine()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
@@ -107,7 +124,6 @@
           ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
         </div>
       </section>
-      <button type="button" class="bouton" data-action="ajouter" data-focus="ajouter">${ICONE.plus} Ajouter une tâche</button>
       <div class="duo">
         <button type="button" class="carte mini" data-action="serie" data-focus="serie" aria-label="Série actuelle : ${pluriel(s, 'jour')} d'affilée avec toutes tes habitudes. Meilleure : ${pluriel(Math.max(S.meilleureSerie, s), 'jour')}.">
           <span class="titre-mini" aria-hidden="true">🔥 Série</span><b aria-hidden="true">${s} j</b><small aria-hidden="true">Meilleure : ${Math.max(S.meilleureSerie, s)} j</small></button>

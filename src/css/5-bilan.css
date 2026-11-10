@@ -15,15 +15,15 @@
 .prio-ligne:first-child { border-top: 0; }
 .prio-ligne span { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
 .prio-ligne .rond-coche { width: 26px; height: 26px; }
-.prio-ligne.faite span { color: var(--doux); text-decoration: line-through; text-decoration-color: rgba(163, 168, 212, .6); }
+.prio-ligne.faite span { color: var(--doux); text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, .3); }
 
 /* Saisie des priorités */
 .prio-champ { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; border-bottom: 1px solid var(--trait); }
 .prio-champ:last-child { border-bottom: 0; }
-.prio-champ .num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex: none; font-size: 13px; font-weight: 800; color: #fff; background: var(--accent); }
+.prio-champ .num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex: none; font-size: 13px; font-weight: 800; color: var(--sur-accent); background: var(--accent); }
 .prio-champ input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font-size: 16px; padding: 14px 0; }
 .prio-champ input::placeholder { color: var(--pale); opacity: 1; }
-.prio-champ:focus-within { background: rgba(79, 107, 255, .1); }
+.prio-champ:focus-within { background: rgba(255, 255, 255, .05); }
 
 /* Feuille du bilan */
 #bilan .f-corps { gap: 20px; }
@@ -37,7 +37,7 @@
 .b-semaine .icone-bouton:disabled { opacity: .3; }
 .b-semaine .icone-bouton svg { width: 18px; height: 18px; }
 .b-hero { display: grid; grid-template-columns: auto 1fr; gap: 14px 18px; align-items: center; padding: 16px;
-  background: radial-gradient(120% 120% at 100% 0%, rgba(123, 77, 255, .3), transparent 55%), linear-gradient(180deg, rgba(28, 31, 76, .9), rgba(14, 16, 44, .95)); }
+  background: radial-gradient(120% 120% at 100% 0%, rgba(255, 255, 255, .15), transparent 55%), linear-gradient(180deg, rgba(30, 30, 32, .9), rgba(16, 16, 18, .95)); }
 .b-chiffres { display: grid; gap: 6px; min-width: 0; }
 .b-pts { color: var(--doux); font-size: 14px; }
 .b-pts b { color: var(--texte); font-size: 30px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-right: 2px; }
@@ -66,7 +66,7 @@
 .prio-revue li > span:last-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .prio-revue .marque-prio { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--anneau); display: grid; place-items: center; flex: none; color: #fff; }
 .prio-revue .marque-prio svg { width: 13px; height: 13px; }
-.prio-revue li.faite .marque-prio { background: var(--accent); border-color: #8f9bff; }
+.prio-revue li.faite .marque-prio { background: var(--accent); border-color: #eee8de; }
 .prio-revue li:not(.faite) > span:last-child { color: var(--doux); }
 .b-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .b-grille .mini { min-height: 0; padding: 12px 14px; }
@@ -92,11 +92,11 @@
 .pf-haut .quoi small { color: var(--doux); font-size: 12.5px; }
 .pf-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .pf-b { display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; padding: 6px 4px; border-radius: 14px; border: 1px solid var(--trait-fort);
-  background: rgba(33, 37, 88, .55); color: var(--texte); font-size: 12.5px; font-weight: 650; text-align: center; line-height: 1.15; }
+  background: rgba(35, 35, 37, .55); color: var(--texte); font-size: 12.5px; font-weight: 650; text-align: center; line-height: 1.15; }
 .pf-b svg { width: 18px; height: 18px; }
 .pf-b > span[aria-hidden] { font-size: 17px; line-height: 18px; }
 .pf-b[data-pf="fait"] svg { color: var(--vert); }
-.pf-b[aria-expanded="true"] { background: rgba(79, 107, 255, .25); border-color: #8f9bff; }
+.pf-b[aria-expanded="true"] { background: rgba(255, 255, 255, .125); border-color: #eee8de; }
 .pf-reports { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .pf-reports .bouton { font-size: 14px; padding: 0 10px; }
 .pf-reports .bouton:last-child:nth-child(odd) { grid-column: 1 / -1; }

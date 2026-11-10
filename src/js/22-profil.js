@@ -11,8 +11,8 @@
         <span class="embleme-p" aria-hidden="true">${embleme(P.id)}</span>
       </div>
       <fieldset><legend>Toi</legend><div class="groupe">
-        <label class="rang"><span>Prénom</span><input type="text" data-profil="prenom" maxlength="24" autocomplete="given-name" value="${esc(S.profil.prenom || '')}" style="max-width:55%;text-align:right;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
-        <label class="rang"><span>Initiales</span><input type="text" data-profil="initiales" maxlength="2" autocomplete="off" value="${esc(S.profil.initiales || '')}" style="width:64px;text-align:center;text-transform:uppercase;border:1px solid var(--trait-fort);background:rgba(10,12,34,.8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
+        <label class="rang"><span>Prénom</span><input type="text" data-profil="prenom" maxlength="24" autocomplete="given-name" value="${esc(S.profil.prenom || '')}" style="max-width:55%;text-align:right;border:1px solid var(--trait-fort);background:rgba(12, 12, 14, .8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
+        <label class="rang"><span>Initiales</span><input type="text" data-profil="initiales" maxlength="2" autocomplete="off" value="${esc(S.profil.initiales || '')}" style="width:64px;text-align:center;text-transform:uppercase;border:1px solid var(--trait-fort);background:rgba(12, 12, 14, .8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
       </div></fieldset>
       <fieldset><legend>Ton univers</legend><div class="groupe">
         <button type="button" class="rang" data-p="categories"><span><span class="ic">🗂️</span><span>Catégories<span class="sous">${S.categories.filter(c => c.active).length} actives · points et objectifs par semaine</span></span></span><span class="val">${ICONE.droite}</span></button>
@@ -143,9 +143,9 @@
       <div class="m-centre">
         <div class="m-tache"><b>${M && M.titre ? esc(M.titre) : 'Session libre'}</b><small>${c.icone} ${esc(c.nom)} · Pomodoro ${R.travail} / ${R.pause}</small></div>
         <div class="m-anneau" role="timer" aria-live="off" aria-label="${libelle} : ${mmss(reste)} restantes">
-          <svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="gm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${phase === 'pause' ? '#2fd3c5' : '#4f6bff'}"/><stop offset="1" stop-color="${phase === 'pause' ? '#57c3ff' : '#9a5cff'}"/></linearGradient></defs>
-            <circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(129,140,255,.14)" stroke-width="8"/>
-            <circle data-arc cx="80" cy="80" r="${r}" fill="none" stroke="url(#gm)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(circ * (1 - reste / tot)).toFixed(1)} 999" style="filter:drop-shadow(0 0 8px rgba(110,100,255,.8))"/></svg>
+          <svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="gm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${phase === 'pause' ? '#2fd3c5' : '#e6e0d5'}"/><stop offset="1" stop-color="${phase === 'pause' ? '#57c3ff' : '#e8e2d8'}"/></linearGradient></defs>
+            <circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(255, 255, 255, .07)" stroke-width="8"/>
+            <circle data-arc cx="80" cy="80" r="${r}" fill="none" stroke="url(#gm)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${(circ * (1 - reste / tot)).toFixed(1)} 999" style="filter:drop-shadow(0 0 8px rgba(255, 255, 255, .4))"/></svg>
           <div class="temps" aria-hidden="true"><b data-temps>${mmss(reste)}</b><span>${libelle}</span></div>
         </div>
         ${M ? `<div class="m-cycles" role="img" aria-label="${pluriel(M.phase === 'travail' ? M.cycle - 1 : M.cycle, 'session terminée', 'sessions terminées')}">${Array.from({ length: Math.max(4, M.cycle) }, (_, i) => `<i class="${i < (M.phase === 'travail' ? M.cycle - 1 : M.cycle) ? 'fait' : ''}"></i>`).join('')}</div>` : ''}
