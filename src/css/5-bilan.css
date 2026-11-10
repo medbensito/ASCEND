@@ -113,3 +113,27 @@
 .difficile .bouton.petit { font-size: 13.5px; padding: 0 12px; line-height: 1.15; text-align: center; }
 .dur-lien { align-self: center; margin: 6px auto 0; display: flex; color: var(--doux); min-height: 44px; }
 .etiquette .sous { color: var(--pale); font-weight: 500; }
+
+/* ===== Qui je deviens ===== */
+.idt .section-tete { margin-bottom: 4px; align-items: center; }
+.idt-liste { display: grid; }
+.idt-ligne { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 0; border: 0; border-top: 1px solid var(--trait); background: none; color: inherit; text-align: left; }
+.idt-ligne:first-child { border-top: 0; }
+.groupe .idt-ligne { padding: 10px 14px; }
+.idt-ligne .tuile { --c: #e4d3b3; font-size: 20px; }
+.idt-ligne .quoi { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.idt-ligne .quoi b { font-size: 15.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.idt-ligne .quoi small { color: var(--doux); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.idt-ligne .barre-obj { height: 4px; margin-top: 4px; }
+.idt-ligne.dort .tuile { opacity: .55; filter: grayscale(.6); }
+.idt-ligne.dort .quoi small { color: var(--accent-texte); }
+.idt-val { display: grid; justify-items: end; flex: none; }
+.idt-val b { font-size: 24px; font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; }
+.idt-val small { color: var(--doux); font-size: 11px; }
+.pastilles { display: flex; flex-wrap: wrap; gap: 8px; }
+.pastille { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--trait-fort); background: rgba(255, 255, 255, .05); color: var(--texte); font-size: 14px; font-weight: 550; }
+.pastille.ronde { width: 46px; padding: 0; font-size: 20px; }
+.pastille[aria-checked="true"] { background: rgba(255, 255, 255, .16); border-color: #fff; box-shadow: 0 0 14px rgba(255, 255, 255, .25); }
+.idt-revue li > span:last-child { display: grid; gap: 2px; }
+.idt-revue li small { color: var(--doux); font-size: 12.5px; }
+.idt-revue li:not(.faite) .tuile { opacity: .5; filter: grayscale(.6); }

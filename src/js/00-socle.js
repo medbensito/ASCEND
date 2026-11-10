@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 13;                      // édition de l'app, comme le cache du service worker (ascend-13)
+  const EDITION = 14;                      // édition de l'app, comme le cache du service worker (ascend-14)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -72,7 +72,7 @@
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null,
+    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [],
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -92,6 +92,9 @@
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (typeof S.vu !== 'string') S.vu = null;
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
+    S.identites = (Array.isArray(S.identites) ? S.identites : []).filter(x => x && x.id && typeof x.nom === 'string' && x.nom.trim()).slice(0, 4);
+    S.identites.forEach(x => { x.icone = typeof x.icone === 'string' && x.icone ? x.icone : '🎯'; x.phrase = typeof x.phrase === 'string' ? x.phrase : ''; });
+    S.categories.forEach(c => { if (c && !S.identites.some(x => x.id === c.identite)) c.identite = null; });
     S.categories.forEach(c => {
       c.points = Math.max(0, Math.min(1000, Math.round(Number(c.points) || 0)));
       c.objectif = Math.max(0, Math.min(21, Math.round(Number(c.objectif) || 0)));

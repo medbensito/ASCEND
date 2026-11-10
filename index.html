@@ -708,6 +708,30 @@ html.paysage .pay:has(.ajuste) .fab { width: 46px; height: 46px; right: 2px; bot
 .difficile .bouton.petit { font-size: 13.5px; padding: 0 12px; line-height: 1.15; text-align: center; }
 .dur-lien { align-self: center; margin: 6px auto 0; display: flex; color: var(--doux); min-height: 44px; }
 .etiquette .sous { color: var(--pale); font-weight: 500; }
+
+/* ===== Qui je deviens ===== */
+.idt .section-tete { margin-bottom: 4px; align-items: center; }
+.idt-liste { display: grid; }
+.idt-ligne { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 0; border: 0; border-top: 1px solid var(--trait); background: none; color: inherit; text-align: left; }
+.idt-ligne:first-child { border-top: 0; }
+.groupe .idt-ligne { padding: 10px 14px; }
+.idt-ligne .tuile { --c: #e4d3b3; font-size: 20px; }
+.idt-ligne .quoi { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.idt-ligne .quoi b { font-size: 15.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.idt-ligne .quoi small { color: var(--doux); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.idt-ligne .barre-obj { height: 4px; margin-top: 4px; }
+.idt-ligne.dort .tuile { opacity: .55; filter: grayscale(.6); }
+.idt-ligne.dort .quoi small { color: var(--accent-texte); }
+.idt-val { display: grid; justify-items: end; flex: none; }
+.idt-val b { font-size: 24px; font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; }
+.idt-val small { color: var(--doux); font-size: 11px; }
+.pastilles { display: flex; flex-wrap: wrap; gap: 8px; }
+.pastille { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--trait-fort); background: rgba(255, 255, 255, .05); color: var(--texte); font-size: 14px; font-weight: 550; }
+.pastille.ronde { width: 46px; padding: 0; font-size: 20px; }
+.pastille[aria-checked="true"] { background: rgba(255, 255, 255, .16); border-color: #fff; box-shadow: 0 0 14px rgba(255, 255, 255, .25); }
+.idt-revue li > span:last-child { display: grid; gap: 2px; }
+.idt-revue li small { color: var(--doux); font-size: 12.5px; }
+.idt-revue li:not(.faite) .tuile { opacity: .5; filter: grayscale(.6); }
 /* ===== Refonte (édition 11) : noir profond, verre, platine, arcs de lumière ===== */
 :root {
   --fond: #050506;
@@ -945,6 +969,13 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   <div class="f-pied" id="pf-pied"></div>
 </dialog>
 
+<dialog class="feuille haute page" id="identites" aria-labelledby="i-titre">
+  <div class="f-haut"><button type="button" class="f-icone" data-i-retour aria-label="Fermer"></button><h2 id="i-titre">Qui je deviens</h2><span></span></div>
+  <p class="f-msg" role="status" aria-live="polite"></p>
+  <div class="f-corps" id="i-corps"></div>
+  <div class="f-pied" id="i-pied"></div>
+</dialog>
+
 <dialog class="minuteur" id="minuteur" aria-labelledby="m-titre">
   <div class="m-corps" id="m-corps"></div>
 </dialog>
@@ -1002,7 +1033,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 13;                      // édition de l'app, comme le cache du service worker (ascend-13)
+  const EDITION = 14;                      // édition de l'app, comme le cache du service worker (ascend-14)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -1072,7 +1103,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null,
+    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [],
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -1092,6 +1123,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (typeof S.vu !== 'string') S.vu = null;
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
+    S.identites = (Array.isArray(S.identites) ? S.identites : []).filter(x => x && x.id && typeof x.nom === 'string' && x.nom.trim()).slice(0, 4);
+    S.identites.forEach(x => { x.icone = typeof x.icone === 'string' && x.icone ? x.icone : '🎯'; x.phrase = typeof x.phrase === 'string' ? x.phrase : ''; });
+    S.categories.forEach(c => { if (c && !S.identites.some(x => x.id === c.identite)) c.identite = null; });
     S.categories.forEach(c => {
       c.points = Math.max(0, Math.min(1000, Math.round(Number(c.points) || 0)));
       c.objectif = Math.max(0, Math.min(21, Math.round(Number(c.objectif) || 0)));
@@ -1386,7 +1420,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const pts = valeur(o.el);
     if (!prevue(o)) return 'Bien joué ! Pas de points : elle a été ajoutée après son début.';
     if (debutOcc(o) > Date.now()) return `Faite en avance : +${pts} pts ${o.k === aujourdhui() ? 'à ' + hhmm(o.el.debut) : quandJour(o.k)}.`;
-    return `+${gagner(o.cle, pts, o.k, 'tache', cat(o.el.cat).id)} pts`;
+    return `+${gagner(o.cle, pts, o.k, 'tache', cat(o.el.cat).id)} pts${echoIdentite(o.el.cat)}`;
   }
   // Moment sans écran : tenu ou pas (on peut changer d'avis)
   function validerSansEcran(o, tenu) {
@@ -1434,7 +1468,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (s > S.meilleureSerie) S.meilleureSerie = s;
     const toutes = S.habitudes.filter(x => habitudeDue(x, k));
     const reste = toutes.filter(x => !x.faits[k]).length;
-    return `+${pts} pts` + (k === aujourdhui() ? (reste ? ` · encore ${pluriel(reste, 'habitude')} aujourd'hui` : ` · série : ${pluriel(s, 'jour')} 🔥`) : '');
+    return `+${pts} pts` + (k === aujourdhui() ? (reste ? ` · encore ${pluriel(reste, 'habitude')} aujourd'hui` : ` · série : ${pluriel(s, 'jour')} 🔥`) : '') + echoIdentite(h.cat);
   }
   // Un jour compte si toutes les habitudes prévues ce jour-là sont faites ; null si aucune n'était prévue.
   function jourComplet(k) {
@@ -1811,6 +1845,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
       </section>
       ${carteSemaine()}
+      ${carteIdentites()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
@@ -2406,7 +2441,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <div class="section-tete"><h3 id="b-cible">${st.enCours ? 'Tes priorités de la semaine' : 'Ta semaine qui commence'}</h3></div>${st.enCours ? '' : lienPf}
         <p class="note">${st.enCours ? 'Coche-les sur l\'accueil quand elles sont tenues.' : `Choisis 1 à 3 priorités, ${texteSemaine(lundiAuj)}. Elles t'attendent sur l'accueil.`}</p>
         ${editeurPriorites(B.cible)}</section>` : '';
-    corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + stats + (st.enCours ? '' : edit);
+    corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + bilanIdentites(B.lundi) + stats + (st.enCours ? '' : edit);
     pied.innerHTML = B.cible ? `<button type="button" class="bouton" data-b="fermer">${B.auto ? 'C\'est parti !' : 'Enregistrer'}</button>`
       : `<button type="button" class="bouton secondaire" data-b="fermer">Fermer</button>`;
     if (focus) { const c = BD.querySelector(`[data-focus="${focus}"]`); if (c && !c.disabled) c.focus(); else { const t = BD.querySelector('[data-fermer]'); if (t) t.focus(); } }
@@ -2647,6 +2682,148 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     }
     proposerBilan();
   }
+  // ---------- Qui je deviens ----------
+  // 1 à 4 identités (« Athlète », « Bâtisseur »…). Chaque catégorie peut en nourrir une : chaque tâche ou habitude faite
+  // dans cette catégorie est un acte qui te fait devenir cette personne. S.identites = [{ id, nom, icone, phrase }] ; categorie.identite = id.
+  const IDEES = [['Athlète', '🏃', 'Je prends soin de mon corps, chaque semaine.'], ['Bâtisseur', '🏗️', 'J\'avance sur ce qui compte, pas seulement sur l\'urgent.'],
+    ['Esprit curieux', '📚', 'J\'apprends quelque chose chaque jour.'], ['Présent pour les miens', '🤝', 'Je donne du temps à ceux que j\'aime.'],
+    ['Serein', '🧘', 'Je protège mon calme et mon repos.'], ['Créateur', '🎨', 'Je fabrique, j\'écris, je crée.']];
+  const EMOJIS_ID = ['🏃', '🏗️', '📚', '🤝', '🧘', '🎨', '💪', '🧠', '❤️', '🌱', '🎯', '✨'];
+  const identite = id => S.identites.find(x => x.id === id) || null;
+  const catsIdentite = id => S.categories.filter(c => c.identite === id);
+  const identiteDeCat = catId => { const c = S.categories.find(x => x.id === catId); return c && c.identite ? identite(c.identite) : null; };
+  // Actes d'une identité sur une période, et part de ses objectifs de la semaine déjà tenue
+  function statsIdentite(idt, a, b) {
+    const cats = catsIdentite(idt.id), G = gainsEntre(a, b);
+    let actes = 0, vise = 0, tenu = 0, pts = 0;
+    cats.forEach(c => { const n = faitsCat(c.id, a, b); actes += n; pts += G.cats[c.id] || 0; if (c.active && c.objectif) { vise += c.objectif; tenu += Math.min(n, c.objectif); } });
+    return { cats, actes, pts, taux: vise ? tenu / vise : null };
+  }
+  const enSommeil = idt => { const auj = aujourdhui(); return catsIdentite(idt.id).length > 0 && statsIdentite(idt, decaler(auj, -6), auj).actes === 0; };
+  // Après une tâche ou une habitude faite : « tu deviens… »
+  const echoIdentite = catId => { const i = identiteDeCat(catId); return i ? ` · ${i.icone} ${i.nom}` : ''; };
+
+  function ligneIdentite(idt, a, b, focus) {
+    const st = statsIdentite(idt, a, b), dort = enSommeil(idt), pc = st.taux == null ? null : Math.round(st.taux * 100);
+    const lab = `${idt.nom} : ${pluriel(st.actes, 'acte')} cette semaine${pc == null ? '' : `, ${pc} % de ses objectifs`}${dort ? ', en sommeil depuis 7 jours' : ''}${st.cats.length ? '' : ', aucune catégorie rattachée'}. Modifier`;
+    return `<button type="button" class="idt-ligne${dort ? ' dort' : ''}" data-identite="${esc(idt.id)}" data-focus="${focus}${esc(idt.id)}" aria-label="${esc(lab)}">
+        <span class="tuile" aria-hidden="true">${idt.icone}</span>
+        <span class="quoi" aria-hidden="true"><b>${esc(idt.nom)}</b><small>${st.cats.length ? (dort ? 'En sommeil : un petit acte la réveille' : esc(st.cats.map(c => c.nom).join(' · '))) : 'Rattache-lui une catégorie'}</small>
+          ${pc == null ? '' : `<span class="barre-obj"><i style="width:${Math.max(pc, 2)}%"></i></span>`}</span>
+        <span class="idt-val" aria-hidden="true"><b>${st.actes}</b><small>${st.actes > 1 ? 'actes' : 'acte'}</small></span></button>`;
+  }
+  // Sur l'accueil
+  function carteIdentites() {
+    const l = lundiDe(aujourdhui()), d = decaler(l, 6);
+    if (!S.identites.length) return `<button type="button" class="carte b-entree" data-action="identites" data-focus="idt">
+        <span class="tuile" style="--c:#e4d3b3" aria-hidden="true">🧭</span><span class="quoi"><b>Qui veux-tu devenir ?</b><small>Donne un sens à tes points : choisis 1 à 4 identités.</small></span>${ICONE.droite}</button>`;
+    return `<section class="carte pad idt" aria-labelledby="idt-titre">
+        <div class="section-tete"><h2 id="idt-titre">Qui je deviens</h2><button type="button" class="lien" data-action="identites" data-focus="idt" aria-label="Modifier mes identités">Modifier</button></div>
+        <div class="idt-liste">${S.identites.map(i => ligneIdentite(i, l, d, 'idt')).join('')}</div></section>`;
+  }
+  // Dans le bilan de la semaine
+  function bilanIdentites(lundi) {
+    if (!S.identites.length) return '';
+    const dim = decaler(lundi, 6);
+    const l = S.identites.map(i => ({ i, st: statsIdentite(i, lundi, dim) })).sort((x, y) => y.st.actes - x.st.actes);
+    return `<section aria-labelledby="b-idt"><div class="section-tete"><h3 id="b-idt">Qui tu as nourri</h3></div>
+        <ul class="groupe prio-revue idt-revue">${l.map(({ i, st }) => `<li class="${st.actes ? 'faite' : ''}"><span class="tuile petite" aria-hidden="true">${i.icone}</span>
+          <span>${esc(i.nom)}<small>${st.actes ? `${pluriel(st.actes, 'acte')} · +${nombre(st.pts)} pts` : (st.cats.length ? 'rien cette semaine-là' : 'aucune catégorie rattachée')}</small></span></li>`).join('')}</ul></section>`;
+  }
+
+  // ---------- La page ----------
+  const ID = $('#identites');
+  const I = { edit: null, brouillon: null };       // edit : id, 'nouveau' ou null (liste)
+  function ouvrirIdentites(id) {
+    I.edit = null;
+    if (id) editerIdentite(id); else renderIdentites();
+    if (!ID.open) ID.showModal();
+  }
+  function editerIdentite(id) {
+    const x = id === 'nouveau' ? null : identite(id);
+    I.edit = x ? x.id : 'nouveau';
+    I.brouillon = x ? { nom: x.nom, icone: x.icone, phrase: x.phrase || '', cats: catsIdentite(x.id).map(c => c.id) } : { nom: '', icone: '🎯', phrase: '', cats: [] };
+    renderIdentites();
+  }
+  function renderIdentites(focus) {
+    const corps = $('#i-corps'), pied = $('#i-pied'), haut = ID.querySelector('[data-i-retour]');
+    ID.querySelector('.f-msg').textContent = '';
+    if (!I.edit) {
+      const l = lundiDe(aujourdhui()), d = decaler(l, 6);
+      haut.innerHTML = ICONE.croix; haut.setAttribute('aria-label', 'Fermer');
+      $('#i-titre').textContent = 'Qui je deviens';
+      corps.innerHTML = `<p class="note">Tu ne coches pas des cases : tu deviens quelqu'un. Choisis 1 à 4 identités et rattache-leur tes catégories. Chaque tâche ou habitude faite est un acte de plus.</p>
+        ${S.identites.length ? `<div class="groupe idt-liste">${S.identites.map(i => ligneIdentite(i, l, d, 'idl')).join('')}</div>` : '<p class="carte vide">Aucune identité pour l\'instant. Qui veux-tu être dans un an ?</p>'}`;
+      pied.innerHTML = S.identites.length < 4 ? `<button type="button" class="bouton" data-i="nouvelle" data-focus="i-nouvelle">${ICONE.plus} Ajouter une identité</button>` : `<p class="note" style="text-align:center">4 identités au plus : choisir, c'est renoncer.</p>`;
+    } else {
+      const b = I.brouillon, nouveau = I.edit === 'nouveau';
+      haut.innerHTML = ICONE.gauche; haut.setAttribute('aria-label', 'Retour');
+      $('#i-titre').textContent = nouveau ? 'Nouvelle identité' : 'Identité';
+      const prises = S.identites.map(x => x.nom);
+      corps.innerHTML = `
+        ${nouveau ? `<div><span class="etiquette" id="i-idees">Des idées</span><div class="pastilles" role="group" aria-labelledby="i-idees">${IDEES.filter(x => !prises.includes(x[0])).map((x, n) => `<button type="button" class="pastille" data-i-idee="${IDEES.indexOf(x)}" data-focus="idee${n}">${x[1]} ${x[0]}</button>`).join('')}</div></div>` : ''}
+        <label class="champ-nom"><span aria-hidden="true">${b.icone}</span><span class="masque">Nom de l'identité</span><input name="i-nom" maxlength="40" autocomplete="off" placeholder="Athlète, Bâtisseur…" value="${esc(b.nom)}"></label>
+        <div><span class="etiquette" id="i-ic">Symbole</span><div class="pastilles" role="radiogroup" aria-labelledby="i-ic">${EMOJIS_ID.map((e, n) => `<button type="button" class="pastille ronde" role="radio" aria-checked="${e === b.icone}" aria-label="Symbole ${e}" data-i-icone="${e}" data-focus="ic${n}">${e}</button>`).join('')}</div></div>
+        <div><label class="etiquette" for="i-phrase">Ce que ça veut dire <span class="sous">facultatif</span></label>
+          <label class="champ-nom"><span aria-hidden="true">💬</span><input id="i-phrase" name="i-phrase" maxlength="80" autocomplete="off" placeholder="Je suis quelqu'un qui…" value="${esc(b.phrase)}"></label></div>
+        <div><span class="etiquette" id="i-cats">Les catégories qui la nourrissent</span>
+          <div class="groupe" role="group" aria-labelledby="i-cats">${S.categories.filter(c => c.active || b.cats.includes(c.id)).map(c => { const autre = c.identite && c.identite !== I.edit ? identite(c.identite) : null;
+            return `<label class="rang"><span><span class="tuile petite" style="--c:${c.couleur}" aria-hidden="true">${c.icone}</span><span>${esc(c.nom)}${autre && !b.cats.includes(c.id) ? `<span class="sous">nourrit déjà « ${esc(autre.nom)} »</span>` : ''}</span></span>
+              <span class="interrupteur"><input type="checkbox" role="switch" data-i-cat="${esc(c.id)}"${b.cats.includes(c.id) ? ' checked' : ''}><i></i></span></label>`; }).join('')}</div>
+          <p class="note" style="margin-top:8px">Une catégorie nourrit une seule identité.</p></div>
+        <p class="erreur" id="i-erreur" role="alert"></p>
+        ${nouveau ? '' : `<button type="button" class="bouton danger" data-i="supprimer">${ICONE.corbeille} Retirer cette identité</button>`}`;
+      pied.innerHTML = `<button type="button" class="bouton" data-i="enregistrer">${nouveau ? 'Devenir cette personne' : 'Enregistrer'}</button>`;
+    }
+    if (focus) { const c = ID.querySelector(`[data-focus="${CSS.escape(focus)}"]`); if (c) c.focus(); }
+  }
+  const lireIdentite = () => { const n = ID.querySelector('[name="i-nom"]'), p = ID.querySelector('[name="i-phrase"]'); if (n) I.brouillon.nom = n.value.trim().replace(/\s+/g, ' '); if (p) I.brouillon.phrase = p.value.trim(); };
+  ID.addEventListener('change', e => {
+    const c = e.target.dataset && e.target.dataset.iCat;
+    if (!c) return;
+    const l = I.brouillon.cats;
+    if (e.target.checked) { if (!l.includes(c)) l.push(c); } else l.splice(l.indexOf(c), 1);
+  });
+  ID.addEventListener('click', async e => {
+    if (e.target.closest('[data-i-retour]')) { if (I.edit && S.identites.length) { I.edit = null; renderIdentites(); } else ID.close(); return; }
+    const li = e.target.closest('[data-identite]');
+    if (li) return editerIdentite(li.dataset.identite);
+    const idee = e.target.closest('[data-i-idee]');
+    if (idee) { const x = IDEES[+idee.dataset.iIdee]; lireIdentite(); Object.assign(I.brouillon, { nom: x[0], icone: x[1], phrase: x[2] }); return renderIdentites(); }
+    const ic = e.target.closest('[data-i-icone]');
+    if (ic) { lireIdentite(); I.brouillon.icone = ic.dataset.iIcone; return renderIdentites(ic.dataset.focus); }
+    const b = e.target.closest('[data-i]');
+    if (!b) return;
+    const a = b.dataset.i;
+    if (a === 'nouvelle') return editerIdentite('nouveau');
+    if (a === 'enregistrer') {
+      lireIdentite();
+      const br = I.brouillon;
+      if (!br.nom) { $('#i-erreur').textContent = 'Donne un nom à cette identité.'; ID.querySelector('[name="i-nom"]').focus(); return; }
+      let x = identite(I.edit);
+      if (!x) { x = { id: uid() }; S.identites.push(x); }
+      Object.assign(x, { nom: br.nom.slice(0, 40), icone: br.icone, phrase: br.phrase.slice(0, 80) });
+      S.categories.forEach(c => { if (br.cats.includes(c.id)) c.identite = x.id; else if (c.identite === x.id) c.identite = null; });
+      sauver();
+      const nouveau = I.edit === 'nouveau';
+      I.edit = null;
+      renderIdentites();
+      ID.querySelector('.f-msg').textContent = '';
+      dire(nouveau ? `${x.icone} ${x.nom} : chaque acte compte, à partir de maintenant.` : 'Identité enregistrée.');
+      return;
+    }
+    if (a === 'supprimer') {
+      const x = identite(I.edit);
+      if (!(await demander('Retirer cette identité ?', `« ${x.nom} » ne sera plus suivie. Tes catégories, tes tâches et tes points ne changent pas.`, [{ texte: 'Retirer', valeur: true, danger: true }, { texte: 'Annuler', valeur: false, clair: true }]))) return;
+      S.identites = S.identites.filter(y => y.id !== x.id);
+      S.categories.forEach(c => { if (c.identite === x.id) c.identite = null; });
+      sauver();
+      I.edit = null;
+      renderIdentites();
+      dire('Identité retirée.');
+    }
+  });
+  ID.addEventListener('close', () => { I.edit = null; render(); });
   // ---------- Questions (remplacent confirm) ----------
   function demander(titreQ, texte, options) {
     return new Promise(resoudre => {
@@ -3227,6 +3404,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <label class="rang"><span>Initiales</span><input type="text" data-profil="initiales" maxlength="2" autocomplete="off" value="${esc(S.profil.initiales || '')}" style="width:64px;text-align:center;text-transform:uppercase;border:1px solid var(--trait-fort);background:rgba(12, 12, 14, .8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
       </div></fieldset>
       <fieldset><legend>Ton univers</legend><div class="groupe">
+        <button type="button" class="rang" data-p="identites"><span><span class="ic">🧭</span><span>Qui je deviens<span class="sous">${S.identites.length ? esc(S.identites.map(x => x.nom).join(' · ')) : 'Choisis 1 à 4 identités'}</span></span></span><span class="val">${ICONE.droite}</span></button>
         <button type="button" class="rang" data-p="categories"><span><span class="ic">🗂️</span><span>Catégories<span class="sous">${S.categories.filter(c => c.active).length} actives · points et objectifs par semaine</span></span></span><span class="val">${ICONE.droite}</span></button>
         <label class="rang"><span><span class="ic">⚖️</span><span>Plafond par jour<span class="sous">JOMO : au-delà, ASCEND te prévient</span></span></span><select data-reglage="plafond">${plafonds.map(m => `<option value="${m}"${m === R.plafond ? ' selected' : ''}>${duree(m)}</option>`).join('')}</select></label>
         <label class="rang"><span><span class="ic">⏱️</span>Concentration</span><select data-reglage="travail">${[15, 20, 25, 30, 40, 45, 50].map(m => `<option value="${m}"${m === R.travail ? ' selected' : ''}>${m} min</option>`).join('')}</select></label>
@@ -3269,6 +3447,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   PD.addEventListener('click', e => {
     const b = e.target.closest('[data-p]');
     if (b && b.dataset.p === 'categories') ouvrirCategories();
+    if (b && b.dataset.p === 'identites') ouvrirIdentites();
     if (b && b.dataset.p === 'copier-mesures') {
       const t = `ASCEND édition ${EDITION} · ` + $('#p-diag').innerText.replace(/\n/g, ' · ');
       const fini = ok => dire(ok ? 'Mesures copiées : colle-les dans la conversation avec Claude.' : 'Copie impossible : fais une capture d\'écran de ces lignes.');
@@ -4351,6 +4530,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (d.cocher) return cocher(d.cocher);
     if (d.habitude) { U.garderDefilement = true; return cocherHabitude(d.habitude); }
     if (d.priorite) return cocherPriorite(d.priorite);
+    if (d.identite) return ouvrirIdentites(d.identite);
     if (d.tenu || d.pasTenu) {
       const o = trouver(d.tenu || d.pasTenu);
       if (!o) return;
@@ -4386,6 +4566,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (a === 'bilan-semaine') return ouvrirBilan(lundiDe(aujourdhui()));
     if (a === 'priorites') return ouvrirPriorites();
     if (a === 'pas-faites') return ouvrirPasFaites();
+    if (a === 'identites') return ouvrirIdentites();
     if (a === 'difficile') return jourDifficile();
     if (a === 'fin-difficile') { delete S.difficiles[aujourdhui()]; sauver(); U.garderDefilement = true; render('dur'); return dire('Mode jour difficile retiré.'); }
     if (a === 'alleger') return allegerJournee();

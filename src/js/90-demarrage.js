@@ -245,6 +245,7 @@
     if (d.cocher) return cocher(d.cocher);
     if (d.habitude) { U.garderDefilement = true; return cocherHabitude(d.habitude); }
     if (d.priorite) return cocherPriorite(d.priorite);
+    if (d.identite) return ouvrirIdentites(d.identite);
     if (d.tenu || d.pasTenu) {
       const o = trouver(d.tenu || d.pasTenu);
       if (!o) return;
@@ -280,6 +281,7 @@
     if (a === 'bilan-semaine') return ouvrirBilan(lundiDe(aujourdhui()));
     if (a === 'priorites') return ouvrirPriorites();
     if (a === 'pas-faites') return ouvrirPasFaites();
+    if (a === 'identites') return ouvrirIdentites();
     if (a === 'difficile') return jourDifficile();
     if (a === 'fin-difficile') { delete S.difficiles[aujourdhui()]; sauver(); U.garderDefilement = true; render('dur'); return dire('Mode jour difficile retiré.'); }
     if (a === 'alleger') return allegerJournee();

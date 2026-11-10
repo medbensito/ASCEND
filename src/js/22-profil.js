@@ -15,6 +15,7 @@
         <label class="rang"><span>Initiales</span><input type="text" data-profil="initiales" maxlength="2" autocomplete="off" value="${esc(S.profil.initiales || '')}" style="width:64px;text-align:center;text-transform:uppercase;border:1px solid var(--trait-fort);background:rgba(12, 12, 14, .8);border-radius:10px;padding:8px 10px;min-height:40px;font-size:16px"></label>
       </div></fieldset>
       <fieldset><legend>Ton univers</legend><div class="groupe">
+        <button type="button" class="rang" data-p="identites"><span><span class="ic">🧭</span><span>Qui je deviens<span class="sous">${S.identites.length ? esc(S.identites.map(x => x.nom).join(' · ')) : 'Choisis 1 à 4 identités'}</span></span></span><span class="val">${ICONE.droite}</span></button>
         <button type="button" class="rang" data-p="categories"><span><span class="ic">🗂️</span><span>Catégories<span class="sous">${S.categories.filter(c => c.active).length} actives · points et objectifs par semaine</span></span></span><span class="val">${ICONE.droite}</span></button>
         <label class="rang"><span><span class="ic">⚖️</span><span>Plafond par jour<span class="sous">JOMO : au-delà, ASCEND te prévient</span></span></span><select data-reglage="plafond">${plafonds.map(m => `<option value="${m}"${m === R.plafond ? ' selected' : ''}>${duree(m)}</option>`).join('')}</select></label>
         <label class="rang"><span><span class="ic">⏱️</span>Concentration</span><select data-reglage="travail">${[15, 20, 25, 30, 40, 45, 50].map(m => `<option value="${m}"${m === R.travail ? ' selected' : ''}>${m} min</option>`).join('')}</select></label>
@@ -57,6 +58,7 @@
   PD.addEventListener('click', e => {
     const b = e.target.closest('[data-p]');
     if (b && b.dataset.p === 'categories') ouvrirCategories();
+    if (b && b.dataset.p === 'identites') ouvrirIdentites();
     if (b && b.dataset.p === 'copier-mesures') {
       const t = `ASCEND édition ${EDITION} · ` + $('#p-diag').innerText.replace(/\n/g, ' · ');
       const fini = ok => dire(ok ? 'Mesures copiées : colle-les dans la conversation avec Claude.' : 'Copie impossible : fais une capture d\'écran de ces lignes.');

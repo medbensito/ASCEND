@@ -102,7 +102,7 @@
     const pts = valeur(o.el);
     if (!prevue(o)) return 'Bien joué ! Pas de points : elle a été ajoutée après son début.';
     if (debutOcc(o) > Date.now()) return `Faite en avance : +${pts} pts ${o.k === aujourdhui() ? 'à ' + hhmm(o.el.debut) : quandJour(o.k)}.`;
-    return `+${gagner(o.cle, pts, o.k, 'tache', cat(o.el.cat).id)} pts`;
+    return `+${gagner(o.cle, pts, o.k, 'tache', cat(o.el.cat).id)} pts${echoIdentite(o.el.cat)}`;
   }
   // Moment sans écran : tenu ou pas (on peut changer d'avis)
   function validerSansEcran(o, tenu) {
@@ -150,7 +150,7 @@
     if (s > S.meilleureSerie) S.meilleureSerie = s;
     const toutes = S.habitudes.filter(x => habitudeDue(x, k));
     const reste = toutes.filter(x => !x.faits[k]).length;
-    return `+${pts} pts` + (k === aujourdhui() ? (reste ? ` · encore ${pluriel(reste, 'habitude')} aujourd'hui` : ` · série : ${pluriel(s, 'jour')} 🔥`) : '');
+    return `+${pts} pts` + (k === aujourdhui() ? (reste ? ` · encore ${pluriel(reste, 'habitude')} aujourd'hui` : ` · série : ${pluriel(s, 'jour')} 🔥`) : '') + echoIdentite(h.cat);
   }
   // Un jour compte si toutes les habitudes prévues ce jour-là sont faites ; null si aucune n'était prévue.
   function jourComplet(k) {
