@@ -3,7 +3,7 @@
     const r = 64, c = 2 * Math.PI * r, f = fraction == null ? 0 : Math.max(0, Math.min(1, fraction));
     return `<svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="ga${taille || ''}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f6bff"/><stop offset="1" stop-color="#9a5cff"/></linearGradient></defs>
       <circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(129,140,255,.16)" stroke-width="13"/>
-      <circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#ga${taille || ''})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}" style="filter:drop-shadow(0 0 6px rgba(110,100,255,.7))"/></svg>`;
+      <circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#ga${taille || ''})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}"${f > 0 ? '' : ' opacity="0"'} style="filter:drop-shadow(0 0 6px rgba(110,100,255,.7))"/></svg>`;
   }
   // Points gagnés jour par jour (ou semaine par semaine sur 90 jours) : barres, valeur la plus haute écrite
   function graphePoints(jours) {
@@ -50,6 +50,8 @@
     return `
       <header class="tete"><div><h1>Progression</h1><p>Deviens la meilleure version.</p></div>
         <span class="icone-bouton" aria-hidden="true" style="border:0;background:none;color:#8fa2ff">${ICONE.progression}</span></header>
+      <button type="button" class="carte b-entree" data-action="bilan" data-focus="bilan">
+        <span class="tuile" style="--c:#7b6cff" aria-hidden="true">🗓️</span><span class="quoi"><b>Bilan de la semaine</b><small>${lundiParDefaut() === lundiDe(auj) ? 'Semaine en cours' : 'Semaine'} ${texteSemaine(lundiParDefaut())}</small></span>${ICONE.droite}</button>
       <div class="segments" role="group" aria-label="Période">
         ${[7, 30, 90].map(n => `<button type="button" aria-pressed="${n === j}" data-periode="${n}" data-focus="per${n}">${n} j</button>`).join('')}
       </div>

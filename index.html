@@ -579,6 +579,87 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   .m-anneau .temps b { font-size: 44px; }
   .boutons { grid-auto-flow: column; }
 }
+/* ===== Bilan de la semaine et priorités ===== */
+/* Entrées : « Bilan de la semaine » (Progression), « Choisis tes priorités » (Accueil) */
+.b-entree { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; min-height: 64px; text-align: left; color: inherit; }
+.b-entree .quoi { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.b-entree .quoi b { font-weight: 650; font-size: 15.5px; }
+.b-entree .quoi small { color: var(--doux); font-size: 12.5px; }
+.b-entree > svg { width: 18px; height: 18px; color: var(--doux); flex: none; }
+
+/* Accueil : les priorités de la semaine */
+.prio .section-tete { margin-bottom: 4px; align-items: center; }
+.prio .section-tete h2 { font-size: 16px; }
+.prio .section-tete h2 small { color: var(--doux); font-size: 13px; font-weight: 600; margin-left: 4px; }
+.prio-liste { display: grid; }
+.prio-ligne { display: flex; align-items: center; gap: 12px; min-height: 48px; border-top: 1px solid var(--trait); }
+.prio-ligne:first-child { border-top: 0; }
+.prio-ligne span { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.prio-ligne .rond-coche { width: 26px; height: 26px; }
+.prio-ligne.faite span { color: var(--doux); text-decoration: line-through; text-decoration-color: rgba(163, 168, 212, .6); }
+
+/* Saisie des priorités */
+.prio-champ { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; border-bottom: 1px solid var(--trait); }
+.prio-champ:last-child { border-bottom: 0; }
+.prio-champ .num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex: none; font-size: 13px; font-weight: 800; color: #fff; background: var(--accent); }
+.prio-champ input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font-size: 16px; padding: 14px 0; }
+.prio-champ input::placeholder { color: var(--pale); opacity: 1; }
+.prio-champ:focus-within { background: rgba(79, 107, 255, .1); }
+
+/* Feuille du bilan */
+#bilan .f-corps { gap: 20px; }
+#bilan .section-tete { margin-bottom: 8px; align-items: baseline; }
+#bilan .section-tete h3 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+#bilan .section-tete .note { text-align: right; font-size: 12px; }
+.b-semaine { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 8px; text-align: center; }
+.b-semaine p { display: grid; gap: 2px; }
+.b-semaine b { font-size: 16px; font-weight: 700; }
+.b-semaine small { color: var(--doux); font-size: 12.5px; }
+.b-semaine .icone-bouton:disabled { opacity: .3; }
+.b-semaine .icone-bouton svg { width: 18px; height: 18px; }
+.b-hero { display: grid; grid-template-columns: auto 1fr; gap: 14px 18px; align-items: center; padding: 16px;
+  background: radial-gradient(120% 120% at 100% 0%, rgba(123, 77, 255, .3), transparent 55%), linear-gradient(180deg, rgba(28, 31, 76, .9), rgba(14, 16, 44, .95)); }
+.b-chiffres { display: grid; gap: 6px; min-width: 0; }
+.b-pts { color: var(--doux); font-size: 14px; }
+.b-pts b { color: var(--texte); font-size: 30px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-right: 2px; }
+.b-chiffres .evol { display: grid; gap: 1px; }
+.b-chiffres .evol b { font-size: 17px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+.b-chiffres .evol b svg { width: 14px; height: 14px; }
+.b-chiffres .evol b.hausse { color: var(--vert); }
+.b-chiffres .evol b.baisse { color: #ff8a9a; }
+.b-chiffres .evol b.egal { color: var(--doux); }
+.b-chiffres .evol small { color: var(--doux); font-size: 12px; }
+.b-bonus { color: var(--orange); font-size: 13.5px; font-weight: 700; }
+.b-phrase { grid-column: 1 / -1; font-size: 15px; line-height: 1.45; padding-top: 12px; border-top: 1px solid var(--trait); }
+.b-cat { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--trait); }
+.b-cat:last-child { border-bottom: 0; }
+.b-cat-nom { display: grid; gap: 7px; min-width: 0; }
+.b-cat-nom b { font-weight: 650; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-cat .barre-obj { height: 6px; }
+.b-cat .barre-obj i { background: var(--c); box-shadow: none; }
+.b-cat-val { display: grid; justify-items: end; gap: 2px; text-align: right; }
+.b-cat-val b { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.b-cat-val small { color: var(--doux); font-size: 12px; white-space: nowrap; }
+.b-cat.ok .b-cat-val small { color: var(--vert); font-weight: 700; }
+.prio-revue { list-style: none; margin: 0; padding: 0; }
+.prio-revue li { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 14px; border-bottom: 1px solid var(--trait); font-size: 15px; }
+.prio-revue li:last-child { border-bottom: 0; }
+.prio-revue li > span:last-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.prio-revue .marque-prio { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--anneau); display: grid; place-items: center; flex: none; color: #fff; }
+.prio-revue .marque-prio svg { width: 13px; height: 13px; }
+.prio-revue li.faite .marque-prio { background: var(--accent); border-color: #8f9bff; }
+.prio-revue li:not(.faite) > span:last-child { color: var(--doux); }
+.b-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.b-grille .mini { min-height: 0; padding: 12px 14px; }
+.b-grille .mini b { font-size: 21px; }
+.b-grille .mini b small { font-size: 13px; color: var(--doux); font-weight: 600; }
+.b-meilleur { display: flex; align-items: center; gap: 10px; padding: 12px 14px; margin-top: 10px; font-size: 14px; color: var(--doux); }
+.b-meilleur b { color: var(--texte); }
+.b-cible { padding-top: 4px; }
+.b-cible .note { margin: -2px 0 10px; }
+@media (max-width: 359px) { .b-hero { grid-template-columns: 1fr; justify-items: center; text-align: center; } .b-chiffres { justify-items: center; } }
+#b-titre:focus { outline: none; }
+.b-regle { margin-top: 8px; font-size: 12.5px; }
 
 </style>
 </head>
@@ -619,6 +700,13 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
 
 <dialog class="feuille haute page" id="objectif" aria-labelledby="o-titre">
   <form id="form-obj" novalidate></form>
+</dialog>
+
+<dialog class="feuille haute page" id="bilan" aria-labelledby="b-titre">
+  <div class="f-haut"><button type="button" class="f-icone" data-fermer aria-label="Fermer"></button><h2 id="b-titre" tabindex="-1">Bilan de la semaine</h2><span></span></div>
+  <p class="f-msg" role="status" aria-live="polite"></p>
+  <div class="f-corps" id="b-corps"></div>
+  <div class="f-pied" id="b-pied"></div>
 </dialog>
 
 <dialog class="minuteur" id="minuteur" aria-labelledby="m-titre">
@@ -678,7 +766,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 8;                       // édition de l'app, comme le cache du service worker (ascend-8)
+  const EDITION = 9;                       // édition de l'app, comme le cache du service worker (ascend-9)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -688,7 +776,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     duree: 60,             // durée proposée pour une nouvelle plage
     ouverture: 7,          // heure en haut de la grille à l'ouverture
     appuiLong: 450,        // ms : appui long sur l'écran tactile
-    points: { libre: 30, sansecran: 40, libresParJour: 2, libreMin: 30, bonusObjectif: 5 },
+    points: { libre: 30, sansecran: 40, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
     paliers: [
@@ -726,6 +814,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   // habitudes : { id, titre, cat, jours: [0..6] (0 = lundi), debut (date), fin (date de retrait ou null), faits: { date: true } }
   // objectifs : { id, titre, cat, echeance, etapes: [{ id, titre, faitLe }], creeLe, atteintLe }
   // payes : { clé : { pts, jour, type, cat, raison? } } ; gains : { jour : { total, cats: { id: pts }, src: { type: pts } } }
+  // priorites : { lundi : [{ id, titre, fait }] } (1 à 3 par semaine) ; bilanVu : lundi de la semaine où le bilan s'est ouvert de lui-même
   function rappelsVides() {
     return { actif: false, jeton: null, service: null, avant: true, delai: 30, matin: true, heureMatin: 8 * 60, sauvegarde: true, signature: null, majLe: null, erreur: null };
   }
@@ -740,6 +829,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
+    priorites: {}, bilanVu: null,
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -750,7 +840,13 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   const estObjet = v => v && typeof v === 'object' && !Array.isArray(v);
   function nettoyer() {
     ['elements', 'habitudes', 'objectifs', 'focus'].forEach(c => { if (!Array.isArray(S[c])) S[c] = []; });
-    ['tenus', 'payes', 'gains'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    ['tenus', 'payes', 'gains', 'priorites'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    Object.keys(S.priorites).forEach(k => {
+      const l = Array.isArray(S.priorites[k]) ? S.priorites[k].filter(p => p && p.id && typeof p.titre === 'string' && p.titre.trim()).slice(0, 3) : [];
+      l.forEach(p => { p.titre = p.titre.slice(0, 60); p.fait = !!p.fait; });
+      if (l.length && /^\d{4}-\d{2}-\d{2}$/.test(k)) S.priorites[k] = l; else delete S.priorites[k];
+    });
+    if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.categories.forEach(c => {
       c.points = Math.max(0, Math.min(1000, Math.round(Number(c.points) || 0)));
@@ -784,12 +880,13 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   }
   let erreurStockage = false;
   // Enregistre, puis prévient le service de rappels et la sauvegarde automatique
-  const sauver = () => { verifierObjectifs(); ecrire(); planifierSynchro(); planifierCoffre(); };
+  const sauver = () => { verifierObjectifs(); verifierSemaines(); ecrire(); planifierSynchro(); planifierCoffre(); };
   const ecrire = () => {
     nettoyer();
     // Journal des gains et paiements : 400 jours (les étapes et les objectifs restent)
     const limite = decaler(aujourdhui(), -400);
     Object.keys(S.gains).forEach(k => { if (k < limite) delete S.gains[k]; });
+    Object.keys(S.priorites).forEach(k => { if (k < limite) delete S.priorites[k]; });
     Object.keys(S.payes).forEach(c => { if (!/^[eo]:/.test(c) && (!S.payes[c] || (S.payes[c].jour || '') < limite)) delete S.payes[c]; });
     try { localStorage.setItem(CLE, JSON.stringify(S)); erreurStockage = false; }
     catch (e) { erreurStockage = true; }
@@ -1025,6 +1122,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
         }
       });
     }
+    if (verifierSemaines()) change = true;
     if (change) sauver();
     return change;
   }
@@ -1424,6 +1522,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
         <div class="boutons deux"><button type="button" class="bouton petit" data-tenu="${o.cle}" data-focus="tenu${o.cle}">Tenu</button><button type="button" class="bouton petit secondaire" data-pas-tenu="${o.cle}" data-focus="pas${o.cle}">Pas tenu</button></div></div>`).join('')}
+      ${cartePriorites()}
       <section aria-labelledby="auj-titre">
         <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
         <div class="lignes">
@@ -1702,7 +1801,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     const r = 64, c = 2 * Math.PI * r, f = fraction == null ? 0 : Math.max(0, Math.min(1, fraction));
     return `<svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="ga${taille || ''}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f6bff"/><stop offset="1" stop-color="#9a5cff"/></linearGradient></defs>
       <circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(129,140,255,.16)" stroke-width="13"/>
-      <circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#ga${taille || ''})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}" style="filter:drop-shadow(0 0 6px rgba(110,100,255,.7))"/></svg>`;
+      <circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#ga${taille || ''})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}"${f > 0 ? '' : ' opacity="0"'} style="filter:drop-shadow(0 0 6px rgba(110,100,255,.7))"/></svg>`;
   }
   // Points gagnés jour par jour (ou semaine par semaine sur 90 jours) : barres, valeur la plus haute écrite
   function graphePoints(jours) {
@@ -1749,6 +1848,8 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     return `
       <header class="tete"><div><h1>Progression</h1><p>Deviens la meilleure version.</p></div>
         <span class="icone-bouton" aria-hidden="true" style="border:0;background:none;color:#8fa2ff">${ICONE.progression}</span></header>
+      <button type="button" class="carte b-entree" data-action="bilan" data-focus="bilan">
+        <span class="tuile" style="--c:#7b6cff" aria-hidden="true">🗓️</span><span class="quoi"><b>Bilan de la semaine</b><small>${lundiParDefaut() === lundiDe(auj) ? 'Semaine en cours' : 'Semaine'} ${texteSemaine(lundiParDefaut())}</small></span>${ICONE.droite}</button>
       <div class="segments" role="group" aria-label="Période">
         ${[7, 30, 90].map(n => `<button type="button" aria-pressed="${n === j}" data-periode="${n}" data-focus="per${n}">${n} j</button>`).join('')}
       </div>
@@ -1783,6 +1884,251 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
           : '<p class="vide" style="padding:6px 0">Lance une session de 25 minutes depuis une tâche ou l\'accueil.</p>'}
       </section>
       <div class="carte encourage">${ICONE.tendance}<p>${esc(phraseEncouragement(taux, diff, s))}</p></div>`;
+  }
+  // ---------- Bilan de la semaine ----------
+  // Chaque lundi (dès 5 h, à la première ouverture), le bilan de la semaine passée s'ouvre : points, objectifs par catégorie
+  // et leur bonus, priorités tenues, habitudes, JOMO, concentration ; puis on choisit 1 à 3 priorités pour la semaine qui commence.
+  // Il s'ouvre aussi à la demande (Progression), avec la semaine en cours et les précédentes.
+  const dimancheDe = lundi => decaler(lundi, 6);
+  const cleSemaine = (lundi, id) => 's:' + lundi + ':' + id;
+  // Objectif de la semaine atteint : la moitié des points de l'objectif, en plus (Sport : 2 × 50 pts → +50)
+  const bonusSemaine = c => Math.round(c.points * c.objectif * CONFIG.points.bonusSemaine / 5) * 5;
+  // Verse le bonus des semaines terminées depuis peu, pour chaque catégorie active dont l'objectif est atteint.
+  // Une fois versé, il n'est repris que si l'on décoche sous l'objectif retenu ce jour-là.
+  function verifierSemaines() {
+    const lundiAuj = lundiDe(aujourdhui());
+    let change = false;
+    for (let i = 1; i <= 2; i++) {
+      const lundi = decaler(lundiAuj, -7 * i), dim = dimancheDe(lundi);
+      if (dim < (S.depuis || aujourdhui())) continue;
+      S.categories.forEach(c => {
+        const cle = cleSemaine(lundi, c.id), p = S.payes[cle], n = faitsCat(c.id, lundi, dim);
+        if (p) { if (n < (p.obj || 1)) { reprendre(cle); change = true; } return; }
+        if (!c.active || !c.objectif || n < c.objectif) return;
+        gagner(cle, bonusSemaine(c), dim, 'semaine', c.id);
+        S.payes[cle].obj = c.objectif;
+        change = true;
+      });
+    }
+    return change;
+  }
+  // Une catégorie dans le bilan : faits, objectif, bonus (versé, ou à venir pour la semaine en cours)
+  function objectifsSemaine(lundi) {
+    const dim = dimancheDe(lundi);
+    return S.categories.filter(c => S.payes[cleSemaine(lundi, c.id)] || (c.active && c.objectif > 0)).map(c => {
+      const p = S.payes[cleSemaine(lundi, c.id)], objectif = (p && p.obj) || c.objectif, n = faitsCat(c.id, lundi, dim);
+      return { c, n, objectif, atteint: n >= objectif, bonus: p ? p.pts : bonusSemaine(c), paye: !!p };
+    });
+  }
+  function statsSemaine(lundi) {
+    const auj = aujourdhui(), dim = dimancheDe(lundi), enCours = auj <= dim, fin = enCours ? auj : dim;
+    const G = gainsEntre(lundi, dim);
+    // Comparaison : la semaine d'avant entière, ou jusqu'au même jour si la semaine est en cours
+    const lundiAv = decaler(lundi, -7);
+    const Gav = gainsEntre(lundiAv, enCours ? decaler(lundiAv, ecart(lundi, auj)) : dimancheDe(lundiAv));
+    let prevues = 0, faites = 0, meilleur = null, jours = 0, complets = 0;
+    for (let k = lundi; k <= dim; k = decaler(k, 1)) {
+      duJour(k).forEach(o => { if (o.el.type === 'tache') { prevues++; if (o.fait) faites++; } });
+      if (k > fin) continue;
+      const g = gainDuJour(k);
+      if (g > 0 && (!meilleur || g > meilleur.pts)) meilleur = { k, pts: g };
+      const c = jourComplet(k);
+      if (c !== null) { jours++; if (c) complets++; }
+    }
+    const cats = objectifsSemaine(lundi);
+    const cible = cats.reduce((t, x) => t + x.objectif, 0);
+    const taux = cible ? cats.reduce((t, x) => t + Math.min(x.n, x.objectif), 0) / cible : null;
+    return { lundi, dim, enCours, reste: enCours ? ecart(auj, dim) : 0, G, Gav, diff: Gav.total > 0 ? (G.total - Gav.total) / Gav.total : null,
+      bonus: G.src.semaine || 0, prevues, faites, meilleur, jours, complets, cats, taux,
+      J: jomoEntre(lundi, dim), F: focusEntre(lundi, dim), prio: S.priorites[lundi] || [] };
+  }
+  function phraseBilan(st) {
+    if (st.enCours) return st.reste ? `Semaine en cours : encore ${pluriel(st.reste, 'jour')} pour atteindre tes objectifs.` : 'Dernier jour de la semaine : un dernier effort ?';
+    if (st.taux != null && st.taux >= 1) return 'Semaine parfaite : tous tes objectifs sont atteints. 🏆';
+    if (st.taux != null && st.taux >= .7) return 'Belle semaine : tu as tenu l\'essentiel. ⚡';
+    if (st.diff != null && st.diff > .05) return 'Mieux que la semaine d\'avant. Continue comme ça !';
+    if (!st.G.total) return 'Une semaine calme. Choisis 1 à 3 priorités et lance-toi. 🌿';
+    return 'Une semaine en demi-teinte. Garde 1 à 3 priorités, et laisse le reste filer. 🌿';
+  }
+  const jourMois = k => { const d = parse(k); return `${d.getDate() === 1 ? '1er' : d.getDate()} ${fmt(k, { month: 'long' })}`; };
+  const texteSemaine = lundi => {
+    const d = dimancheDe(lundi), a = parse(lundi), b = parse(d);
+    return a.getMonth() === b.getMonth() ? `du ${a.getDate() === 1 ? '1er' : a.getDate()} au ${jourMois(d)}` : `du ${jourMois(lundi)} au ${jourMois(d)}`;
+  };
+
+  // ---------- Priorités de la semaine ----------
+  const prioritesDe = lundi => S.priorites[lundi] || [];
+  function editeurPriorites(lundi) {
+    const l = prioritesDe(lundi);
+    return `<div class="groupe prio-edit">${[0, 1, 2].map(i => `<label class="prio-champ"><span class="num" aria-hidden="true">${i + 1}</span><span class="masque">Priorité ${i + 1}</span>
+      <input data-prio="${i}" data-id="${l[i] ? esc(l[i].id) : ''}" maxlength="60" autocomplete="off" enterkeyhint="${i < 2 ? 'next' : 'done'}" placeholder="${['Ce qui compte le plus', 'Ensuite', 'Et enfin'][i]}" value="${l[i] ? esc(l[i].titre) : ''}"></label>`).join('')}</div>`;
+  }
+  // Lit les champs du bilan ; renvoie vrai si les priorités ont changé
+  function lirePriorites() {
+    const champs = [...BD.querySelectorAll('[data-prio]')];
+    if (!B.cible || !champs.length) return false;
+    const avant = prioritesDe(B.cible), l = [];
+    champs.forEach(c => {
+      const t = c.value.trim().replace(/\s+/g, ' ').slice(0, 60);
+      if (!t) { c.dataset.id = ''; return; }
+      const a = avant.find(x => x.id === c.dataset.id);
+      const e = { id: a ? a.id : uid(), titre: t, fait: !!(a && a.fait) };
+      c.dataset.id = e.id;
+      l.push(e);
+    });
+    if (JSON.stringify(avant) === JSON.stringify(l)) return false;
+    if (l.length) S.priorites[B.cible] = l; else delete S.priorites[B.cible];
+    sauver();
+    if (B.cible === lundiDe(aujourdhui())) B.change = true;
+    return true;
+  }
+  function cocherPriorite(v) {
+    const [lundi, id] = v.split('|'), p = prioritesDe(lundi).find(x => x.id === id);
+    if (!p) return;
+    p.fait = !p.fait;
+    sauver();
+    U.garderDefilement = true;
+    render();
+    const l = prioritesDe(lundi), n = l.filter(x => x.fait).length;
+    dire(p.fait ? (n === l.length ? `Toutes tes priorités de la semaine sont tenues ! 🎯` : `Priorité tenue 💪 · ${n} / ${l.length}`) : 'Décochée.');
+  }
+  // Sur l'accueil : les priorités de la semaine, ou l'invitation à les choisir
+  function cartePriorites() {
+    const lundi = lundiDe(aujourdhui()), l = prioritesDe(lundi);
+    if (!l.length) return `<button type="button" class="carte b-entree" data-action="priorites" data-focus="prio-choisir">
+        <span class="tuile" style="--c:#7b6cff" aria-hidden="true">🎯</span><span class="quoi"><b>Choisis tes priorités de la semaine</b><small>1 à 3 choses qui comptent vraiment.</small></span>${ICONE.droite}</button>`;
+    const n = l.filter(x => x.fait).length;
+    return `<section class="carte pad prio" aria-labelledby="prio-titre">
+        <div class="section-tete"><h2 id="prio-titre">🎯 Priorités de la semaine <small>${n} / ${l.length}</small></h2><button type="button" class="lien" data-action="priorites" data-focus="prio-modifier" aria-label="Modifier les priorités de la semaine">Modifier</button></div>
+        <div class="prio-liste">${l.map(p => `<div class="prio-ligne${p.fait ? ' faite' : ''}">${rondCoche(lundi + '|' + p.id, p.fait, `${p.titre} : ${p.fait ? 'tenue' : 'à faire'}`, 'data-priorite')}<span>${esc(p.titre)}</span></div>`).join('')}</div>
+      </section>`;
+  }
+
+  // ---------- La feuille du bilan ----------
+  const BD = $('#bilan');
+  const B = { lundi: null, mode: 'bilan', auto: false, cible: null, change: false };
+  const lundiMin = () => lundiDe(S.depuis || aujourdhui());
+  // Semaine montrée par défaut : la dernière terminée, ou la semaine en cours si ASCEND est plus récent
+  const lundiParDefaut = () => { const l = lundiDe(aujourdhui()), p = decaler(l, -7); return p >= lundiMin() ? p : l; };
+  function ouvrirBilan(lundi, auto) {
+    B.mode = 'bilan'; B.auto = !!auto; if (!BD.open) B.change = false;
+    B.lundi = lundi || lundiParDefaut();
+    renderBilan();
+    if (!BD.open) { BD.showModal(); $('#b-titre').focus({ preventScroll: true }); }
+    $('#b-corps').scrollTop = 0;
+  }
+  function ouvrirPriorites() {
+    B.mode = 'priorites'; B.auto = false; if (!BD.open) B.change = false;
+    renderBilan();
+    if (!BD.open) BD.showModal();
+    focusDepart(() => BD.querySelector('[data-prio]'));
+  }
+  function miniStat(icone, titre, val, sous, label) {
+    return `<div class="mini carte" role="group" aria-label="${esc(label)}"><span class="titre-mini" aria-hidden="true">${icone} ${titre}</span><b aria-hidden="true">${val}</b><small aria-hidden="true">${sous}</small></div>`;
+  }
+  function renderBilan(focus) {
+    const corps = $('#b-corps'), pied = $('#b-pied'), lundiAuj = lundiDe(aujourdhui());
+    $('#bilan [data-fermer]').innerHTML = ICONE.croix;
+    $('#bilan .f-msg').textContent = '';
+    if (B.mode === 'priorites') {
+      B.cible = lundiAuj;
+      $('#b-titre').textContent = 'Priorités de la semaine';
+      corps.innerHTML = `<p class="note">1 à 3 choses qui comptent vraiment, ${texteSemaine(lundiAuj)}. Elles s'affichent sur l'accueil : coche-les quand elles sont tenues.</p>${editeurPriorites(lundiAuj)}`;
+      pied.innerHTML = `<button type="button" class="bouton" data-b="fermer">Enregistrer</button>`;
+      return;
+    }
+    const st = statsSemaine(B.lundi), passee = B.lundi === decaler(lundiAuj, -7);
+    B.cible = st.enCours ? B.lundi : passee ? lundiAuj : null;
+    $('#b-titre').textContent = 'Bilan de la semaine';
+    const pc = st.taux == null ? null : Math.round(st.taux * 100);
+    const evol = st.diff == null ? '' : `<p class="evol"><b class="${st.diff > .005 ? 'hausse' : st.diff < -.005 ? 'baisse' : 'egal'}">${st.diff > .005 ? ICONE.hausse : st.diff < -.005 ? ICONE.baisse : ''}${st.diff > 0 ? '+' : ''}${Math.round(st.diff * 100)} %</b><small>${st.enCours ? 'vs le même jour, la semaine d\'avant' : 'vs la semaine d\'avant'}</small></p>`;
+    const nav = `<div class="b-semaine">
+        <button type="button" class="icone-bouton" data-b-nav="-1" aria-label="Semaine précédente" data-focus="b-prec"${B.lundi <= lundiMin() ? ' disabled' : ''}>${ICONE.gauche}</button>
+        <p><b>${cap(texteSemaine(B.lundi))}</b><small>${st.enCours ? 'Semaine en cours' : passee ? 'La semaine passée' : `Il y a ${ecart(B.lundi, lundiAuj) / 7} semaines`}</small></p>
+        <button type="button" class="icone-bouton" data-b-nav="1" aria-label="Semaine suivante" data-focus="b-suiv"${st.enCours ? ' disabled' : ''}>${ICONE.droite}</button></div>`;
+    const hero = `<section class="carte b-hero" aria-label="Résumé de la semaine">
+        <div class="anneau petit" role="img" aria-label="${pc == null ? 'Pas d\'objectif par semaine défini' : pc + ' % des objectifs de la semaine atteints'}">${anneau(st.taux, 'b')}
+          <div class="val" aria-hidden="true"><b>${pc == null ? '—' : pc}<small>${pc == null ? '' : '%'}</small></b><span>objectifs</span></div></div>
+        <div class="b-chiffres">
+          <p class="b-pts"><b>${nombre(st.G.total)}</b> pts${st.enCours ? ' jusqu\'ici' : ' gagnés'}</p>
+          ${evol}
+          ${st.bonus ? `<p class="b-bonus">dont +${nombre(st.bonus)} de bonus 🏆</p>` : ''}
+        </div>
+        <p class="b-phrase">${esc(phraseBilan(st))}</p>
+      </section>`;
+    const cats = st.cats.length ? `<section aria-labelledby="b-obj">
+        <div class="section-tete"><h3 id="b-obj">Objectifs par catégorie</h3></div>
+        <div class="groupe">${st.cats.map(x => {
+          const r = Math.min(1, x.n / x.objectif), manque = x.objectif - x.n;
+          const etat = x.atteint ? (x.paye ? `+${x.bonus} bonus` : st.enCours ? `+${x.bonus} lundi` : 'atteint') : st.enCours ? `encore ${manque}` : 'manqué';
+          const lab = `${x.c.nom} : ${x.n} sur ${x.objectif}, ${x.atteint ? 'objectif atteint' + (x.bonus ? (x.paye ? `, bonus de ${x.bonus} points` : `, bonus de ${x.bonus} points versé lundi`) : '') : st.enCours ? `encore ${manque} pour l'objectif, bonus de ${x.bonus} points` : 'objectif manqué'}`;
+          return `<div class="b-cat${x.atteint ? ' ok' : ''}" role="group" aria-label="${esc(lab)}" style="--c:${x.c.couleur}">
+            <span class="tuile petite" aria-hidden="true">${x.c.icone}</span>
+            <span class="b-cat-nom" aria-hidden="true"><b>${esc(x.c.nom)}</b><span class="barre-obj"><i style="width:${Math.round(r * 100)}%"></i></span></span>
+            <span class="b-cat-val" aria-hidden="true"><b>${x.n} / ${x.objectif}</b><small>${x.atteint ? '✓ ' : ''}${etat}</small></span></div>`;
+        }).join('')}</div><p class="note b-regle">Objectif atteint : un bonus de la moitié des points visés (${esc(st.cats[0].c.nom)} : ${st.cats[0].objectif} × ${st.cats[0].c.points} pts → +${bonusSemaine(st.cats[0].c)}).</p></section>` : `<p class="carte vide">Donne un objectif par semaine à tes catégories (Profil › Catégories) : le bilan te dira lesquels sont atteints, avec un bonus.</p>`;
+    const prioRevue = !st.enCours ? `<section aria-labelledby="b-prio">
+        <div class="section-tete"><h3 id="b-prio">Tes priorités</h3>${st.prio.length ? `<span class="note">${st.prio.filter(p => p.fait).length} / ${st.prio.length} tenues</span>` : ''}</div>
+        ${st.prio.length ? `<ul class="groupe prio-revue">${st.prio.map(p => `<li class="${p.fait ? 'faite' : ''}"><span class="marque-prio" aria-hidden="true">${p.fait ? ICONE.coche : ''}</span><span>${esc(p.titre)}<span class="masque"> : ${p.fait ? 'tenue' : 'pas tenue'}</span></span></li>`).join('')}</ul>`
+          : '<p class="note">Aucune priorité choisie cette semaine-là.</p>'}</section>` : '';
+    const se = st.J, sur = (n, t) => t ? `${n}<small> / ${t}</small>` : '—';
+    const stats = `<section aria-labelledby="b-stats">
+        <div class="section-tete"><h3 id="b-stats">En chiffres</h3></div>
+        <div class="b-grille">
+          ${miniStat('✅', 'Tâches', sur(st.faites, st.prevues), st.prevues ? 'faites' : 'aucune prévue', st.prevues ? `Tâches faites : ${st.faites} sur ${st.prevues}` : 'Tâches : aucune prévue')}
+          ${miniStat('🔥', 'Habitudes', sur(st.complets, st.jours), st.jours ? 'jours complets' : 'aucune prévue', st.jours ? `Habitudes : ${st.complets} jours complets sur ${st.jours}` : 'Habitudes : aucune prévue')}
+          ${miniStat('🌿', 'Pour moi', sur(se.libres, se.libresTotal), se.libresTotal ? 'gardés' : 'aucun prévu', se.libresTotal ? `Temps pour moi gardés : ${se.libres} sur ${se.libresTotal}` : 'Temps pour moi : aucun prévu')}
+          ${miniStat('📵', 'Sans écran', sur(se.tenus, se.ecransTotal), se.ecransTotal ? 'tenus' : 'aucun prévu', se.ecransTotal ? `Moments sans écran tenus : ${se.tenus} sur ${se.ecransTotal}` : 'Moments sans écran : aucun prévu')}
+          ${miniStat('⚖️', 'Plafond', sur(se.sous, se.joursPrevus), se.joursPrevus ? 'jours dessous' : 'aucune tâche', se.joursPrevus ? `Jours sous le plafond : ${se.sous} sur ${se.joursPrevus}` : 'Plafond : aucune tâche prévue')}
+          ${miniStat('⏱️', 'Concentration', duree(st.F.total), pluriel(st.F.sessions, 'session'), `Concentration : ${duree(st.F.total)}, ${pluriel(st.F.sessions, 'session')}`)}
+        </div>
+        ${st.meilleur ? `<p class="carte b-meilleur"><span aria-hidden="true">⭐</span><span>Meilleur jour : <b>${esc(jourLong(st.meilleur.k))}</b> · +${nombre(st.meilleur.pts)} pts</span></p>` : ''}
+      </section>`;
+    const edit = B.cible ? `<section aria-labelledby="b-cible" class="b-cible">
+        <div class="section-tete"><h3 id="b-cible">${st.enCours ? 'Tes priorités de la semaine' : 'Ta semaine qui commence'}</h3></div>
+        <p class="note">${st.enCours ? 'Coche-les sur l\'accueil quand elles sont tenues.' : `Choisis 1 à 3 priorités, ${texteSemaine(lundiAuj)}. Elles t'attendent sur l'accueil.`}</p>
+        ${editeurPriorites(B.cible)}</section>` : '';
+    corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + stats + (st.enCours ? '' : edit);
+    pied.innerHTML = B.cible ? `<button type="button" class="bouton" data-b="fermer">${B.auto ? 'C\'est parti !' : 'Enregistrer'}</button>`
+      : `<button type="button" class="bouton secondaire" data-b="fermer">Fermer</button>`;
+    if (focus) { const c = BD.querySelector(`[data-focus="${focus}"]`); if (c && !c.disabled) c.focus(); else { const t = BD.querySelector('[data-fermer]'); if (t) t.focus(); } }
+  }
+  BD.addEventListener('click', e => {
+    const n = e.target.closest('[data-b-nav]');
+    if (n) {
+      lirePriorites();
+      B.lundi = decaler(B.lundi, 7 * +n.dataset.bNav);
+      renderBilan(n.dataset.focus);
+      $('#b-corps').scrollTop = 0;
+      return;
+    }
+    if (e.target.closest('[data-b="fermer"]')) BD.close();
+  });
+  BD.addEventListener('change', e => { if (e.target.matches('[data-prio]')) lirePriorites(); });
+  // Entrée sur un champ : au suivant, puis on range le clavier
+  BD.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' || !e.target.matches('[data-prio]')) return;
+    e.preventDefault();
+    const champs = [...BD.querySelectorAll('[data-prio]')], i = champs.indexOf(e.target);
+    if (i < champs.length - 1) champs[i + 1].focus(); else e.target.blur();
+  });
+  BD.addEventListener('close', () => {
+    lirePriorites();
+    render();
+    if (!B.change) return;
+    B.change = false;
+    const n = prioritesDe(lundiDe(aujourdhui())).length;
+    dire(!n ? 'Priorités retirées.' : `${pluriel(n, 'priorité')} pour ta semaine 🎯`);
+  });
+  // Le lundi (dès 5 h) ou au premier passage de la semaine : le bilan de la semaine passée, une fois
+  function proposerBilan() {
+    if (V.etat !== 'ouvert' || document.querySelector('dialog[open]')) return;
+    const auj = aujourdhui(), lundi = lundiDe(auj);
+    if (S.bilanVu === lundi || decaler(lundi, -1) < (S.depuis || auj)) return;
+    if (auj === lundi && minNow() < 5 * 60) return;
+    S.bilanVu = lundi;
+    ecrire();
+    ouvrirBilan(decaler(lundi, -7), true);
   }
   // ---------- Questions (remplacent confirm) ----------
   function demander(titreQ, texte, options) {
@@ -2609,6 +2955,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     const t = occs.filter(o => o.el.type === 'tache' && !o.fait).length;
     const h = S.habitudes.filter(x => habitudeDue(x, k)).length;
     const parts = [];
+    if (indexJour(k) === 0 && decaler(k, -1) >= (S.depuis || aujourdhui())) parts.push('ton bilan de la semaine t\'attend');
     if (t) parts.push(pluriel(t, 'tâche') + " aujourd'hui");
     if (h) parts.push(pluriel(h, 'habitude'));
     if (occs.some(o => o.el.type !== 'tache')) parts.push('un moment pour toi');
@@ -3048,7 +3395,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   function deverrouiller(msg) {
     V.etat = 'ouvert';
     if (VR.open) VR.close();
-    if (!document.querySelector('dialog[open]')) { render(); if (msg) dire(msg); }
+    if (!document.querySelector('dialog[open]')) { render(); if (msg) dire(msg); else setTimeout(proposerBilan, 300); }
     else if (msg) dire(msg);
   }
   VR.addEventListener('cancel', e => e.preventDefault());
@@ -3477,6 +3824,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     if (d.onglet) return changerOnglet(d.onglet);
     if (d.cocher) return cocher(d.cocher);
     if (d.habitude) { U.garderDefilement = true; return cocherHabitude(d.habitude); }
+    if (d.priorite) return cocherPriorite(d.priorite);
     if (d.tenu || d.pasTenu) {
       const o = trouver(d.tenu || d.pasTenu);
       if (!o) return;
@@ -3508,6 +3856,8 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     if (a === 'chercher') return ouvrirLoupe();
     if (a === 'serie') { U.onglet = 'objectifs'; S.onglet = 'objectifs'; S.vueObj = 'habitudes'; ecrire(); $('#ecran').scrollTop = 0; return render('tab-objectifs'); }
     if (a === 'minuteur') return ouvrirMinuteur();
+    if (a === 'bilan') return ouvrirBilan();
+    if (a === 'priorites') return ouvrirPriorites();
     if (a === 'nouvelle-habitude') return ouvrirHabitude(null);
     if (a === 'nouvel-objectif') return ouvrirObjectif(null);
     if (b.classList.contains('colonne')) {
@@ -3535,7 +3885,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   function rafraichir() {
     crediter();
     const libre = !G && !document.querySelector('dialog[open]');
-    if (libre) { U.garderDefilement = true; render(); }
+    if (libre) { U.garderDefilement = true; render(); proposerBilan(); }
   }
   setInterval(rafraichir, 60000);
   document.addEventListener('visibilitychange', () => {
@@ -3626,6 +3976,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   render();
   setTimeout(() => L0.classList.add('parti'), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 1100);
   setTimeout(() => L0.remove(), 1800);
+  setTimeout(proposerBilan, 1300);
   if (erreurStockage) dire('Attention : le téléphone refuse d\'enregistrer. Libère de la place.');
   synchroniser();
   if (S.coffre.actif) setTimeout(() => envoyerCoffre(), 5000);

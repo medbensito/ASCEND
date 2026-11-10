@@ -73,6 +73,7 @@
     const t = occs.filter(o => o.el.type === 'tache' && !o.fait).length;
     const h = S.habitudes.filter(x => habitudeDue(x, k)).length;
     const parts = [];
+    if (indexJour(k) === 0 && decaler(k, -1) >= (S.depuis || aujourdhui())) parts.push('ton bilan de la semaine t\'attend');
     if (t) parts.push(pluriel(t, 'tâche') + " aujourd'hui");
     if (h) parts.push(pluriel(h, 'habitude'));
     if (occs.some(o => o.el.type !== 'tache')) parts.push('un moment pour toi');

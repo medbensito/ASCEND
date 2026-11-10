@@ -96,6 +96,7 @@
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
         <div class="boutons deux"><button type="button" class="bouton petit" data-tenu="${o.cle}" data-focus="tenu${o.cle}">Tenu</button><button type="button" class="bouton petit secondaire" data-pas-tenu="${o.cle}" data-focus="pas${o.cle}">Pas tenu</button></div></div>`).join('')}
+      ${cartePriorites()}
       <section aria-labelledby="auj-titre">
         <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
         <div class="lignes">

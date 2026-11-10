@@ -84,6 +84,7 @@
         }
       });
     }
+    if (verifierSemaines()) change = true;
     if (change) sauver();
     return change;
   }

@@ -1,0 +1,81 @@
+/* ===== Bilan de la semaine et priorités ===== */
+/* Entrées : « Bilan de la semaine » (Progression), « Choisis tes priorités » (Accueil) */
+.b-entree { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; min-height: 64px; text-align: left; color: inherit; }
+.b-entree .quoi { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.b-entree .quoi b { font-weight: 650; font-size: 15.5px; }
+.b-entree .quoi small { color: var(--doux); font-size: 12.5px; }
+.b-entree > svg { width: 18px; height: 18px; color: var(--doux); flex: none; }
+
+/* Accueil : les priorités de la semaine */
+.prio .section-tete { margin-bottom: 4px; align-items: center; }
+.prio .section-tete h2 { font-size: 16px; }
+.prio .section-tete h2 small { color: var(--doux); font-size: 13px; font-weight: 600; margin-left: 4px; }
+.prio-liste { display: grid; }
+.prio-ligne { display: flex; align-items: center; gap: 12px; min-height: 48px; border-top: 1px solid var(--trait); }
+.prio-ligne:first-child { border-top: 0; }
+.prio-ligne span { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.prio-ligne .rond-coche { width: 26px; height: 26px; }
+.prio-ligne.faite span { color: var(--doux); text-decoration: line-through; text-decoration-color: rgba(163, 168, 212, .6); }
+
+/* Saisie des priorités */
+.prio-champ { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; border-bottom: 1px solid var(--trait); }
+.prio-champ:last-child { border-bottom: 0; }
+.prio-champ .num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex: none; font-size: 13px; font-weight: 800; color: #fff; background: var(--accent); }
+.prio-champ input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font-size: 16px; padding: 14px 0; }
+.prio-champ input::placeholder { color: var(--pale); opacity: 1; }
+.prio-champ:focus-within { background: rgba(79, 107, 255, .1); }
+
+/* Feuille du bilan */
+#bilan .f-corps { gap: 20px; }
+#bilan .section-tete { margin-bottom: 8px; align-items: baseline; }
+#bilan .section-tete h3 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+#bilan .section-tete .note { text-align: right; font-size: 12px; }
+.b-semaine { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 8px; text-align: center; }
+.b-semaine p { display: grid; gap: 2px; }
+.b-semaine b { font-size: 16px; font-weight: 700; }
+.b-semaine small { color: var(--doux); font-size: 12.5px; }
+.b-semaine .icone-bouton:disabled { opacity: .3; }
+.b-semaine .icone-bouton svg { width: 18px; height: 18px; }
+.b-hero { display: grid; grid-template-columns: auto 1fr; gap: 14px 18px; align-items: center; padding: 16px;
+  background: radial-gradient(120% 120% at 100% 0%, rgba(123, 77, 255, .3), transparent 55%), linear-gradient(180deg, rgba(28, 31, 76, .9), rgba(14, 16, 44, .95)); }
+.b-chiffres { display: grid; gap: 6px; min-width: 0; }
+.b-pts { color: var(--doux); font-size: 14px; }
+.b-pts b { color: var(--texte); font-size: 30px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-right: 2px; }
+.b-chiffres .evol { display: grid; gap: 1px; }
+.b-chiffres .evol b { font-size: 17px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+.b-chiffres .evol b svg { width: 14px; height: 14px; }
+.b-chiffres .evol b.hausse { color: var(--vert); }
+.b-chiffres .evol b.baisse { color: #ff8a9a; }
+.b-chiffres .evol b.egal { color: var(--doux); }
+.b-chiffres .evol small { color: var(--doux); font-size: 12px; }
+.b-bonus { color: var(--orange); font-size: 13.5px; font-weight: 700; }
+.b-phrase { grid-column: 1 / -1; font-size: 15px; line-height: 1.45; padding-top: 12px; border-top: 1px solid var(--trait); }
+.b-cat { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--trait); }
+.b-cat:last-child { border-bottom: 0; }
+.b-cat-nom { display: grid; gap: 7px; min-width: 0; }
+.b-cat-nom b { font-weight: 650; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-cat .barre-obj { height: 6px; }
+.b-cat .barre-obj i { background: var(--c); box-shadow: none; }
+.b-cat-val { display: grid; justify-items: end; gap: 2px; text-align: right; }
+.b-cat-val b { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.b-cat-val small { color: var(--doux); font-size: 12px; white-space: nowrap; }
+.b-cat.ok .b-cat-val small { color: var(--vert); font-weight: 700; }
+.prio-revue { list-style: none; margin: 0; padding: 0; }
+.prio-revue li { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 8px 14px; border-bottom: 1px solid var(--trait); font-size: 15px; }
+.prio-revue li:last-child { border-bottom: 0; }
+.prio-revue li > span:last-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.prio-revue .marque-prio { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--anneau); display: grid; place-items: center; flex: none; color: #fff; }
+.prio-revue .marque-prio svg { width: 13px; height: 13px; }
+.prio-revue li.faite .marque-prio { background: var(--accent); border-color: #8f9bff; }
+.prio-revue li:not(.faite) > span:last-child { color: var(--doux); }
+.b-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.b-grille .mini { min-height: 0; padding: 12px 14px; }
+.b-grille .mini b { font-size: 21px; }
+.b-grille .mini b small { font-size: 13px; color: var(--doux); font-weight: 600; }
+.b-meilleur { display: flex; align-items: center; gap: 10px; padding: 12px 14px; margin-top: 10px; font-size: 14px; color: var(--doux); }
+.b-meilleur b { color: var(--texte); }
+.b-cible { padding-top: 4px; }
+.b-cible .note { margin: -2px 0 10px; }
+@media (max-width: 359px) { .b-hero { grid-template-columns: 1fr; justify-items: center; text-align: center; } .b-chiffres { justify-items: center; } }
+#b-titre:focus { outline: none; }
+.b-regle { margin-top: 8px; font-size: 12.5px; }

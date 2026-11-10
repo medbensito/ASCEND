@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 8;                       // édition de l'app, comme le cache du service worker (ascend-8)
+  const EDITION = 9;                       // édition de l'app, comme le cache du service worker (ascend-9)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -12,7 +12,7 @@
     duree: 60,             // durée proposée pour une nouvelle plage
     ouverture: 7,          // heure en haut de la grille à l'ouverture
     appuiLong: 450,        // ms : appui long sur l'écran tactile
-    points: { libre: 30, sansecran: 40, libresParJour: 2, libreMin: 30, bonusObjectif: 5 },
+    points: { libre: 30, sansecran: 40, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
     paliers: [
@@ -50,6 +50,7 @@
   // habitudes : { id, titre, cat, jours: [0..6] (0 = lundi), debut (date), fin (date de retrait ou null), faits: { date: true } }
   // objectifs : { id, titre, cat, echeance, etapes: [{ id, titre, faitLe }], creeLe, atteintLe }
   // payes : { clé : { pts, jour, type, cat, raison? } } ; gains : { jour : { total, cats: { id: pts }, src: { type: pts } } }
+  // priorites : { lundi : [{ id, titre, fait }] } (1 à 3 par semaine) ; bilanVu : lundi de la semaine où le bilan s'est ouvert de lui-même
   function rappelsVides() {
     return { actif: false, jeton: null, service: null, avant: true, delai: 30, matin: true, heureMatin: 8 * 60, sauvegarde: true, signature: null, majLe: null, erreur: null };
   }
@@ -64,6 +65,7 @@
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
+    priorites: {}, bilanVu: null,
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -74,7 +76,13 @@
   const estObjet = v => v && typeof v === 'object' && !Array.isArray(v);
   function nettoyer() {
     ['elements', 'habitudes', 'objectifs', 'focus'].forEach(c => { if (!Array.isArray(S[c])) S[c] = []; });
-    ['tenus', 'payes', 'gains'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    ['tenus', 'payes', 'gains', 'priorites'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    Object.keys(S.priorites).forEach(k => {
+      const l = Array.isArray(S.priorites[k]) ? S.priorites[k].filter(p => p && p.id && typeof p.titre === 'string' && p.titre.trim()).slice(0, 3) : [];
+      l.forEach(p => { p.titre = p.titre.slice(0, 60); p.fait = !!p.fait; });
+      if (l.length && /^\d{4}-\d{2}-\d{2}$/.test(k)) S.priorites[k] = l; else delete S.priorites[k];
+    });
+    if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.categories.forEach(c => {
       c.points = Math.max(0, Math.min(1000, Math.round(Number(c.points) || 0)));
@@ -108,12 +116,13 @@
   }
   let erreurStockage = false;
   // Enregistre, puis prévient le service de rappels et la sauvegarde automatique
-  const sauver = () => { verifierObjectifs(); ecrire(); planifierSynchro(); planifierCoffre(); };
+  const sauver = () => { verifierObjectifs(); verifierSemaines(); ecrire(); planifierSynchro(); planifierCoffre(); };
   const ecrire = () => {
     nettoyer();
     // Journal des gains et paiements : 400 jours (les étapes et les objectifs restent)
     const limite = decaler(aujourdhui(), -400);
     Object.keys(S.gains).forEach(k => { if (k < limite) delete S.gains[k]; });
+    Object.keys(S.priorites).forEach(k => { if (k < limite) delete S.priorites[k]; });
     Object.keys(S.payes).forEach(c => { if (!/^[eo]:/.test(c) && (!S.payes[c] || (S.payes[c].jour || '') < limite)) delete S.payes[c]; });
     try { localStorage.setItem(CLE, JSON.stringify(S)); erreurStockage = false; }
     catch (e) { erreurStockage = true; }

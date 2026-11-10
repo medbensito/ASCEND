@@ -238,6 +238,7 @@
     if (d.onglet) return changerOnglet(d.onglet);
     if (d.cocher) return cocher(d.cocher);
     if (d.habitude) { U.garderDefilement = true; return cocherHabitude(d.habitude); }
+    if (d.priorite) return cocherPriorite(d.priorite);
     if (d.tenu || d.pasTenu) {
       const o = trouver(d.tenu || d.pasTenu);
       if (!o) return;
@@ -269,6 +270,8 @@
     if (a === 'chercher') return ouvrirLoupe();
     if (a === 'serie') { U.onglet = 'objectifs'; S.onglet = 'objectifs'; S.vueObj = 'habitudes'; ecrire(); $('#ecran').scrollTop = 0; return render('tab-objectifs'); }
     if (a === 'minuteur') return ouvrirMinuteur();
+    if (a === 'bilan') return ouvrirBilan();
+    if (a === 'priorites') return ouvrirPriorites();
     if (a === 'nouvelle-habitude') return ouvrirHabitude(null);
     if (a === 'nouvel-objectif') return ouvrirObjectif(null);
     if (b.classList.contains('colonne')) {
@@ -296,7 +299,7 @@
   function rafraichir() {
     crediter();
     const libre = !G && !document.querySelector('dialog[open]');
-    if (libre) { U.garderDefilement = true; render(); }
+    if (libre) { U.garderDefilement = true; render(); proposerBilan(); }
   }
   setInterval(rafraichir, 60000);
   document.addEventListener('visibilitychange', () => {
@@ -387,6 +390,7 @@
   render();
   setTimeout(() => L0.classList.add('parti'), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 1100);
   setTimeout(() => L0.remove(), 1800);
+  setTimeout(proposerBilan, 1300);
   if (erreurStockage) dire('Attention : le téléphone refuse d\'enregistrer. Libère de la place.');
   synchroniser();
   if (S.coffre.actif) setTimeout(() => envoyerCoffre(), 5000);
