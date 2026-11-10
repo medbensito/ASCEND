@@ -83,7 +83,7 @@
   }
   function bloc(g) {
     const o = g.o, el = o.el, l = look(el);
-    const haut = el.debut / 60 * H, hauteur = Math.max((el.fin - el.debut) / 60 * H, 22);
+    const haut = el.debut / 60 * H, hauteur = Math.max((el.fin - el.debut) / 60 * H, HMIN);
     const court = hauteur < 42;
     const choisi = U.selection === o.cle;
     const etat = el.type === 'libre' ? etatLibre(o) : el.type === 'sansecran' ? etatSansEcran(o) : null;
@@ -99,7 +99,7 @@
     </div>`;
   }
   function blocBrouillon(b) {
-    const hauteur = Math.max((b.fin - b.debut) / 60 * H, 22);
+    const hauteur = Math.max((b.fin - b.debut) / 60 * H, HMIN);
     return `<div class="bloc brouillon${hauteur < 42 ? ' court' : ''}" data-brouillon="1" style="top:${b.debut / 60 * H}px;height:${hauteur}px;left:2px;width:calc(100% - 4px)">
       <button type="button" class="b-ouvrir" data-action="remplir" aria-label="Nouvelle plage de ${hhmm(b.debut)} à ${finTexte(b.fin)} : toucher pour la remplir" data-focus="brouillon"></button>
       <span class="b-texte" aria-hidden="true"><b>Nouvelle</b><small>${hhmm(b.debut)} – ${finTexte(b.fin)}</small></span>
@@ -168,6 +168,22 @@
     }).join('');
     return `<div class="pay-mois" style="--rangs:${rangs}" data-balayage="mois">${JOURS_LONGS.map(n => `<span class="jsem" aria-hidden="true">${n.slice(0, 3)}</span>`).join('')}${cases}</div>`;
   }
+  // Téléphone couché, vue Jour : toute la journée tient à l'écran, sans défiler.
+  // De 7 h à 23 h, élargi si une plage commence plus tôt ou finit plus tard ; la hauteur d'une heure s'y ajuste.
+  function reglerHeure(ajuste) {
+    PLAGE.ajuste = ajuste;
+    if (!ajuste) { H = CONFIG.heure; HMIN = 22; }
+    else {
+      const l = duJour(U.date).map(o => o.el);
+      if (U.brouillon && U.brouillon.k === U.date) l.push(U.brouillon);
+      PLAGE.a = Math.min(7, ...l.map(e => Math.floor(e.debut / 60)));
+      PLAGE.b = Math.max(23, ...l.map(e => Math.ceil(e.fin / 60)));
+      const dispo = PLAGE.dispo || (($('.app') || {}).clientHeight || window.innerHeight) - 66;
+      H = Math.max(12, (dispo - 14) / (PLAGE.b - PLAGE.a));
+      HMIN = 14;
+    }
+    document.documentElement.style.setProperty('--H', H + 'px');
+  }
   function vuePaysage() {
     const jour = S.vueCal === 'jour', k = U.date, auj = aujourdhui();
     const titre = jour ? (k === auj ? "Aujourd'hui · " : '') + jourLong(k) : cap(parse(k).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
@@ -186,7 +202,7 @@
           <button type="button" class="icone-bouton" data-action="aujourdhui" aria-label="Aujourd'hui" data-focus="auj">${ICONE.calendrier}</button>
           <button type="button" class="icone-bouton" data-action="chercher" aria-label="Chercher" data-focus="chercher">${ICONE.loupe}</button>
         </div>
-        ${jour ? `<div class="defile" data-defile="jour">${grille([k])}</div>
+        ${jour ? `<div class="defile ajuste" data-defile="jour">${grille([k])}</div>
           <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>` : moisPaysage()}
       </div>`;
   }

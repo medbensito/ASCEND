@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 11;                      // édition de l'app, comme le cache du service worker (ascend-11)
+  const EDITION = 12;                      // édition de l'app, comme le cache du service worker (ascend-12)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -23,7 +23,9 @@
       { id: 'nova', nom: 'Nova', seuil: 10000 }
     ]
   };
-  const H = CONFIG.heure;
+  let H = CONFIG.heure;                    // px par heure ; téléphone couché, la vue Jour l'ajuste pour montrer toute la journée
+  let HMIN = 22;                           // hauteur minimale d'un bloc
+  const PLAGE = { a: 0, b: 24, dispo: 0, ajuste: false };
   const PALETTE = ['#ff4d6d', '#ffb547', '#7b6cff', '#d78bff', '#ff5e7a', '#4f8bff', '#3ee08f', '#2fd3c5', '#57c3ff', '#ff8a3d', '#f5d547', '#9aa3d9'];
   const NOMS_COULEURS = { '#ff4d6d': 'Rouge', '#ffb547': 'Orange', '#7b6cff': 'Violet', '#d78bff': 'Mauve', '#ff5e7a': 'Rose', '#4f8bff': 'Bleu', '#3ee08f': 'Vert', '#2fd3c5': 'Turquoise', '#57c3ff': 'Ciel', '#ff8a3d': 'Mandarine', '#f5d547': 'Jaune', '#9aa3d9': 'Gris' };
   const ICONES_CAT = ['🏋️', '💼', '📘', '👥', '❤️', '⭐', '🧘', '🏃', '🚴', '⚽', '🎯', '🧠', '💡', '📝', '🎨', '🎵', '🍎', '💰', '🏠', '✈️', '🌱', '🛠️', '📷', '🎮'];

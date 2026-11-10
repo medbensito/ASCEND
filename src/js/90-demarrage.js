@@ -9,7 +9,7 @@
     const f = focus || signatureFocus();
     const E = $('#ecran');
     const ancien = $('#ecran .defile');
-    if (ancien) U.defile[ancien.dataset.defile] = ancien.scrollTop;
+    if (ancien && !ancien.classList.contains('ajuste')) U.defile[ancien.dataset.defile] = ancien.scrollTop;
     if (U.recentrer) { U.defile = {}; U.recentrer = false; }
     // Téléphone couché : le calendrier seul, quel que soit l'onglet ; redressé, on retrouve l'onglet
     const couche = paysage();
@@ -17,13 +17,18 @@
     const plein = couche || (U.onglet === 'calendrier' && S.vueCal === 'jour');
     E.classList.toggle('plein', plein);
     const haut = E.scrollTop;
+    reglerHeure(couche && S.vueCal === 'jour');
     E.innerHTML = couche ? vuePaysage() : { accueil: vueAccueil, calendrier: vueCalendrier, objectifs: vueObjectifs, progression: vueProgression }[U.onglet]();
     if (U.garderDefilement) E.scrollTop = haut;
     U.garderDefilement = false;
     renderOnglets();
     U.reaction = false;
     const d = $('#ecran .defile');
-    if (d) {
+    if (d && PLAGE.ajuste) {
+      // La place réelle est connue une fois la vue posée : on s'y ajuste (une seule reprise)
+      if (Math.abs(d.clientHeight - PLAGE.dispo) > 1) { PLAGE.dispo = d.clientHeight; return render(focus); }
+      d.scrollTop = PLAGE.a * H - 8;
+    } else if (d) {
       if (U.defile.jour != null) d.scrollTop = U.defile.jour;
       else d.scrollTop = Math.max(0, (U.date === aujourdhui() ? Math.min(Math.floor(minNow() / 60) * 60 - 60, 16 * 60) : CONFIG.ouverture * 60) / 60 * H);
     }

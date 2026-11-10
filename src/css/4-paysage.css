@@ -44,3 +44,17 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   .m-anneau .temps b { font-size: 44px; }
   .boutons { grid-auto-flow: column; }
 }
+/* Jour, téléphone couché : toute la journée à l'écran, sans défiler */
+html.paysage .defile.ajuste { overflow: hidden; }
+.ajuste .bas-espace { height: 0; }
+.ajuste .grille { margin-left: 40px; }
+.ajuste .grille .heure { left: -40px; width: 34px; font-size: 10px; }
+.ajuste .bloc { border-radius: 8px; border-left-width: 3px; }
+.ajuste .bloc.court .b-texte { height: 100%; align-items: center; padding: 0 44px 0 8px; gap: 8px; }
+html.paysage .ajuste .bloc.court .b-texte b { font-size: 12.5px; line-height: 1; }
+html.paysage .ajuste .bloc.court .b-texte small { font-size: 11px; line-height: 1; }
+.ajuste .bloc.court .rond-coche { top: 50%; margin-top: 0; transform: translateY(-50%); height: min(18px, calc(100% - 2px)); width: auto; aspect-ratio: 1; border-width: 1.5px; right: 10px; }
+.ajuste .bloc.court .rond-coche svg { width: 62%; height: 62%; }
+.ajuste .bloc.court .gain { top: 50%; bottom: auto; transform: translateY(-50%); right: 36px; }
+.ajuste .maintenant span { left: -44px; font-size: 10px; }
+html.paysage .pay:has(.ajuste) .fab { width: 46px; height: 46px; right: 2px; bottom: 4px; }
