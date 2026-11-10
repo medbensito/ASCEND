@@ -661,6 +661,32 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
 #b-titre:focus { outline: none; }
 .b-regle { margin-top: 8px; font-size: 12.5px; }
 
+/* ===== Tâches pas faites ===== */
+.pf-entree .tuile { --c: #ffb547; }
+#pas-faites .f-corps { gap: 18px; }
+.pf-jour { display: grid; gap: 10px; }
+.pf-jour h3 { font-size: 13px; font-weight: 700; color: var(--doux); text-transform: uppercase; letter-spacing: .08em; margin: 2px 2px 0; }
+.pf-item { display: grid; gap: 12px; padding: 14px; border-left: 4px solid var(--c); }
+.pf-haut { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pf-haut .quoi { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pf-haut .quoi b { font-weight: 650; font-size: 15.5px; overflow-wrap: anywhere; }
+.pf-haut .quoi small { color: var(--doux); font-size: 12.5px; }
+.pf-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pf-b { display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 56px; padding: 6px 4px; border-radius: 14px; border: 1px solid var(--trait-fort);
+  background: rgba(33, 37, 88, .55); color: var(--texte); font-size: 12.5px; font-weight: 650; text-align: center; line-height: 1.15; }
+.pf-b svg { width: 18px; height: 18px; }
+.pf-b > span[aria-hidden] { font-size: 17px; line-height: 18px; }
+.pf-b[data-pf="fait"] svg { color: var(--vert); }
+.pf-b[aria-expanded="true"] { background: rgba(79, 107, 255, .25); border-color: #8f9bff; }
+.pf-reports { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pf-reports .bouton { font-size: 14px; padding: 0 10px; }
+.pf-reports .bouton:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.pf-fini { display: grid; justify-items: center; gap: 12px; text-align: center; padding: 48px 16px; }
+.pf-fini > span { font-size: 44px; }
+.pf-fini p { color: var(--doux); font-size: 15px; display: grid; gap: 4px; }
+.pf-fini p b { color: var(--texte); font-size: 19px; }
+#bilan .pf-entree { margin-bottom: 12px; }
+
 </style>
 </head>
 <body>
@@ -707,6 +733,13 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   <p class="f-msg" role="status" aria-live="polite"></p>
   <div class="f-corps" id="b-corps"></div>
   <div class="f-pied" id="b-pied"></div>
+</dialog>
+
+<dialog class="feuille haute page" id="pas-faites" aria-labelledby="pf-titre">
+  <div class="f-haut"><button type="button" class="f-icone" data-fermer aria-label="Fermer"></button><h2 id="pf-titre">Pas faites</h2><span></span></div>
+  <p class="f-msg" role="status" aria-live="polite"></p>
+  <div class="f-corps" id="pf-corps"></div>
+  <div class="f-pied" id="pf-pied"></div>
 </dialog>
 
 <dialog class="minuteur" id="minuteur" aria-labelledby="m-titre">
@@ -766,7 +799,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 9;                       // édition de l'app, comme le cache du service worker (ascend-9)
+  const EDITION = 10;                      // édition de l'app, comme le cache du service worker (ascend-10)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -815,6 +848,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   // objectifs : { id, titre, cat, echeance, etapes: [{ id, titre, faitLe }], creeLe, atteintLe }
   // payes : { clé : { pts, jour, type, cat, raison? } } ; gains : { jour : { total, cats: { id: pts }, src: { type: pts } } }
   // priorites : { lundi : [{ id, titre, fait }] } (1 à 3 par semaine) ; bilanVu : lundi de la semaine où le bilan s'est ouvert de lui-même
+  // partis : { clé d'une tâche pas faite : jour où on l'a laissée partir }
   function rappelsVides() {
     return { actif: false, jeton: null, service: null, avant: true, delai: 30, matin: true, heureMatin: 8 * 60, sauvegarde: true, signature: null, majLe: null, erreur: null };
   }
@@ -829,7 +863,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null,
+    priorites: {}, bilanVu: null, partis: {},
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -840,7 +874,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   const estObjet = v => v && typeof v === 'object' && !Array.isArray(v);
   function nettoyer() {
     ['elements', 'habitudes', 'objectifs', 'focus'].forEach(c => { if (!Array.isArray(S[c])) S[c] = []; });
-    ['tenus', 'payes', 'gains', 'priorites'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    ['tenus', 'payes', 'gains', 'priorites', 'partis'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
     Object.keys(S.priorites).forEach(k => {
       const l = Array.isArray(S.priorites[k]) ? S.priorites[k].filter(p => p && p.id && typeof p.titre === 'string' && p.titre.trim()).slice(0, 3) : [];
       l.forEach(p => { p.titre = p.titre.slice(0, 60); p.fait = !!p.fait; });
@@ -887,6 +921,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     const limite = decaler(aujourdhui(), -400);
     Object.keys(S.gains).forEach(k => { if (k < limite) delete S.gains[k]; });
     Object.keys(S.priorites).forEach(k => { if (k < limite) delete S.priorites[k]; });
+    Object.keys(S.partis).forEach(c => { if (c.slice(c.lastIndexOf('|') + 1) < limite) delete S.partis[c]; });
     Object.keys(S.payes).forEach(c => { if (!/^[eo]:/.test(c) && (!S.payes[c] || (S.payes[c].jour || '') < limite)) delete S.payes[c]; });
     try { localStorage.setItem(CLE, JSON.stringify(S)); erreurStockage = false; }
     catch (e) { erreurStockage = true; }
@@ -961,6 +996,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     if (ancienne === nouvelle) return;
     if (S.payes[ancienne]) { S.payes[nouvelle] = S.payes[ancienne]; delete S.payes[ancienne]; }
     if (S.tenus[ancienne] !== undefined) { S.tenus[nouvelle] = S.tenus[ancienne]; delete S.tenus[ancienne]; }
+    delete S.partis[ancienne];
   }
   function prendreDepuis(obj, depuis, delta) {
     const res = {};
@@ -1433,7 +1469,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     if (el.rep) d += ', ' + REPET[el.rep.freq].toLowerCase();
     if (el.type === 'libre') d += ', ' + ETAT_LIBRE[etatLibre(o)];
     if (el.type === 'sansecran') d += ', ' + ETAT_ECRAN[etatSansEcran(o)];
-    if (el.type === 'tache') d += o.fait ? ', faite' : ', à faire';
+    if (el.type === 'tache') d += o.fait ? ', faite' : S.partis[o.cle] ? ', laissée partir' : ', à faire';
     const p = S.payes[o.cle];
     if (p && p.pts) d += `, +${p.pts} points gagnés`;
     else if (el.type === 'tache' && !prevue(o)) d += ', ne rapporte pas de points (ajoutée après son début)';
@@ -1444,6 +1480,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
   function ptsElement(o) {
     const p = S.payes[o.cle];
     if (p) return p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts nul" aria-hidden="true">0 pt</span>`;
+    if (o.el.type === 'tache' && !o.fait && S.partis[o.cle]) return `<span class="pts nul" aria-hidden="true">🍃</span>`;
     if (o.el.type === 'tache' && !prevue(o)) return `<span class="pts nul" aria-hidden="true">0 pt</span>`;
     if (o.el.type === 'libre' && etatLibre(o) === 'grignote') return `<span class="pts nul" aria-hidden="true">grignoté</span>`;
     return `<span class="pts" aria-hidden="true">+${valeur(o.el)} pts</span>`;
@@ -1454,7 +1491,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     if (el.type === 'libre') return `${plage(el)} · Pour moi · ${ETAT_LIBRE[etatLibre(o)]}`;
     if (el.type === 'sansecran') return `${plage(el)} · Sans écran · ${ETAT_ECRAN[etatSansEcran(o)]}`;
     const ob = el.objectif && S.objectifs.find(x => x.id === el.objectif);
-    return `${plage(el)} · ${cat(el.cat).nom}${ob ? ' · 🎯 ' + ob.titre : ''}`;
+    return `${plage(el)} · ${cat(el.cat).nom}${!o.fait && S.partis[o.cle] ? ' · laissée partir' : ''}${ob ? ' · 🎯 ' + ob.titre : ''}`;
   }
   // Ligne d'un élément. cocheGauche : la case à gauche (accueil), sinon à droite après l'icône (calendrier)
   function ligneOcc(o, cocheGauche) {
@@ -1522,6 +1559,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
         <div class="boutons deux"><button type="button" class="bouton petit" data-tenu="${o.cle}" data-focus="tenu${o.cle}">Tenu</button><button type="button" class="bouton petit secondaire" data-pas-tenu="${o.cle}" data-focus="pas${o.cle}">Pas tenu</button></div></div>`).join('')}
+      ${cartePasFaites()}
       ${cartePriorites()}
       <section aria-labelledby="auj-titre">
         <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
@@ -1926,9 +1964,9 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     // Comparaison : la semaine d'avant entière, ou jusqu'au même jour si la semaine est en cours
     const lundiAv = decaler(lundi, -7);
     const Gav = gainsEntre(lundiAv, enCours ? decaler(lundiAv, ecart(lundi, auj)) : dimancheDe(lundiAv));
-    let prevues = 0, faites = 0, meilleur = null, jours = 0, complets = 0;
+    let prevues = 0, faites = 0, partis = 0, meilleur = null, jours = 0, complets = 0;
     for (let k = lundi; k <= dim; k = decaler(k, 1)) {
-      duJour(k).forEach(o => { if (o.el.type === 'tache') { prevues++; if (o.fait) faites++; } });
+      duJour(k).forEach(o => { if (o.el.type === 'tache') { prevues++; if (o.fait) faites++; else if (S.partis[o.cle]) partis++; } });
       if (k > fin) continue;
       const g = gainDuJour(k);
       if (g > 0 && (!meilleur || g > meilleur.pts)) meilleur = { k, pts: g };
@@ -1939,7 +1977,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     const cible = cats.reduce((t, x) => t + x.objectif, 0);
     const taux = cible ? cats.reduce((t, x) => t + Math.min(x.n, x.objectif), 0) / cible : null;
     return { lundi, dim, enCours, reste: enCours ? ecart(auj, dim) : 0, G, Gav, diff: Gav.total > 0 ? (G.total - Gav.total) / Gav.total : null,
-      bonus: G.src.semaine || 0, prevues, faites, meilleur, jours, complets, cats, taux,
+      bonus: G.src.semaine || 0, prevues, faites, partis, meilleur, jours, complets, cats, taux,
       J: jomoEntre(lundi, dim), F: focusEntre(lundi, dim), prio: S.priorites[lundi] || [] };
   }
   function phraseBilan(st) {
@@ -2075,7 +2113,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     const stats = `<section aria-labelledby="b-stats">
         <div class="section-tete"><h3 id="b-stats">En chiffres</h3></div>
         <div class="b-grille">
-          ${miniStat('✅', 'Tâches', sur(st.faites, st.prevues), st.prevues ? 'faites' : 'aucune prévue', st.prevues ? `Tâches faites : ${st.faites} sur ${st.prevues}` : 'Tâches : aucune prévue')}
+          ${miniStat('✅', 'Tâches', sur(st.faites, st.prevues), st.prevues ? 'faites' + (st.partis ? ` · ${st.partis} 🍃` : '') : 'aucune prévue', st.prevues ? `Tâches faites : ${st.faites} sur ${st.prevues}${st.partis ? `, ${pluriel(st.partis, 'laissée', 'laissées')} partir` : ''}` : 'Tâches : aucune prévue')}
           ${miniStat('🔥', 'Habitudes', sur(st.complets, st.jours), st.jours ? 'jours complets' : 'aucune prévue', st.jours ? `Habitudes : ${st.complets} jours complets sur ${st.jours}` : 'Habitudes : aucune prévue')}
           ${miniStat('🌿', 'Pour moi', sur(se.libres, se.libresTotal), se.libresTotal ? 'gardés' : 'aucun prévu', se.libresTotal ? `Temps pour moi gardés : ${se.libres} sur ${se.libresTotal}` : 'Temps pour moi : aucun prévu')}
           ${miniStat('📵', 'Sans écran', sur(se.tenus, se.ecransTotal), se.ecransTotal ? 'tenus' : 'aucun prévu', se.ecransTotal ? `Moments sans écran tenus : ${se.tenus} sur ${se.ecransTotal}` : 'Moments sans écran : aucun prévu')}
@@ -2084,8 +2122,10 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
         </div>
         ${st.meilleur ? `<p class="carte b-meilleur"><span aria-hidden="true">⭐</span><span>Meilleur jour : <b>${esc(jourLong(st.meilleur.k))}</b> · +${nombre(st.meilleur.pts)} pts</span></p>` : ''}
       </section>`;
+    const npf = B.cible ? pasFaites().length : 0;
+    const lienPf = npf ? `<button type="button" class="carte b-entree pf-entree" data-b="pas-faites"><span class="tuile" style="--c:#ffb547" aria-hidden="true">📋</span><span class="quoi"><b>${pluriel(npf, 'tâche pas faite', 'tâches pas faites')}</b><small>Coche, reporte ou laisse partir avant de commencer.</small></span>${ICONE.droite}</button>` : '';
     const edit = B.cible ? `<section aria-labelledby="b-cible" class="b-cible">
-        <div class="section-tete"><h3 id="b-cible">${st.enCours ? 'Tes priorités de la semaine' : 'Ta semaine qui commence'}</h3></div>
+        <div class="section-tete"><h3 id="b-cible">${st.enCours ? 'Tes priorités de la semaine' : 'Ta semaine qui commence'}</h3></div>${st.enCours ? '' : lienPf}
         <p class="note">${st.enCours ? 'Coche-les sur l\'accueil quand elles sont tenues.' : `Choisis 1 à 3 priorités, ${texteSemaine(lundiAuj)}. Elles t'attendent sur l'accueil.`}</p>
         ${editeurPriorites(B.cible)}</section>` : '';
     corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + stats + (st.enCours ? '' : edit);
@@ -2103,6 +2143,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
       return;
     }
     if (e.target.closest('[data-b="fermer"]')) BD.close();
+    if (e.target.closest('[data-b="pas-faites"]')) { BD.close(); ouvrirPasFaites(); }
   });
   BD.addEventListener('change', e => { if (e.target.matches('[data-prio]')) lirePriorites(); });
   // Entrée sur un champ : au suivant, puis on range le clavier
@@ -2130,6 +2171,154 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     ecrire();
     ouvrirBilan(decaler(lundi, -7), true);
   }
+  // ---------- Tâches pas faites ----------
+  // Les tâches non cochées des 7 derniers jours (avant aujourd'hui). Pour chacune : je l'ai faite, la reporter
+  // (aujourd'hui, demain, ou un autre moment), ou la laisser partir — JOMO : rater sans regret, sans points ni pénalité.
+  // Laissées partir : S.partis = { clé de l'occurrence : jour de la décision }.
+  function pasFaites() {
+    const auj = aujourdhui(), res = [];
+    for (let i = 7; i >= 1; i--) {
+      const k = decaler(auj, -i);
+      if (k < (S.depuis || auj)) continue;
+      duJour(k).forEach(o => { if (o.el.type === 'tache' && !o.fait && !S.partis[o.cle]) res.push(o); });
+    }
+    return res;
+  }
+  // Prochain créneau libre de cette durée, entre 8 h et 22 h, à partir d'un jour (et d'une heure ce jour-là)
+  function creneauLibre(k, duree, sans, apres) {
+    const occupe = duJour(k).filter(o => o.cle !== sans).map(o => [o.el.debut, o.el.fin]);
+    for (let m = Math.max(8 * 60, apres || 0); m + duree <= 22 * 60; m += CONFIG.pas) {
+      if (!occupe.some(([a, b]) => m < b && m + duree > a)) return { k, debut: m, fin: m + duree };
+    }
+    return null;
+  }
+  const libreA = (k, debut, fin, sans) => !duJour(k).some(o => o.cle !== sans && debut < o.el.fin && fin > o.el.debut);
+  // Propositions pour reporter : aujourd'hui (même heure si elle est encore à venir et libre, sinon le prochain créneau libre),
+  // demain (même heure si libre, sinon le premier créneau libre)
+  function propositions(o) {
+    const auj = aujourdhui(), dem = decaler(auj, 1), d = o.el.debut, f = o.el.fin, du = f - d;
+    const tot = Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas;
+    const res = [];
+    const a = d >= tot && libreA(auj, d, f, o.cle) ? { k: auj, debut: d, fin: f } : creneauLibre(auj, du, o.cle, tot);
+    if (a) res.push(a);
+    const b = libreA(dem, d, f, o.cle) ? { k: dem, debut: d, fin: f } : creneauLibre(dem, du, o.cle);
+    if (b) res.push(b);
+    return res;
+  }
+  const quandCourt = k => { const a = aujourdhui(); return k === a ? "Aujourd'hui" : k === decaler(a, 1) ? 'Demain' : cap(fmt(k, { weekday: 'long', day: 'numeric' })); };
+
+  // ---------- Sur l'accueil ----------
+  function cartePasFaites() {
+    const n = pasFaites().length;
+    if (!n) return '';
+    return `<button type="button" class="carte b-entree pf-entree" data-action="pas-faites" data-focus="pas-faites">
+        <span class="tuile" style="--c:#ffb547" aria-hidden="true">📋</span><span class="quoi"><b>${pluriel(n, 'tâche pas faite', 'tâches pas faites')}</b><small>Coche, reporte ou laisse partir.</small></span>${ICONE.droite}</button>`;
+  }
+
+  // ---------- La page « Pas faites » ----------
+  const PF = $('#pas-faites');
+  const P = { ouverte: null };          // clé de la tâche dont les choix de report sont dépliés
+  function ouvrirPasFaites() {
+    P.ouverte = null;
+    renderPasFaites();
+    PF.querySelector('[data-fermer]').innerHTML = ICONE.croix;
+    PF.querySelector('.f-msg').textContent = '';
+    if (!PF.open) PF.showModal();
+  }
+  function renderPasFaites(focus) {
+    const l = pasFaites();
+    const corps = $('#pf-corps');
+    if (!l.length) {
+      corps.innerHTML = `<div class="pf-fini"><span aria-hidden="true">✨</span><p><b>Tout est décidé.</b>Place à aujourd'hui.</p></div>`;
+      $('#pf-pied').innerHTML = `<button type="button" class="bouton" data-fermer-pf>Fermer</button>`;
+    } else {
+      const jours = [...new Set(l.map(o => o.k))].sort().reverse();
+      corps.innerHTML = `<p class="note">Les 7 derniers jours. Rien de grave : décide, puis passe à autre chose. 🌿</p>` + jours.map(k => `
+        <section class="pf-jour" aria-labelledby="pf-${k}"><h3 id="pf-${k}">${k === decaler(aujourdhui(), -1) ? 'Hier' : jourLong(k)}</h3>
+          ${l.filter(o => o.k === k).map(o => {
+            const lk = look(o.el), pts = prevue(o) ? `+${valeur(o.el)} pts si faite` : '0 pt (ajoutée après son début)';
+            const ouv = P.ouverte === o.cle, props = ouv ? propositions(o) : [];
+            return `<div class="carte pf-item" style="--c:${lk.couleur}" role="group" aria-label="${esc(o.el.titre)}, ${esc(quandJour(o.k))}, ${plage(o.el)}, ${esc(lk.nom)}">
+              <div class="pf-haut"><span class="tuile petite" aria-hidden="true">${lk.icone}</span><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>${plage(o.el)} · ${esc(lk.nom)} · ${pts}</small></span></div>
+              <div class="pf-actions">
+                <button type="button" class="pf-b" data-pf="fait" data-cle="${o.cle}" data-focus="pff${o.cle}">${ICONE.coche}<span>Faite</span></button>
+                <button type="button" class="pf-b" data-pf="reporter" data-cle="${o.cle}" aria-expanded="${ouv}" data-focus="pfr${o.cle}">${ICONE.repeter}<span>Reporter</span></button>
+                <button type="button" class="pf-b" data-pf="partir" data-cle="${o.cle}" data-focus="pfp${o.cle}"><span aria-hidden="true">🍃</span><span>Laisser partir</span></button>
+              </div>
+              ${ouv ? `<div class="pf-reports" role="group" aria-label="Reporter « ${esc(o.el.titre)} »">
+                ${props.map((p, i) => `<button type="button" class="bouton petit secondaire" data-pf="mettre" data-cle="${o.cle}" data-k="${p.k}" data-debut="${p.debut}" data-fin="${p.fin}" data-focus="pfm${i}${o.cle}">${quandCourt(p.k)} · ${hhmm(p.debut)}</button>`).join('')}
+                <button type="button" class="bouton petit secondaire" data-pf="choisir" data-cle="${o.cle}" data-focus="pfc${o.cle}">Choisir…</button></div>` : ''}
+            </div>`;
+          }).join('')}
+        </section>`).join('');
+      $('#pf-pied').innerHTML = `<button type="button" class="bouton secondaire" data-pf="tout-partir">🍃 Tout laisser partir (${l.length})</button>`;
+    }
+    if (focus) {
+      const c = PF.querySelector(`[data-focus="${CSS.escape(focus)}"]`) || PF.querySelector('[data-pf="fait"]') || PF.querySelector('[data-fermer-pf]');
+      if (c) c.focus({ preventScroll: false });
+    }
+  }
+  // Après une décision, le focus passe à la tâche suivante
+  function suivante(cle) {
+    const l = pasFaites(), i = l.findIndex(o => o.cle === cle);
+    return i >= 0 ? 'pff' + cle : l.length ? 'pff' + l[0].cle : null;
+  }
+  async function reporter(o, p) {
+    if (!(await accepterPlafond(p.k, o.cle, p.debut, p.fin))) return null;
+    const cle = appliquer(o, { date: p.k, debut: p.debut, fin: p.fin }, 'une');
+    sauver();
+    avertirLibre(cle);
+    return cle;
+  }
+  PF.addEventListener('click', async e => {
+    if (e.target.closest('[data-fermer-pf]')) { PF.close(); return; }
+    const b = e.target.closest('[data-pf]');
+    if (!b) return;
+    const a = b.dataset.pf;
+    if (a === 'tout-partir') {
+      const l = pasFaites(), auj = aujourdhui();
+      l.forEach(o => { S.partis[o.cle] = auj; });
+      sauver();
+      P.ouverte = null;
+      renderPasFaites();
+      dire(`${pluriel(l.length, 'tâche laissée', 'tâches laissées')} partir. Sans regret. 🍃`);
+      const f = PF.querySelector('[data-fermer-pf]'); if (f) f.focus();
+      return;
+    }
+    const o = trouver(b.dataset.cle);
+    if (!o) return;
+    if (a === 'fait') {
+      const msg = basculerTache(o);
+      sauver();
+      P.ouverte = null;
+      renderPasFaites(suivante(o.cle));
+      dire(msg);
+      feliciter();
+      return;
+    }
+    if (a === 'partir') {
+      S.partis[o.cle] = aujourdhui();
+      sauver();
+      P.ouverte = null;
+      renderPasFaites(suivante(o.cle));
+      dire(`« ${o.el.titre} » : laissée partir. 🍃`);
+      return;
+    }
+    if (a === 'reporter') { P.ouverte = P.ouverte === o.cle ? null : o.cle; renderPasFaites('pfr' + o.cle); return; }
+    if (a === 'mettre') {
+      const p = { k: b.dataset.k, debut: +b.dataset.debut, fin: +b.dataset.fin };
+      const cle = await reporter(o, p);
+      if (!cle) return;
+      P.ouverte = null;
+      renderPasFaites(suivante(o.cle));
+      dire(`« ${o.el.titre} » : ${quandJour(p.k)}, ${hhmm(p.debut)}.`);
+      return;
+    }
+    if (a === 'choisir') { P.ouverte = null; ouvrirTache(o); }
+  });
+  // La feuille d'une tâche ouverte par « Choisir… » se ferme : la liste se met à jour
+  $('#tache').addEventListener('close', () => { if (PF.open) setTimeout(() => renderPasFaites(), 0); });
+  PF.addEventListener('close', () => { P.ouverte = null; render(); });
   // ---------- Questions (remplacent confirm) ----------
   function demander(titreQ, texte, options) {
     return new Promise(resoudre => {
@@ -3858,6 +4047,7 @@ html.paysage .bloc .b-texte small { font-size: 12px; }
     if (a === 'minuteur') return ouvrirMinuteur();
     if (a === 'bilan') return ouvrirBilan();
     if (a === 'priorites') return ouvrirPriorites();
+    if (a === 'pas-faites') return ouvrirPasFaites();
     if (a === 'nouvelle-habitude') return ouvrirHabitude(null);
     if (a === 'nouvel-objectif') return ouvrirObjectif(null);
     if (b.classList.contains('colonne')) {

@@ -7,7 +7,7 @@
     if (el.rep) d += ', ' + REPET[el.rep.freq].toLowerCase();
     if (el.type === 'libre') d += ', ' + ETAT_LIBRE[etatLibre(o)];
     if (el.type === 'sansecran') d += ', ' + ETAT_ECRAN[etatSansEcran(o)];
-    if (el.type === 'tache') d += o.fait ? ', faite' : ', à faire';
+    if (el.type === 'tache') d += o.fait ? ', faite' : S.partis[o.cle] ? ', laissée partir' : ', à faire';
     const p = S.payes[o.cle];
     if (p && p.pts) d += `, +${p.pts} points gagnés`;
     else if (el.type === 'tache' && !prevue(o)) d += ', ne rapporte pas de points (ajoutée après son début)';
@@ -18,6 +18,7 @@
   function ptsElement(o) {
     const p = S.payes[o.cle];
     if (p) return p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts nul" aria-hidden="true">0 pt</span>`;
+    if (o.el.type === 'tache' && !o.fait && S.partis[o.cle]) return `<span class="pts nul" aria-hidden="true">🍃</span>`;
     if (o.el.type === 'tache' && !prevue(o)) return `<span class="pts nul" aria-hidden="true">0 pt</span>`;
     if (o.el.type === 'libre' && etatLibre(o) === 'grignote') return `<span class="pts nul" aria-hidden="true">grignoté</span>`;
     return `<span class="pts" aria-hidden="true">+${valeur(o.el)} pts</span>`;
@@ -28,7 +29,7 @@
     if (el.type === 'libre') return `${plage(el)} · Pour moi · ${ETAT_LIBRE[etatLibre(o)]}`;
     if (el.type === 'sansecran') return `${plage(el)} · Sans écran · ${ETAT_ECRAN[etatSansEcran(o)]}`;
     const ob = el.objectif && S.objectifs.find(x => x.id === el.objectif);
-    return `${plage(el)} · ${cat(el.cat).nom}${ob ? ' · 🎯 ' + ob.titre : ''}`;
+    return `${plage(el)} · ${cat(el.cat).nom}${!o.fait && S.partis[o.cle] ? ' · laissée partir' : ''}${ob ? ' · 🎯 ' + ob.titre : ''}`;
   }
   // Ligne d'un élément. cocheGauche : la case à gauche (accueil), sinon à droite après l'icône (calendrier)
   function ligneOcc(o, cocheGauche) {
@@ -96,6 +97,7 @@
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
         <div class="boutons deux"><button type="button" class="bouton petit" data-tenu="${o.cle}" data-focus="tenu${o.cle}">Tenu</button><button type="button" class="bouton petit secondaire" data-pas-tenu="${o.cle}" data-focus="pas${o.cle}">Pas tenu</button></div></div>`).join('')}
+      ${cartePasFaites()}
       ${cartePriorites()}
       <section aria-labelledby="auj-titre">
         <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>

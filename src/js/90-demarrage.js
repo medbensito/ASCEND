@@ -272,6 +272,7 @@
     if (a === 'minuteur') return ouvrirMinuteur();
     if (a === 'bilan') return ouvrirBilan();
     if (a === 'priorites') return ouvrirPriorites();
+    if (a === 'pas-faites') return ouvrirPasFaites();
     if (a === 'nouvelle-habitude') return ouvrirHabitude(null);
     if (a === 'nouvel-objectif') return ouvrirObjectif(null);
     if (b.classList.contains('colonne')) {

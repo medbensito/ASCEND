@@ -39,9 +39,9 @@
     // Comparaison : la semaine d'avant entière, ou jusqu'au même jour si la semaine est en cours
     const lundiAv = decaler(lundi, -7);
     const Gav = gainsEntre(lundiAv, enCours ? decaler(lundiAv, ecart(lundi, auj)) : dimancheDe(lundiAv));
-    let prevues = 0, faites = 0, meilleur = null, jours = 0, complets = 0;
+    let prevues = 0, faites = 0, partis = 0, meilleur = null, jours = 0, complets = 0;
     for (let k = lundi; k <= dim; k = decaler(k, 1)) {
-      duJour(k).forEach(o => { if (o.el.type === 'tache') { prevues++; if (o.fait) faites++; } });
+      duJour(k).forEach(o => { if (o.el.type === 'tache') { prevues++; if (o.fait) faites++; else if (S.partis[o.cle]) partis++; } });
       if (k > fin) continue;
       const g = gainDuJour(k);
       if (g > 0 && (!meilleur || g > meilleur.pts)) meilleur = { k, pts: g };
@@ -52,7 +52,7 @@
     const cible = cats.reduce((t, x) => t + x.objectif, 0);
     const taux = cible ? cats.reduce((t, x) => t + Math.min(x.n, x.objectif), 0) / cible : null;
     return { lundi, dim, enCours, reste: enCours ? ecart(auj, dim) : 0, G, Gav, diff: Gav.total > 0 ? (G.total - Gav.total) / Gav.total : null,
-      bonus: G.src.semaine || 0, prevues, faites, meilleur, jours, complets, cats, taux,
+      bonus: G.src.semaine || 0, prevues, faites, partis, meilleur, jours, complets, cats, taux,
       J: jomoEntre(lundi, dim), F: focusEntre(lundi, dim), prio: S.priorites[lundi] || [] };
   }
   function phraseBilan(st) {
@@ -188,7 +188,7 @@
     const stats = `<section aria-labelledby="b-stats">
         <div class="section-tete"><h3 id="b-stats">En chiffres</h3></div>
         <div class="b-grille">
-          ${miniStat('✅', 'Tâches', sur(st.faites, st.prevues), st.prevues ? 'faites' : 'aucune prévue', st.prevues ? `Tâches faites : ${st.faites} sur ${st.prevues}` : 'Tâches : aucune prévue')}
+          ${miniStat('✅', 'Tâches', sur(st.faites, st.prevues), st.prevues ? 'faites' + (st.partis ? ` · ${st.partis} 🍃` : '') : 'aucune prévue', st.prevues ? `Tâches faites : ${st.faites} sur ${st.prevues}${st.partis ? `, ${pluriel(st.partis, 'laissée', 'laissées')} partir` : ''}` : 'Tâches : aucune prévue')}
           ${miniStat('🔥', 'Habitudes', sur(st.complets, st.jours), st.jours ? 'jours complets' : 'aucune prévue', st.jours ? `Habitudes : ${st.complets} jours complets sur ${st.jours}` : 'Habitudes : aucune prévue')}
           ${miniStat('🌿', 'Pour moi', sur(se.libres, se.libresTotal), se.libresTotal ? 'gardés' : 'aucun prévu', se.libresTotal ? `Temps pour moi gardés : ${se.libres} sur ${se.libresTotal}` : 'Temps pour moi : aucun prévu')}
           ${miniStat('📵', 'Sans écran', sur(se.tenus, se.ecransTotal), se.ecransTotal ? 'tenus' : 'aucun prévu', se.ecransTotal ? `Moments sans écran tenus : ${se.tenus} sur ${se.ecransTotal}` : 'Moments sans écran : aucun prévu')}
@@ -197,8 +197,10 @@
         </div>
         ${st.meilleur ? `<p class="carte b-meilleur"><span aria-hidden="true">⭐</span><span>Meilleur jour : <b>${esc(jourLong(st.meilleur.k))}</b> · +${nombre(st.meilleur.pts)} pts</span></p>` : ''}
       </section>`;
+    const npf = B.cible ? pasFaites().length : 0;
+    const lienPf = npf ? `<button type="button" class="carte b-entree pf-entree" data-b="pas-faites"><span class="tuile" style="--c:#ffb547" aria-hidden="true">📋</span><span class="quoi"><b>${pluriel(npf, 'tâche pas faite', 'tâches pas faites')}</b><small>Coche, reporte ou laisse partir avant de commencer.</small></span>${ICONE.droite}</button>` : '';
     const edit = B.cible ? `<section aria-labelledby="b-cible" class="b-cible">
-        <div class="section-tete"><h3 id="b-cible">${st.enCours ? 'Tes priorités de la semaine' : 'Ta semaine qui commence'}</h3></div>
+        <div class="section-tete"><h3 id="b-cible">${st.enCours ? 'Tes priorités de la semaine' : 'Ta semaine qui commence'}</h3></div>${st.enCours ? '' : lienPf}
         <p class="note">${st.enCours ? 'Coche-les sur l\'accueil quand elles sont tenues.' : `Choisis 1 à 3 priorités, ${texteSemaine(lundiAuj)}. Elles t'attendent sur l'accueil.`}</p>
         ${editeurPriorites(B.cible)}</section>` : '';
     corps.innerHTML = nav + hero + (st.enCours ? edit + cats : cats + prioRevue) + stats + (st.enCours ? '' : edit);
@@ -216,6 +218,7 @@
       return;
     }
     if (e.target.closest('[data-b="fermer"]')) BD.close();
+    if (e.target.closest('[data-b="pas-faites"]')) { BD.close(); ouvrirPasFaites(); }
   });
   BD.addEventListener('change', e => { if (e.target.matches('[data-prio]')) lirePriorites(); });
   // Entrée sur un champ : au suivant, puis on range le clavier

@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 9;                       // édition de l'app, comme le cache du service worker (ascend-9)
+  const EDITION = 10;                      // édition de l'app, comme le cache du service worker (ascend-10)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -51,6 +51,7 @@
   // objectifs : { id, titre, cat, echeance, etapes: [{ id, titre, faitLe }], creeLe, atteintLe }
   // payes : { clé : { pts, jour, type, cat, raison? } } ; gains : { jour : { total, cats: { id: pts }, src: { type: pts } } }
   // priorites : { lundi : [{ id, titre, fait }] } (1 à 3 par semaine) ; bilanVu : lundi de la semaine où le bilan s'est ouvert de lui-même
+  // partis : { clé d'une tâche pas faite : jour où on l'a laissée partir }
   function rappelsVides() {
     return { actif: false, jeton: null, service: null, avant: true, delai: 30, matin: true, heureMatin: 8 * 60, sauvegarde: true, signature: null, majLe: null, erreur: null };
   }
@@ -65,7 +66,7 @@
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null,
+    priorites: {}, bilanVu: null, partis: {},
     onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -76,7 +77,7 @@
   const estObjet = v => v && typeof v === 'object' && !Array.isArray(v);
   function nettoyer() {
     ['elements', 'habitudes', 'objectifs', 'focus'].forEach(c => { if (!Array.isArray(S[c])) S[c] = []; });
-    ['tenus', 'payes', 'gains', 'priorites'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
+    ['tenus', 'payes', 'gains', 'priorites', 'partis'].forEach(c => { if (!estObjet(S[c])) S[c] = {}; });
     Object.keys(S.priorites).forEach(k => {
       const l = Array.isArray(S.priorites[k]) ? S.priorites[k].filter(p => p && p.id && typeof p.titre === 'string' && p.titre.trim()).slice(0, 3) : [];
       l.forEach(p => { p.titre = p.titre.slice(0, 60); p.fait = !!p.fait; });
@@ -123,6 +124,7 @@
     const limite = decaler(aujourdhui(), -400);
     Object.keys(S.gains).forEach(k => { if (k < limite) delete S.gains[k]; });
     Object.keys(S.priorites).forEach(k => { if (k < limite) delete S.priorites[k]; });
+    Object.keys(S.partis).forEach(c => { if (c.slice(c.lastIndexOf('|') + 1) < limite) delete S.partis[c]; });
     Object.keys(S.payes).forEach(c => { if (!/^[eo]:/.test(c) && (!S.payes[c] || (S.payes[c].jour || '') < limite)) delete S.payes[c]; });
     try { localStorage.setItem(CLE, JSON.stringify(S)); erreurStockage = false; }
     catch (e) { erreurStockage = true; }
@@ -197,6 +199,7 @@
     if (ancienne === nouvelle) return;
     if (S.payes[ancienne]) { S.payes[nouvelle] = S.payes[ancienne]; delete S.payes[ancienne]; }
     if (S.tenus[ancienne] !== undefined) { S.tenus[nouvelle] = S.tenus[ancienne]; delete S.tenus[ancienne]; }
+    delete S.partis[ancienne];
   }
   function prendreDepuis(obj, depuis, delta) {
     const res = {};
