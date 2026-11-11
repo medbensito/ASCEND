@@ -244,3 +244,21 @@
 .bac-ligne .quoi b { font-weight: 600; font-size: 15.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bac-ligne .quoi small { color: var(--doux); font-size: 12.5px; }
 .bac-ajout .champ-nom input { font-size: 16px; }
+
+/* ===== Semaine couchée (7 colonnes), tâches sans heure ===== */
+.sem7-tete { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0 0 2px 40px; gap: 4px; }
+.sem7-tete span { text-align: center; font-size: 11px; font-weight: 600; color: var(--doux); white-space: nowrap; }
+.sem7-tete span b { font-weight: 700; color: var(--texte); }
+.sem7-tete span.auj, .sem7-tete span.auj b { color: var(--accent-texte); }
+.sem7-tete span.charge b { color: var(--orange); }
+.sem7-tete span i { font-style: normal; margin-left: 4px; color: var(--pale); }
+.sem7 .bloc.court .b-texte { padding: 0 4px 0 5px; }
+.sem7 .bloc .b-texte small, .sem7 .bloc .rond-coche, .sem7 .bloc .gain { display: none; }
+html.paysage .sem7 .bloc .b-texte b { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sem7 .bloc { border-radius: 6px; }
+.sem7 .colonne.auj { background: rgba(255, 255, 255, .045); }
+.sem7 .colonne + .colonne { border-left: 1px solid var(--trait); }
+.flou-zone { display: grid; gap: 8px; padding: 0 0 10px; }
+.flou-zone .ligne { min-height: 52px; padding: 8px 14px; }
+#form-tache.sans-heure .horaires { opacity: .35; pointer-events: none; }
+.sem7 .bloc .b-texte { padding-right: 4px; padding-left: 5px; }

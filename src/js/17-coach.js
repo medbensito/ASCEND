@@ -74,7 +74,7 @@
     // 5. Le meilleur moment pour une catégorie (4 dernières semaines)
     const debut = decaler(auj, -28) > depuis ? decaler(auj, -28) : depuis;
     const moments = {};
-    for (let k = debut; k < auj; k = decaler(k, 1)) duJour(k).forEach(o => { if (o.el.type !== 'tache') return;
+    for (let k = debut; k < auj; k = decaler(k, 1)) duJour(k).forEach(o => { if (o.el.type !== 'tache' || o.el.flou) return;
       const m = o.el.debut < 720 ? 0 : o.el.debut < 1080 ? 1 : 2, x = (moments[o.el.cat] = moments[o.el.cat] || [[0, 0], [0, 0], [0, 0]]); x[m][1]++; if (o.fait) x[m][0]++; });
     const NOMS = ['le matin', 'l\'après-midi', 'le soir'];
     let meilleur = null;

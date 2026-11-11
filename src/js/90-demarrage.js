@@ -17,7 +17,7 @@
     const plein = couche || (U.onglet === 'calendrier' && S.vueCal === 'jour');
     E.classList.toggle('plein', plein);
     const haut = E.scrollTop;
-    reglerHeure(couche && S.vueCal === 'jour');
+    reglerHeure(couche && S.vueCal !== 'mois');
     E.innerHTML = couche ? vuePaysage() : { accueil: vueAccueil, calendrier: vueCalendrier, objectifs: vueObjectifs, progression: vueProgression }[U.onglet]();
     if (U.garderDefilement) E.scrollTop = haut;
     U.garderDefilement = false;
@@ -44,7 +44,7 @@
   }
   function naviguer(sens) {
     U.selection = null; U.brouillon = null;
-    if (S.vueCal === 'jour') U.date = decaler(U.date, sens); else if (S.vueCal === 'mois' || paysage()) U.date = moisPlus(U.date, sens); else U.date = decaler(U.date, 7 * sens);
+    if (S.vueCal === 'jour') U.date = decaler(U.date, sens); else if (S.vueCal === 'mois') U.date = moisPlus(U.date, sens); else U.date = decaler(U.date, 7 * sens);
     U.garderDefilement = true;
     render();
   }
@@ -132,6 +132,7 @@
       const d = G.t.fin - G.t.debut;
       G.debut = borne(caler(G.t.debut + p.min - G.min0), 0, 1440 - d);
       G.fin = G.debut + d;
+      if (p.k !== G.k) { G.k = p.k; p.col.appendChild(G.vue); }       // plusieurs colonnes (semaine couchée) : d'un jour à l'autre
     } else if (G.mode === 'redim') {
       const m = borne(caler(p.min), 0, 1440);
       if (G.bord === 'haut') G.debut = Math.min(m, G.t.fin - CONFIG.pas);
@@ -182,7 +183,7 @@
     sauver();
     U.selection = g.tactile ? cle : null;
     render();
-    if (!avertirLibre(cle)) dire(`${t.o.el.titre} : ${hhmm(g.debut)} – ${finTexte(g.fin)}`);
+    if (!avertirLibre(cle)) dire(`${t.o.el.titre} : ${g.k !== t.k ? quandJour(g.k) + ', ' : ''}${hhmm(g.debut)} – ${finTexte(g.fin)}`);
   }
   const ECRAN = $('#ecran');
   ECRAN.addEventListener('pointerdown', e => {
@@ -336,7 +337,7 @@
     delete U.defile.jour;
     render();
   });
-  window.addEventListener('resize', () => { if (paysage() && S.vueCal !== 'jour' && !G) render(); });
+  window.addEventListener('resize', () => { if (paysage() && S.vueCal === 'mois' && !G) render(); });
 
   // ---------- Le clavier de l'iPhone ----------
   // Safari place les éléments fixes sur toute la hauteur de l'écran, même quand le clavier en cache la moitié,

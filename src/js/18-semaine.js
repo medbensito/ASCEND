@@ -7,7 +7,7 @@
     const faits = faitsCat(c.id, lundi, dim);
     let venir = 0;
     for (let k = lundi < auj ? auj : lundi; k <= dim; k = decaler(k, 1)) {
-      duJour(k).forEach(o => { if (o.el.type === 'tache' && o.el.cat === c.id && !o.fait && !S.partis[o.cle] && (k > auj || o.el.fin > minNow())) venir++; });
+      duJour(k).forEach(o => { if (o.el.type === 'tache' && o.el.cat === c.id && !o.fait && !S.partis[o.cle] && (k > auj || o.el.flou || o.el.fin > minNow())) venir++; });
       S.habitudes.forEach(h => { if (h.cat === c.id && habitudeDue(h, k) && !h.faits[k]) venir++; });
     }
     return { c, faits, venir, objectif: c.objectif, atteint: faits >= c.objectif, manque: Math.max(0, c.objectif - faits - venir) };
@@ -102,7 +102,7 @@
   // Ce qui est en cours, sinon ce qui vient ensuite aujourd'hui
   function carteMaintenant() {
     const auj = aujourdhui(), now = minNow();
-    const l = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait) && o.el.fin > now);
+    const l = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait) && !o.el.flou && o.el.fin > now);
     const o = l.find(x => x.el.debut <= now) || l[0];
     if (!o) return '';
     const enCours = o.el.debut <= now, lk = look(o.el), dans = o.el.debut - now;

@@ -85,7 +85,7 @@
     const R = S.rappels, auj = aujourdhui(), debutJour = parse(auj).getTime(), res = [];
     for (let i = 0; i < CONFIG.rappels.horizon; i++) {
       const k = decaler(auj, i), occs = duJour(k);
-      if (R.avant) occs.forEach(o => {
+      if (R.avant) occs.filter(o => !o.el.flou).forEach(o => {
         if (o.el.type === 'libre' || (o.el.type === 'tache' && o.fait)) return;
         const at = debutOcc(o) - R.delai * 6e4;
         const quoi = o.el.type === 'sansecran' ? '📵 Moment sans écran' : `${cat(o.el.cat).icone} ${cat(o.el.cat).nom} · +${valeur(o.el)} pts`;

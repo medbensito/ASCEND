@@ -1,5 +1,5 @@
   // ---------- Morceaux communs ----------
-  const plage = el => `${hhmm(el.debut)} – ${finTexte(el.fin)}`;
+  const plage = el => el.flou ? `Dans la journée · ${duree(el.fin - el.debut)}` : `${hhmm(el.debut)} – ${finTexte(el.fin)}`;
   const ptsTexte = n => `${n > 0 ? '+' : ''}${n} pt${Math.abs(n) > 1 ? 's' : ''}`;
   function description(o) {
     const el = o.el, l = look(el);

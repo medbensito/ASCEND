@@ -13,19 +13,20 @@
   }
   // Prochain créneau libre de cette durée, entre 8 h et 22 h, à partir d'un jour (et d'une heure ce jour-là)
   function creneauLibre(k, duree, sans, apres) {
-    const occupe = duJour(k).filter(o => o.cle !== sans).map(o => [o.el.debut, o.el.fin]);
+    const occupe = duJour(k).filter(o => o.cle !== sans && !o.el.flou).map(o => [o.el.debut, o.el.fin]);
     for (let m = Math.max(8 * 60, apres || 0); m + duree <= 22 * 60; m += CONFIG.pas) {
       if (!occupe.some(([a, b]) => m < b && m + duree > a)) return { k, debut: m, fin: m + duree };
     }
     return null;
   }
-  const libreA = (k, debut, fin, sans) => !duJour(k).some(o => o.cle !== sans && debut < o.el.fin && fin > o.el.debut);
+  const libreA = (k, debut, fin, sans) => !duJour(k).some(o => o.cle !== sans && !o.el.flou && debut < o.el.fin && fin > o.el.debut);
   // Propositions pour reporter : aujourd'hui (même heure si elle est encore à venir et libre, sinon le prochain créneau libre),
   // demain (même heure si libre, sinon le créneau libre qui suit)
   function propositions(o) {
     const auj = aujourdhui(), dem = decaler(auj, 1), d = o.el.debut, f = o.el.fin, du = f - d;
     const tot = Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas;
     const res = [];
+    if (o.el.flou) return [{ k: auj, debut: d, fin: f }, { k: dem, debut: d, fin: f }];       // sans heure : le jour seul compte
     const a = d >= tot && libreA(auj, d, f, o.cle) ? { k: auj, debut: d, fin: f } : creneauLibre(auj, du, o.cle, tot);
     if (a) res.push(a);
     const b = libreA(dem, d, f, o.cle) ? { k: dem, debut: d, fin: f } : creneauLibre(dem, du, o.cle);
@@ -73,7 +74,7 @@
                 <button type="button" class="pf-b" data-pf="partir" data-cle="${o.cle}" data-focus="pfp${o.cle}"><span aria-hidden="true">🍃</span><span>Laisser partir</span></button>
               </div>
               ${ouv ? `<div class="pf-reports" role="group" aria-label="Reporter « ${esc(o.el.titre)} »">
-                ${props.map((p, i) => `<button type="button" class="bouton petit secondaire" data-pf="mettre" data-cle="${o.cle}" data-k="${p.k}" data-debut="${p.debut}" data-fin="${p.fin}" data-focus="pfm${i}${o.cle}">${quandCourt(p.k)} · ${hhmm(p.debut)}</button>`).join('')}
+                ${props.map((p, i) => `<button type="button" class="bouton petit secondaire" data-pf="mettre" data-cle="${o.cle}" data-k="${p.k}" data-debut="${p.debut}" data-fin="${p.fin}" data-focus="pfm${i}${o.cle}">${quandCourt(p.k)}${o.el.flou ? '' : ' · ' + hhmm(p.debut)}</button>`).join('')}
                 <button type="button" class="bouton petit secondaire" data-pf="choisir" data-cle="${o.cle}" data-focus="pfc${o.cle}">Choisir…</button></div>` : ''}
             </div>`;
           }).join('')}
@@ -138,7 +139,7 @@
       if (!cle) return;
       P.ouverte = null;
       renderPasFaites(suivante(o.cle));
-      dire(`« ${o.el.titre} » : ${quandJour(p.k)}, ${hhmm(p.debut)}.`);
+      dire(`« ${o.el.titre} » : ${quandJour(p.k)}${o.el.flou ? ', dans la journée' : ', ' + hhmm(p.debut)}.`);
       return;
     }
     if (a === 'choisir') { P.ouverte = null; ouvrirTache(o); }

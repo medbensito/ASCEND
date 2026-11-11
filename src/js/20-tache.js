@@ -65,7 +65,7 @@
     const el = o ? o.el : null;
     const m = el ? { type: el.type, titre: el.titre, date: o.k, debut: el.debut, fin: el.fin, rep: el.rep, cat: el.cat, objectif: el.objectif || '' }
       : Object.assign({ type: 'tache', titre: '', date: U.date, debut: 9 * 60, fin: 10 * 60, rep: null, cat: (catsActives()[0] || S.categories[0]).id, objectif: '' }, modele);
-    U.edition = { o: o || null, depart: m, duree: m.fin - m.debut, cat: cat(m.cat).id };
+    U.edition = { o: o || null, depart: m, duree: m.fin - m.debut, cat: cat(m.cat).id, flou: !!(el ? el.flou : m.flou) };
     const objs = S.objectifs.filter(x => !x.atteintLe || x.id === m.objectif);
     TF.innerHTML = `
       <div class="f-haut"><button type="button" class="f-icone" data-t="annuler" aria-label="Fermer">${ICONE.croix}</button><h2 id="t-titre"></h2>
@@ -124,10 +124,12 @@
     const sans = U.edition.o ? U.edition.o.cle : null;
     const libre = /^\d{4}-\d{2}-\d{2}$/.test(date) ? creneauLibre(date, du, sans, date === auj ? Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas : 8 * 60) : null;
     const heures = [9 * 60, 12 * 60, 14 * 60, 18 * 60, 20 * 60].filter(h => !libre || h !== libre.debut);
-    poser('#t-heures', (libre ? puce('data-t-heure', libre.debut, `Libre · ${hhmm(libre.debut)}`, deb === libre.debut, `Prochain créneau libre : ${hhmm(libre.debut)}`) : '') + heures.map(h => puce('data-t-heure', h, hhmm(h), deb === h)).join(''));
+    const flou = U.edition.flou && type === 'tache';
+    TF.classList.toggle('sans-heure', flou);
+    poser('#t-heures', (type === 'tache' ? puce('data-t-flou', '1', 'Sans heure', flou, 'Sans heure : dans la journée') : '') + (libre ? puce('data-t-heure', libre.debut, `Libre · ${hhmm(libre.debut)}`, !flou && deb === libre.debut, `Prochain créneau libre : ${hhmm(libre.debut)}`) : '') + heures.map(h => puce('data-t-heure', h, hhmm(h), !flou && deb === h)).join(''));
     poser('#t-durees', [15, 30, 60, 90, 120].map(x => puce('data-t-duree', x, duree(x), du === x)).join(''));
     const fin = versMin(champT('fin').value);
-    $('#t-resume').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) && deb != null && fin != null ? `${cap(quandJour(date))} · ${hhmm(deb)} – ${finTexte(fin === 0 ? 1440 : fin)} · ${duree(du)}` : '';
+    $('#t-resume').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) && deb != null && fin != null ? (flou ? `${cap(quandJour(date))} · dans la journée · ${duree(du)}` : `${cap(quandJour(date))} · ${hhmm(deb)} – ${finTexte(fin === 0 ? 1440 : fin)} · ${duree(du)}`) : '';
     const rep = champT('repeter').checked;
     $('#t-freq').hidden = $('#t-jusqua').hidden = !rep;
     $('#t-resume').textContent += $('#t-resume').textContent ? ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts` : '';
@@ -153,14 +155,15 @@
     const titre = champT('titre').value.trim() || (type === 'tache' ? '' : JOMO[type].nom);
     if (!titre) return { erreur: 'Donne un nom à la tâche.', champ: champT('titre') };
     if (!champT('date').value) return { erreur: 'Choisis une date.', champ: champT('date') };
-    const debut = versMin(champT('debut').value);
-    let fin = versMin(champT('fin').value);
+    const flou = U.edition.flou && type === 'tache';
+    const debut = flou ? 0 : versMin(champT('debut').value);
+    let fin = flou ? Math.min(Math.max(U.edition.duree > 0 ? U.edition.duree : 60, 15), 240) : versMin(champT('fin').value);
     if (debut == null || fin == null) return { erreur: 'Indique le début et la fin : chaque tâche a sa plage horaire.', champ: champT('debut') };
     if (fin === 0 && debut > 0) fin = 1440;
     if (fin <= debut) return { erreur: 'La fin doit être après le début.', champ: champT('fin') };
     const rep = champT('repeter').checked ? { freq: champT('freq').value, jusqua: champT('jusqua').value || null } : null;
     if (rep && rep.jusqua && rep.jusqua < champT('date').value) return { erreur: "« Jusqu'au » doit venir après la date.", champ: champT('jusqua') };
-    return { champs: { type, titre, date: champT('date').value, debut, fin, rep, cat: type === 'tache' ? U.edition.cat : (U.edition.depart.cat || S.categories[0].id), objectif: type === 'tache' ? (champT('objectif').value || null) : null } };
+    return { champs: { type, titre, date: champT('date').value, debut, fin, flou, rep, cat: type === 'tache' ? U.edition.cat : (U.edition.depart.cat || S.categories[0].id), objectif: type === 'tache' ? (champT('objectif').value || null) : null } };
   }
   const memeRep = (a, b) => (!a && !b) || (a && b && a.freq === b.freq && (a.jusqua || null) === (b.jusqua || null));
   // Minutes de tâches d'un jour si on y ajoute (ou déplace) une plage
@@ -235,10 +238,11 @@
     const poserFin = (debut, du) => { champT('fin').value = hhmm(Math.min(debut + du, 1440) % 1440); };
     if (d.tCat) U.edition.cat = d.tCat;
     if (d.tJour) champT('date').value = d.tJour;
-    if (d.tHeure) { champT('debut').value = hhmm(+d.tHeure); poserFin(+d.tHeure, dureeAct); }
+    if (d.tFlou) { U.edition.flou = !U.edition.flou; if (!U.edition.flou && versMin(champT('debut').value) === 0) { champT('debut').value = '09:00'; poserFin(540, dureeAct); } }
+    if (d.tHeure) { U.edition.flou = false; champT('debut').value = hhmm(+d.tHeure); poserFin(+d.tHeure, dureeAct); }
     if (d.tDuree) { U.edition.duree = +d.tDuree; const deb = versMin(champT('debut').value); if (deb != null) poserFin(deb, +d.tDuree); }
     majTache();
-    const sel = d.tCat ? `[data-t-cat="${CSS.escape(d.tCat)}"]` : d.tJour ? `[data-t-jour="${d.tJour}"]` : d.tHeure ? `[data-t-heure="${d.tHeure}"]` : `[data-t-duree="${d.tDuree}"]`;
+    const sel = d.tCat ? `[data-t-cat="${CSS.escape(d.tCat)}"]` : d.tJour ? `[data-t-jour="${d.tJour}"]` : d.tFlou ? '[data-t-flou]' : d.tHeure ? `[data-t-heure="${d.tHeure}"]` : `[data-t-duree="${d.tDuree}"]`;
     const f = TD.querySelector(sel); if (f) f.focus();
   });
   TD.addEventListener('click', async e => {

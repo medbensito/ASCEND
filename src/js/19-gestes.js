@@ -20,6 +20,7 @@
   }
   // Jour proposé pour un report : même heure si elle est libre, sinon le créneau libre qui suit, sinon le premier de la journée
   function creneauReport(o, k) {
+    if (o.el.flou) return { k, debut: o.el.debut, fin: o.el.fin };
     const d = o.el.debut, f = o.el.fin, auj = aujourdhui(), tot = k === auj ? Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas : 0;
     if (d >= tot && libreA(k, d, f, o.cle)) return { k, debut: d, fin: f };
     return creneauLibre(k, f - d, o.cle, Math.max(d, tot)) || creneauLibre(k, f - d, o.cle, Math.max(8 * 60, tot));
@@ -39,7 +40,7 @@
     $('#a-corps').innerHTML = `
       <p class="note">${cap(quandJour(o.k))} · ${plage(o.el)} · ${esc(look(o.el).nom)}</p>
       ${o.fait ? '' : `<div><span class="etiquette" id="a-rep">Reporter</span>
-        <div class="puces" role="group" aria-labelledby="a-rep">${jours.map((k, i) => { const p = creneauReport(o, k); return p ? `<button type="button" class="puce" data-a-jour="${k}|${p.debut}|${p.fin}" data-focus="aj${i}" aria-label="${jourLong(k)} à ${hhmm(p.debut)}">${quandCourt(k)} · ${hhmm(p.debut)}</button>` : ''; }).join('')}</div></div>`}
+        <div class="puces" role="group" aria-labelledby="a-rep">${jours.map((k, i) => { const p = creneauReport(o, k); return p ? `<button type="button" class="puce" data-a-jour="${k}|${p.debut}|${p.fin}" data-focus="aj${i}" aria-label="${jourLong(k)}${o.el.flou ? '' : ' à ' + hhmm(p.debut)}">${quandCourt(k)}${o.el.flou ? '' : ' · ' + hhmm(p.debut)}</button>` : ''; }).join('')}</div></div>`}
       <div class="groupe a-liste">
         ${!o.fait && tache ? `<button type="button" class="rang" data-a="caser"><span><span class="ic">📥</span><span>À caser plus tard<span class="sous">Sans jour ni heure, dans le bac de la semaine</span></span></span></button>` : ''}
         ${passee && tache && !S.partis[o.cle] ? `<button type="button" class="rang" data-a="partir"><span><span class="ic">🍃</span><span>Laisser partir<span class="sous">Sans points ni pénalité</span></span></span></button>` : ''}
@@ -86,7 +87,7 @@
       if (o.el.type === 'tache' && !(await accepterPlafond(k, o.cle, +debut, +fin))) return;
       const cle = appliquer(o, { date: k, debut: +debut, fin: +fin }, 'une');
       sauver(); AD.close();
-      if (!avertirLibre(cle)) dire(`« ${o.el.titre} » : ${quandJour(k)} à ${hhmm(+debut)}.`);
+      if (!avertirLibre(cle)) dire(`« ${o.el.titre} » : ${quandJour(k)}${o.el.flou ? ', dans la journée' : ' à ' + hhmm(+debut)}.`);
       return;
     }
     if (!b) return;

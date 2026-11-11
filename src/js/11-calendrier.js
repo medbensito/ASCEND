@@ -112,7 +112,7 @@
     let h = '';
     for (let i = 1; i < 24; i++) h += `${Math.abs(i * 60 - mn) < 14 ? '' : `<div class="heure" style="top:${i * H}px">${hhmm(i * 60)}</div>`}<div class="trait-h" style="top:${i * H}px"></div>`;
     const cols = jours.map(k => {
-      const blocs = disposer(duJour(k)).map(bloc).join('');
+      const blocs = disposer(duJour(k).filter(o => !o.el.flou)).map(bloc).join('');
       const br = U.brouillon && U.brouillon.k === k ? blocBrouillon(U.brouillon) : '';
       return `<div class="colonne${k === auj ? ' auj' : ''}" data-jour="${k}">${blocs}${br}</div>`;
     }).join('');
@@ -141,6 +141,7 @@
         <div class="jauge${m > pl ? ' depasse' : ''}" role="img" aria-label="${duree(m)} de tâches prévues sur un plafond de ${duree(pl)}${m > pl ? ' : journée chargée' : ''}">
           <small aria-hidden="true"><b>${duree(m)}</b> / ${duree(pl)}</small><span class="barre" aria-hidden="true"><i style="width:${Math.min(100, m / pl * 100)}%"></i></span></div>
       </div>
+      ${duJour(k).some(o => o.el.flou) ? `<div class="flou-zone" role="group" aria-label="Dans la journée">${duJour(k).filter(o => o.el.flou).map(o => ligneOcc(o, true)).join('')}</div>` : ''}
       <div class="defile" data-defile="jour">${grille([k])}</div>
       <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>
     </div>`;
@@ -171,12 +172,14 @@
   }
   // Téléphone couché, vue Jour : toute la journée tient à l'écran, sans défiler.
   // De 7 h à 23 h, élargi si une plage commence plus tôt ou finit plus tard ; la hauteur d'une heure s'y ajuste.
+  const joursPaysage = () => S.vueCal === 'semaine' ? Array.from({ length: 7 }, (_, i) => decaler(lundiDe(U.date), i)) : [U.date];
   function reglerHeure(ajuste) {
     PLAGE.ajuste = ajuste;
     if (!ajuste) { H = CONFIG.heure; HMIN = 22; }
     else {
-      const l = duJour(U.date).map(o => o.el);
-      if (U.brouillon && U.brouillon.k === U.date) l.push(U.brouillon);
+      const jours = joursPaysage();
+      const l = [].concat(...jours.map(k => duJour(k).filter(o => !o.el.flou).map(o => o.el)));
+      if (U.brouillon && jours.includes(U.brouillon.k)) l.push(U.brouillon);
       PLAGE.a = Math.min(7, ...l.map(e => Math.floor(e.debut / 60)));
       PLAGE.b = Math.max(23, ...l.map(e => Math.ceil(e.fin / 60)));
       const dispo = PLAGE.dispo || (($('.app') || {}).clientHeight || window.innerHeight) - 66;
@@ -186,24 +189,28 @@
     document.documentElement.style.setProperty('--H', H + 'px');
   }
   function vuePaysage() {
-    const jour = S.vueCal === 'jour', k = U.date, auj = aujourdhui();
-    const titre = jour ? (k === auj ? "Aujourd'hui · " : '') + jourLong(k) : cap(parse(k).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
+    const sem = S.vueCal === 'semaine', jour = S.vueCal === 'jour', k = U.date, auj = aujourdhui();
+    const titre = sem ? 'Semaine ' + texteSemaine(lundiDe(k)) : jour ? (k === auj ? "Aujourd'hui · " : '') + jourLong(k) : cap(parse(k).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
+    const nomNav = sem ? 'Semaine' : jour ? 'Jour' : 'Mois';
     const m = minutesPrevues(k), pl = S.reglages.plafond;
     return `<h1 class="masque">Calendrier</h1>
       <div class="pay"${jour ? ' data-balayage="jour"' : ''}>
         <div class="pay-barre">
-          <button type="button" class="icone-bouton" data-nav="-1" aria-label="${jour ? 'Jour précédent' : 'Mois précédent'}" data-focus="nav-1">${ICONE.gauche}</button>
+          <button type="button" class="icone-bouton" data-nav="-1" aria-label="${nomNav} précédent${sem ? 'e' : ''}" data-focus="nav-1">${ICONE.gauche}</button>
           <h2 aria-live="polite">${esc(titre)}</h2>
-          <button type="button" class="icone-bouton" data-nav="1" aria-label="${jour ? 'Jour suivant' : 'Mois suivant'}" data-focus="nav1">${ICONE.droite}</button>
+          <button type="button" class="icone-bouton" data-nav="1" aria-label="${nomNav} suivant${sem ? 'e' : ''}" data-focus="nav1">${ICONE.droite}</button>
           ${jour ? `<div class="jauge${m > pl ? ' depasse' : ''}" role="img" aria-label="${duree(m)} de tâches prévues sur un plafond de ${duree(pl)}${m > pl ? ' : journée chargée' : ''}"><small aria-hidden="true"><b>${duree(m)}</b> / ${duree(pl)}</small><span class="barre" aria-hidden="true"><i style="width:${Math.min(100, m / pl * 100)}%"></i></span></div>` : ''}
           <div class="segments" role="group" aria-label="Affichage">
-            <button type="button" aria-pressed="${!jour}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
+            <button type="button" aria-pressed="${sem}" data-vue-cal="semaine" data-focus="vc-semaine">Sem.</button>
             <button type="button" aria-pressed="${jour}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+            <button type="button" aria-pressed="${!jour && !sem}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
           </div>
           <button type="button" class="icone-bouton" data-action="aujourdhui" aria-label="Aujourd'hui" data-focus="auj">${ICONE.calendrier}</button>
           <button type="button" class="icone-bouton" data-action="chercher" aria-label="Chercher" data-focus="chercher">${ICONE.loupe}</button>
         </div>
-        ${jour ? `<div class="defile ajuste" data-defile="jour">${grille([k])}</div>
+        ${sem ? `<div class="sem7-tete" aria-hidden="true">${joursPaysage().map((j, i) => { const m7 = minutesPrevues(j), fl = duJour(j).filter(o => o.el.flou).length; return `<span class="${j === auj ? 'auj' : ''}${m7 > pl ? ' charge' : ''}">${JOURS_COURTS_3[i]} <b>${parse(j).getDate()}</b>${fl ? `<i>+${fl}</i>` : ''}</span>`; }).join('')}</div>
+          <div class="defile ajuste sem7" data-defile="jour">${grille(joursPaysage())}</div>`
+          : jour ? `<div class="defile ajuste" data-defile="jour">${grille([k])}</div>
           <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>` : moisPaysage()}
       </div>`;
   }
