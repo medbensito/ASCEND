@@ -38,7 +38,7 @@
     const ouvrir = `<button type="button" class="ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}" data-focus="o${o.cle}">
         ${cocheGauche ? '' : `<span class="tuile" style="--c:${l.couleur}" aria-hidden="true">${l.icone}</span>`}
         <span class="quoi" aria-hidden="true"><b>${esc(el.titre)}</b><small>${esc(sousTitre(o))}</small></span>${ptsElement(o)}</button>`;
-    return `<div class="carte ligne${o.fait ? ' faite' : ''}${U.repere === o.cle ? ' repere' : ''}" style="--c:${l.couleur}">
+    return `<div class="carte ligne${o.fait ? ' faite' : ''}${U.repere === o.cle ? ' repere' : ''}" style="--c:${l.couleur}"${el.type === 'tache' ? ` data-glisse="${o.cle}"` : ''}>
       ${cocheGauche ? (coche || `<span class="tuile petite" style="--c:${l.couleur}" aria-hidden="true">${l.icone}</span>`) : ''}${ouvrir}${cocheGauche ? '' : coche}</div>`;
   }
   function ligneHabitude(h, k, cocheGauche) {

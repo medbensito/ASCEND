@@ -223,3 +223,24 @@
 .mnt-ligne .quoi b { font-size: 18px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mnt-ligne .quoi small { color: var(--doux); font-size: 13px; }
 .mnt-ligne .pts { color: var(--accent-texte); font-weight: 600; font-size: 13.5px; }
+
+/* ===== Gestes, menu d'actions, bac À caser ===== */
+.ligne[data-glisse] { touch-action: pan-y; position: relative; z-index: 1; }
+.ligne.glisse { box-shadow: 0 10px 30px rgba(0, 0, 0, .6); }
+.g-fond { position: absolute; left: 0; right: 0; display: flex; align-items: center; padding: 0 20px; border-radius: var(--rayon); font-size: 14px; font-weight: 700; color: var(--doux); background: rgba(255, 255, 255, .04); }
+.g-fond.droite { justify-content: flex-start; }
+.g-fond.gauche { justify-content: flex-end; }
+.g-fond.droite.ok { background: rgba(47, 211, 125, .22); color: var(--vert); }
+.g-fond.gauche.ok { background: rgba(228, 211, 179, .2); color: var(--accent-texte); }
+.toast.avec-action { display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 20px; pointer-events: auto; }
+.toast-action { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--accent); color: var(--sur-accent); font-size: 14px; font-weight: 700; flex: none; }
+.a-liste .rang { width: 100%; text-align: left; }
+.a-liste .rang.danger { color: #ff8a9a; }
+#actions .f-corps { gap: 18px; }
+.bac { display: grid; gap: 10px; padding-top: 10px; border-top: 1px solid var(--trait); }
+.bac .section-tete h2 small { color: var(--doux); font-size: 13px; font-weight: 600; }
+.bac-ligne { width: 100%; text-align: left; color: inherit; display: flex; align-items: center; gap: 12px; }
+.bac-ligne .quoi { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.bac-ligne .quoi b { font-weight: 600; font-size: 15.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bac-ligne .quoi small { color: var(--doux); font-size: 12.5px; }
+.bac-ajout .champ-nom input { font-size: 16px; }

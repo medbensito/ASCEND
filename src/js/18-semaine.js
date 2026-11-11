@@ -78,7 +78,8 @@
         <button type="button" class="icone-bouton" data-nav="1" aria-label="Semaine suivante" data-focus="nav1">${ICONE.droite}</button>
       </div>
       ${bandeauSemaine(lundi)}
-      <div class="sem-jours" data-balayage="semaine">${jours}</div>`;
+      <div class="sem-jours">${jours}</div>
+      ${bacACaser()}`;
   }
   const JOURS_COURTS_3 = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   // Clics propres à la semaine ; renvoie vrai si le clic est traité

@@ -267,6 +267,7 @@
     if (d.choisir) { U.date = d.choisir; U.garderDefilement = true; return render(); }
     if (d.ouvrirJour) return allerA(d.ouvrirJour, 'jour');
     if (clicSemaine(d)) return;
+    if (d.caser) return ouvrirCaser(d.caser);
     const a = d.action;
     if (a === 'remplir' && U.brouillon) return ouvrirTache(null, { date: U.brouillon.k, debut: U.brouillon.debut, fin: U.brouillon.fin });
     if (a === 'ajouter') {

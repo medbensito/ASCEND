@@ -26,6 +26,7 @@
     if (barre) { barre.textContent = msg; return; }
     const t = $('#toast');
     t.textContent = msg;
+    t.classList.remove('avec-action');
     t.classList.add('visible');
     clearTimeout(minuteurToast);
     minuteurToast = setTimeout(() => t.classList.remove('visible'), 2800);

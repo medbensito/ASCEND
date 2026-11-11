@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 16;                      // édition de l'app, comme le cache du service worker (ascend-16)
+  const EDITION = 17;                      // édition de l'app, comme le cache du service worker (ascend-17)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -72,7 +72,7 @@
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], energie: {}, reflexions: {}, conseilsVus: {},
+    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], aCaser: [], energie: {}, reflexions: {}, conseilsVus: {},
     onglet: 'accueil', vueCal: 'semaine', semaineVue: true, vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -91,6 +91,8 @@
     });
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (typeof S.vu !== 'string') S.vu = null;
+    S.aCaser = (Array.isArray(S.aCaser) ? S.aCaser : []).filter(x => x && x.id && typeof x.titre === 'string' && x.titre.trim()).slice(0, 50);
+    S.aCaser.forEach(x => { x.duree = Math.min(Math.max(+x.duree || 60, 15), 240); if (!S.categories.some(c => c.id === x.cat)) x.cat = S.categories[0].id; });
     if (!S.semaineVue) { S.semaineVue = true; S.vueCal = 'semaine'; }      // édition 16 : la Semaine devient la vue par défaut, une fois
     if (!['semaine', 'jour', 'mois'].includes(S.vueCal)) S.vueCal = 'semaine';
     Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });
