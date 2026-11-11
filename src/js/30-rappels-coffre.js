@@ -74,9 +74,11 @@
     const h = S.habitudes.filter(x => habitudeDue(x, k)).length;
     const parts = [];
     if (indexJour(k) === 0 && decaler(k, -1) >= (S.depuis || aujourdhui())) parts.push('ton bilan de la semaine t\'attend');
+    const ev = occs.filter(o => o.el.type === 'evenement').length;
     if (t) parts.push(pluriel(t, 'tâche') + " aujourd'hui");
+    if (ev) parts.push(pluriel(ev, 'événement'));
     if (h) parts.push(pluriel(h, 'habitude'));
-    if (occs.some(o => o.el.type !== 'tache')) parts.push('un moment pour toi');
+    if (occs.some(o => o.el.type === 'libre' || o.el.type === 'sansecran')) parts.push('un moment pour toi');
     const m = minutesPrevues(k);
     if (m > S.reglages.plafond) parts.push(`journée chargée (${duree(m)})`);
     return parts.length ? cap(parts.join(' · ')) + '.' : '';
@@ -88,7 +90,7 @@
       if (R.avant) occs.filter(o => !o.el.flou).forEach(o => {
         if (o.el.type === 'libre' || (o.el.type === 'tache' && o.fait)) return;
         const at = debutOcc(o) - R.delai * 6e4;
-        const quoi = o.el.type === 'sansecran' ? '📵 Moment sans écran' : `${cat(o.el.cat).icone} ${cat(o.el.cat).nom} · +${valeur(o.el)} pts`;
+        const quoi = o.el.type === 'sansecran' ? '📵 Moment sans écran' : o.el.type === 'evenement' ? '📅 Événement' : `${cat(o.el.cat).icone} ${cat(o.el.cat).nom} · +${valeur(o.el)} pts`;
         if (at >= debutJour) res.push({ at, titre: o.el.titre, corps: `${R.delai >= 60 ? 'Dans 1 h' : 'Dans ' + R.delai + ' min'} · ${plage(o.el)} · ${quoi}`, tag: o.cle });
       });
       if (R.matin) {

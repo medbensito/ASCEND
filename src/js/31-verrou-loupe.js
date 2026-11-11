@@ -204,7 +204,7 @@
   function renderLoupe(focus, garder) {
     const L = U.loupe;
     L.cats = L.cats.filter(id => S.categories.some(c => c.id === id));
-    $('#lp-filtres').innerHTML = [['tache', 'Tâches'], ['habitude', 'Habitudes'], ['objectif', 'Objectifs'], ['libre', '🌿 Pour moi'], ['sansecran', '📵 Sans écran']]
+    $('#lp-filtres').innerHTML = [['tache', 'Tâches'], ['habitude', 'Habitudes'], ['objectif', 'Objectifs'], ['evenement', '📅 Événements'], ['libre', '🌿 Pour moi'], ['sansecran', '📵 Sans écran']]
       .map(([t, n]) => `<button type="button" class="filtre" data-lp-type="${t}" aria-pressed="${L.types.includes(t)}" data-focus="lt${t}">${n}</button>`).join('')
       + S.categories.map(c => `<button type="button" class="filtre" data-lp-cat="${esc(c.id)}" aria-pressed="${L.cats.includes(c.id)}" data-focus="lf${esc(c.id)}">${c.icone} ${esc(c.nom)}</button>`).join('');
     $('.lp-effacer').hidden = !L.q;

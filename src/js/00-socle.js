@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 20;                      // édition de l'app, comme le cache du service worker (ascend-20)
+  const EDITION = 21;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -16,7 +16,7 @@
     duree: 60,             // durée proposée pour une nouvelle plage
     ouverture: 7,          // heure en haut de la grille à l'ouverture
     appuiLong: 450,        // ms : appui long sur l'écran tactile
-    points: { libre: 30, sansecran: 40, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
+    points: { libre: 30, sansecran: 40, evenement: 0, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
     paliers: [
@@ -44,7 +44,9 @@
   // Les deux types JOMO : pas de catégorie, des points fixes
   const JOMO = {
     libre: { nom: 'Temps pour moi', court: 'Pour moi', icone: '🌿', couleur: '#2fd3c5' },
-    sansecran: { nom: 'Sans écran', court: 'Sans écran', icone: '📵', couleur: '#57c3ff' }
+    sansecran: { nom: 'Sans écran', court: 'Sans écran', icone: '📵', couleur: '#57c3ff' },
+    // Événement : un rendez-vous, un cours, un dîner. Il occupe du temps, ne se coche pas et ne rapporte pas de points.
+    evenement: { nom: 'Événement', court: 'Événement', icone: '📅', couleur: '#a9b0c4' }
   };
   const REPET = { jour: 'Chaque jour', ouvres: 'En semaine', semaine: 'Chaque semaine', mois: 'Chaque mois' };
   const JOURS_COURTS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
@@ -117,7 +119,7 @@
     S.elements.forEach(el => {
       el.exceptions = estObjet(el.exceptions) ? el.exceptions : {};
       el.faits = estObjet(el.faits) ? el.faits : {};
-      if (!['tache', 'libre', 'sansecran'].includes(el.type)) el.type = 'tache';
+      if (!['tache', 'libre', 'sansecran', 'evenement'].includes(el.type)) el.type = 'tache';
       if (el.objectif === undefined) el.objectif = null;
     });
     S.elements = S.elements.filter(el => !el.rep || !el.rep.jusqua || el.rep.jusqua >= el.date);
@@ -277,7 +279,7 @@
   }
   // Minutes de tâches prévues un jour (les chevauchements comptent une fois) : c'est ce qui est comparé au plafond
   function minutesPrevues(k, sans) {
-    const iv = duJour(k).filter(o => o.el.type === 'tache' && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).sort((a, b) => a[0] - b[0]);
+    const iv = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).sort((a, b) => a[0] - b[0]);
     let total = 0, d = -1, f = -1;
     iv.forEach(([a, b]) => { if (a > f) { total += Math.max(0, f - d); d = a; f = b; } else f = Math.max(f, b); });
     return total + Math.max(0, f - d);

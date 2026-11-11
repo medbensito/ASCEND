@@ -883,6 +883,11 @@ html.paysage .sem7 .bloc .b-texte b { font-size: 11px; white-space: nowrap; over
 #recompenses .pastille.ronde { padding: 0; }
 .r-ligne .bouton.petit { width: auto; flex: 0 0 auto; min-width: 0; }
 .r-ligne .ouvrir { flex: 1 1 0; }
+
+/* ===== Type Événement ===== */
+.types { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.types label { font-size: 12.5px; white-space: nowrap; padding: 0 2px; }
+@media (max-width: 359px) { .types label { font-size: 11.5px; } }
 /* ===== Refonte (édition 11) : noir profond, verre, platine, arcs de lumière ===== */
 :root {
   --fond: #050506;
@@ -1255,7 +1260,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 20;                      // édition de l'app, comme le cache du service worker (ascend-20)
+  const EDITION = 21;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -1269,7 +1274,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     duree: 60,             // durée proposée pour une nouvelle plage
     ouverture: 7,          // heure en haut de la grille à l'ouverture
     appuiLong: 450,        // ms : appui long sur l'écran tactile
-    points: { libre: 30, sansecran: 40, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
+    points: { libre: 30, sansecran: 40, evenement: 0, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
     paliers: [
@@ -1297,7 +1302,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   // Les deux types JOMO : pas de catégorie, des points fixes
   const JOMO = {
     libre: { nom: 'Temps pour moi', court: 'Pour moi', icone: '🌿', couleur: '#2fd3c5' },
-    sansecran: { nom: 'Sans écran', court: 'Sans écran', icone: '📵', couleur: '#57c3ff' }
+    sansecran: { nom: 'Sans écran', court: 'Sans écran', icone: '📵', couleur: '#57c3ff' },
+    // Événement : un rendez-vous, un cours, un dîner. Il occupe du temps, ne se coche pas et ne rapporte pas de points.
+    evenement: { nom: 'Événement', court: 'Événement', icone: '📅', couleur: '#a9b0c4' }
   };
   const REPET = { jour: 'Chaque jour', ouvres: 'En semaine', semaine: 'Chaque semaine', mois: 'Chaque mois' };
   const JOURS_COURTS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
@@ -1370,7 +1377,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     S.elements.forEach(el => {
       el.exceptions = estObjet(el.exceptions) ? el.exceptions : {};
       el.faits = estObjet(el.faits) ? el.faits : {};
-      if (!['tache', 'libre', 'sansecran'].includes(el.type)) el.type = 'tache';
+      if (!['tache', 'libre', 'sansecran', 'evenement'].includes(el.type)) el.type = 'tache';
       if (el.objectif === undefined) el.objectif = null;
     });
     S.elements = S.elements.filter(el => !el.rep || !el.rep.jusqua || el.rep.jusqua >= el.date);
@@ -1530,7 +1537,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   }
   // Minutes de tâches prévues un jour (les chevauchements comptent une fois) : c'est ce qui est comparé au plafond
   function minutesPrevues(k, sans) {
-    const iv = duJour(k).filter(o => o.el.type === 'tache' && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).sort((a, b) => a[0] - b[0]);
+    const iv = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).sort((a, b) => a[0] - b[0]);
     let total = 0, d = -1, f = -1;
     iv.forEach(([a, b]) => { if (a > f) { total += Math.max(0, f - d); d = a; f = b; } else f = Math.max(f, b); });
     return total + Math.max(0, f - d);
@@ -1984,6 +1991,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   }
   // Ce que rapporte un élément, à droite de sa ligne
   function ptsElement(o) {
+    if (o.el.type === 'evenement') return '';
     const p = S.payes[o.cle];
     if (p) return p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts nul" aria-hidden="true">0 pt</span>`;
     if (o.el.type === 'tache' && !o.fait && S.partis[o.cle]) return `<span class="pts nul" aria-hidden="true">🍃</span>`;
@@ -1996,6 +2004,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const el = o.el;
     if (el.type === 'libre') return `${plage(el)} · Pour moi · ${ETAT_LIBRE[etatLibre(o)]}`;
     if (el.type === 'sansecran') return `${plage(el)} · Sans écran · ${ETAT_ECRAN[etatSansEcran(o)]}`;
+    if (el.type === 'evenement') return `${plage(el)} · Événement`;
     const ob = el.objectif && S.objectifs.find(x => x.id === el.objectif);
     return `${plage(el)} · ${cat(el.cat).nom}${!o.fait && courage(el) ? ` · 🔥 repoussée ${el.reports} fois` : ''}${!o.fait && S.partis[o.cle] ? ' · laissée partir' : ''}${ob ? ' · 🎯 ' + ob.titre : ''}`;
   }
@@ -3551,7 +3560,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       <p class="f-msg" role="status" aria-live="polite"></p>
       <div class="f-corps">
         <div class="segments types" role="radiogroup" aria-label="Type">
-          ${[['tache', 'Tâche'], ['libre', 'Pour moi'], ['sansecran', 'Sans écran']].map(([v, n]) => `<label><input type="radio" name="type" value="${v}"${m.type === v ? ' checked' : ''}>${n}</label>`).join('')}
+          ${[['tache', 'Tâche'], ['evenement', 'Événement'], ['libre', 'Pour moi'], ['sansecran', 'Sans écran']].map(([v, n]) => `<label><input type="radio" name="type" value="${v}"${m.type === v ? ' checked' : ''}>${n}</label>`).join('')}
         </div>
         <label class="champ-nom">${ICONE.crayon}<span class="masque">Nom</span><input name="titre" maxlength="80" autocomplete="off" value="${esc(m.titre)}"></label>
         <div id="t-cat-zone"><span class="etiquette" id="t-cat-lib">Catégorie</span>
@@ -3586,9 +3595,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const type = (TF.querySelector('input[name="type"]:checked') || {}).value || 'tache';
     const nouveau = !(U.edition && U.edition.o);
     const c = cat(U.edition.cat);
-    $('#t-titre').textContent = nouveau ? { tache: 'Nouvelle tâche', libre: 'Temps pour moi', sansecran: 'Sans écran' }[type] : { tache: 'Tâche', libre: 'Temps pour moi', sansecran: 'Sans écran' }[type];
-    $('#t-ok').textContent = nouveau ? { tache: 'Créer la tâche', libre: 'Protéger ce moment', sansecran: 'Prévoir ce moment' }[type] : 'Enregistrer';
-    champT('titre').placeholder = type === 'tache' ? 'Nom de la tâche…' : JOMO[type].nom;
+    $('#t-titre').textContent = nouveau ? { tache: 'Nouvelle tâche', evenement: 'Nouvel événement', libre: 'Temps pour moi', sansecran: 'Sans écran' }[type] : { tache: 'Tâche', evenement: 'Événement', libre: 'Temps pour moi', sansecran: 'Sans écran' }[type];
+    $('#t-ok').textContent = nouveau ? { tache: 'Créer la tâche', evenement: 'Ajouter l\'événement', libre: 'Protéger ce moment', sansecran: 'Prévoir ce moment' }[type] : 'Enregistrer';
+    champT('titre').placeholder = type === 'tache' ? 'Nom de la tâche…' : type === 'evenement' ? 'Rendez-vous, cours, dîner…' : JOMO[type].nom;
     $('#t-cat-zone').hidden = type !== 'tache';
     $('#t-obj').hidden = type !== 'tache' || !S.objectifs.length;
     // Puces : catégories, jours, heures, durées (redessinées seulement si elles changent, pour ne pas perdre un toucher en cours)
@@ -3610,8 +3619,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     $('#t-resume').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) && deb != null && fin != null ? (flou ? `${cap(quandJour(date))} · dans la journée · ${duree(du)}` : `${cap(quandJour(date))} · ${hhmm(deb)} – ${finTexte(fin === 0 ? 1440 : fin)} · ${duree(du)}`) : '';
     const rep = champT('repeter').checked;
     $('#t-freq').hidden = $('#t-jusqua').hidden = !rep;
-    $('#t-resume').textContent += $('#t-resume').textContent ? ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts` : '';
+    $('#t-resume').textContent += $('#t-resume').textContent && type !== 'evenement' ? ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts` : '';
     $('#t-regle').textContent = {
+      evenement: 'Un événement ne se coche pas et ne rapporte pas de points. Il occupe ton temps : il compte dans la charge du jour, et tu reçois un rappel avant.',
       tache: `Rapporte les points de « ${c.nom} » une fois faite, si elle est prévue avant son début. Compte dans l'objectif de la semaine.`,
       libre: `JOMO : +${CONFIG.points.libre} pts si aucune tâche ne vient empiéter sur ce créneau jusqu'au bout (${CONFIG.points.libreMin} min au moins, ${CONFIG.points.libresParJour} par jour).`,
       sansecran: `JOMO : à la fin, ASCEND te demande si tu l'as tenu. +${CONFIG.points.sansecran} pts si oui.`
@@ -3630,8 +3640,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   TF.addEventListener('change', majTache);
   function lireTache() {
     const type = (TF.querySelector('input[name="type"]:checked') || {}).value || 'tache';
-    const titre = champT('titre').value.trim() || (type === 'tache' ? '' : JOMO[type].nom);
-    if (!titre) return { erreur: 'Donne un nom à la tâche.', champ: champT('titre') };
+    const titre = champT('titre').value.trim() || (type === 'tache' || type === 'evenement' ? '' : JOMO[type].nom);
+    if (!titre) return { erreur: type === 'evenement' ? 'Donne un nom à l\'événement.' : 'Donne un nom à la tâche.', champ: champT('titre') };
     if (!champT('date').value) return { erreur: 'Choisis une date.', champ: champT('date') };
     const flou = U.edition.flou && type === 'tache';
     const debut = flou ? 0 : versMin(champT('debut').value);
@@ -3646,7 +3656,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   const memeRep = (a, b) => (!a && !b) || (a && b && a.freq === b.freq && (a.jusqua || null) === (b.jusqua || null));
   // Minutes de tâches d'un jour si on y ajoute (ou déplace) une plage
   function minutesAvec(k, sans, d, f) {
-    const iv = duJour(k).filter(o => o.el.type === 'tache' && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).concat([[d, f]]).sort((a, b) => a[0] - b[0]);
+    const iv = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).concat([[d, f]]).sort((a, b) => a[0] - b[0]);
     let total = 0, a = -1, b = -1;
     iv.forEach(([x, y]) => { if (x > b) { total += Math.max(0, b - a); a = x; b = y; } else b = Math.max(b, y); });
     return total + Math.max(0, b - a);
@@ -4431,9 +4441,11 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const h = S.habitudes.filter(x => habitudeDue(x, k)).length;
     const parts = [];
     if (indexJour(k) === 0 && decaler(k, -1) >= (S.depuis || aujourdhui())) parts.push('ton bilan de la semaine t\'attend');
+    const ev = occs.filter(o => o.el.type === 'evenement').length;
     if (t) parts.push(pluriel(t, 'tâche') + " aujourd'hui");
+    if (ev) parts.push(pluriel(ev, 'événement'));
     if (h) parts.push(pluriel(h, 'habitude'));
-    if (occs.some(o => o.el.type !== 'tache')) parts.push('un moment pour toi');
+    if (occs.some(o => o.el.type === 'libre' || o.el.type === 'sansecran')) parts.push('un moment pour toi');
     const m = minutesPrevues(k);
     if (m > S.reglages.plafond) parts.push(`journée chargée (${duree(m)})`);
     return parts.length ? cap(parts.join(' · ')) + '.' : '';
@@ -4445,7 +4457,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       if (R.avant) occs.filter(o => !o.el.flou).forEach(o => {
         if (o.el.type === 'libre' || (o.el.type === 'tache' && o.fait)) return;
         const at = debutOcc(o) - R.delai * 6e4;
-        const quoi = o.el.type === 'sansecran' ? '📵 Moment sans écran' : `${cat(o.el.cat).icone} ${cat(o.el.cat).nom} · +${valeur(o.el)} pts`;
+        const quoi = o.el.type === 'sansecran' ? '📵 Moment sans écran' : o.el.type === 'evenement' ? '📅 Événement' : `${cat(o.el.cat).icone} ${cat(o.el.cat).nom} · +${valeur(o.el)} pts`;
         if (at >= debutJour) res.push({ at, titre: o.el.titre, corps: `${R.delai >= 60 ? 'Dans 1 h' : 'Dans ' + R.delai + ' min'} · ${plage(o.el)} · ${quoi}`, tag: o.cle });
       });
       if (R.matin) {
@@ -4993,7 +5005,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   function renderLoupe(focus, garder) {
     const L = U.loupe;
     L.cats = L.cats.filter(id => S.categories.some(c => c.id === id));
-    $('#lp-filtres').innerHTML = [['tache', 'Tâches'], ['habitude', 'Habitudes'], ['objectif', 'Objectifs'], ['libre', '🌿 Pour moi'], ['sansecran', '📵 Sans écran']]
+    $('#lp-filtres').innerHTML = [['tache', 'Tâches'], ['habitude', 'Habitudes'], ['objectif', 'Objectifs'], ['evenement', '📅 Événements'], ['libre', '🌿 Pour moi'], ['sansecran', '📵 Sans écran']]
       .map(([t, n]) => `<button type="button" class="filtre" data-lp-type="${t}" aria-pressed="${L.types.includes(t)}" data-focus="lt${t}">${n}</button>`).join('')
       + S.categories.map(c => `<button type="button" class="filtre" data-lp-cat="${esc(c.id)}" aria-pressed="${L.cats.includes(c.id)}" data-focus="lf${esc(c.id)}">${c.icone} ${esc(c.nom)}</button>`).join('');
     $('.lp-effacer').hidden = !L.q;

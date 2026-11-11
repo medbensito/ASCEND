@@ -73,7 +73,7 @@
       <p class="f-msg" role="status" aria-live="polite"></p>
       <div class="f-corps">
         <div class="segments types" role="radiogroup" aria-label="Type">
-          ${[['tache', 'Tâche'], ['libre', 'Pour moi'], ['sansecran', 'Sans écran']].map(([v, n]) => `<label><input type="radio" name="type" value="${v}"${m.type === v ? ' checked' : ''}>${n}</label>`).join('')}
+          ${[['tache', 'Tâche'], ['evenement', 'Événement'], ['libre', 'Pour moi'], ['sansecran', 'Sans écran']].map(([v, n]) => `<label><input type="radio" name="type" value="${v}"${m.type === v ? ' checked' : ''}>${n}</label>`).join('')}
         </div>
         <label class="champ-nom">${ICONE.crayon}<span class="masque">Nom</span><input name="titre" maxlength="80" autocomplete="off" value="${esc(m.titre)}"></label>
         <div id="t-cat-zone"><span class="etiquette" id="t-cat-lib">Catégorie</span>
@@ -108,9 +108,9 @@
     const type = (TF.querySelector('input[name="type"]:checked') || {}).value || 'tache';
     const nouveau = !(U.edition && U.edition.o);
     const c = cat(U.edition.cat);
-    $('#t-titre').textContent = nouveau ? { tache: 'Nouvelle tâche', libre: 'Temps pour moi', sansecran: 'Sans écran' }[type] : { tache: 'Tâche', libre: 'Temps pour moi', sansecran: 'Sans écran' }[type];
-    $('#t-ok').textContent = nouveau ? { tache: 'Créer la tâche', libre: 'Protéger ce moment', sansecran: 'Prévoir ce moment' }[type] : 'Enregistrer';
-    champT('titre').placeholder = type === 'tache' ? 'Nom de la tâche…' : JOMO[type].nom;
+    $('#t-titre').textContent = nouveau ? { tache: 'Nouvelle tâche', evenement: 'Nouvel événement', libre: 'Temps pour moi', sansecran: 'Sans écran' }[type] : { tache: 'Tâche', evenement: 'Événement', libre: 'Temps pour moi', sansecran: 'Sans écran' }[type];
+    $('#t-ok').textContent = nouveau ? { tache: 'Créer la tâche', evenement: 'Ajouter l\'événement', libre: 'Protéger ce moment', sansecran: 'Prévoir ce moment' }[type] : 'Enregistrer';
+    champT('titre').placeholder = type === 'tache' ? 'Nom de la tâche…' : type === 'evenement' ? 'Rendez-vous, cours, dîner…' : JOMO[type].nom;
     $('#t-cat-zone').hidden = type !== 'tache';
     $('#t-obj').hidden = type !== 'tache' || !S.objectifs.length;
     // Puces : catégories, jours, heures, durées (redessinées seulement si elles changent, pour ne pas perdre un toucher en cours)
@@ -132,8 +132,9 @@
     $('#t-resume').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) && deb != null && fin != null ? (flou ? `${cap(quandJour(date))} · dans la journée · ${duree(du)}` : `${cap(quandJour(date))} · ${hhmm(deb)} – ${finTexte(fin === 0 ? 1440 : fin)} · ${duree(du)}`) : '';
     const rep = champT('repeter').checked;
     $('#t-freq').hidden = $('#t-jusqua').hidden = !rep;
-    $('#t-resume').textContent += $('#t-resume').textContent ? ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts` : '';
+    $('#t-resume').textContent += $('#t-resume').textContent && type !== 'evenement' ? ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts` : '';
     $('#t-regle').textContent = {
+      evenement: 'Un événement ne se coche pas et ne rapporte pas de points. Il occupe ton temps : il compte dans la charge du jour, et tu reçois un rappel avant.',
       tache: `Rapporte les points de « ${c.nom} » une fois faite, si elle est prévue avant son début. Compte dans l'objectif de la semaine.`,
       libre: `JOMO : +${CONFIG.points.libre} pts si aucune tâche ne vient empiéter sur ce créneau jusqu'au bout (${CONFIG.points.libreMin} min au moins, ${CONFIG.points.libresParJour} par jour).`,
       sansecran: `JOMO : à la fin, ASCEND te demande si tu l'as tenu. +${CONFIG.points.sansecran} pts si oui.`
@@ -152,8 +153,8 @@
   TF.addEventListener('change', majTache);
   function lireTache() {
     const type = (TF.querySelector('input[name="type"]:checked') || {}).value || 'tache';
-    const titre = champT('titre').value.trim() || (type === 'tache' ? '' : JOMO[type].nom);
-    if (!titre) return { erreur: 'Donne un nom à la tâche.', champ: champT('titre') };
+    const titre = champT('titre').value.trim() || (type === 'tache' || type === 'evenement' ? '' : JOMO[type].nom);
+    if (!titre) return { erreur: type === 'evenement' ? 'Donne un nom à l\'événement.' : 'Donne un nom à la tâche.', champ: champT('titre') };
     if (!champT('date').value) return { erreur: 'Choisis une date.', champ: champT('date') };
     const flou = U.edition.flou && type === 'tache';
     const debut = flou ? 0 : versMin(champT('debut').value);
@@ -168,7 +169,7 @@
   const memeRep = (a, b) => (!a && !b) || (a && b && a.freq === b.freq && (a.jusqua || null) === (b.jusqua || null));
   // Minutes de tâches d'un jour si on y ajoute (ou déplace) une plage
   function minutesAvec(k, sans, d, f) {
-    const iv = duJour(k).filter(o => o.el.type === 'tache' && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).concat([[d, f]]).sort((a, b) => a[0] - b[0]);
+    const iv = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).concat([[d, f]]).sort((a, b) => a[0] - b[0]);
     let total = 0, a = -1, b = -1;
     iv.forEach(([x, y]) => { if (x > b) { total += Math.max(0, b - a); a = x; b = y; } else b = Math.max(b, y); });
     return total + Math.max(0, b - a);

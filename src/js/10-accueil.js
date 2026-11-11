@@ -16,6 +16,7 @@
   }
   // Ce que rapporte un élément, à droite de sa ligne
   function ptsElement(o) {
+    if (o.el.type === 'evenement') return '';
     const p = S.payes[o.cle];
     if (p) return p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts nul" aria-hidden="true">0 pt</span>`;
     if (o.el.type === 'tache' && !o.fait && S.partis[o.cle]) return `<span class="pts nul" aria-hidden="true">🍃</span>`;
@@ -28,6 +29,7 @@
     const el = o.el;
     if (el.type === 'libre') return `${plage(el)} · Pour moi · ${ETAT_LIBRE[etatLibre(o)]}`;
     if (el.type === 'sansecran') return `${plage(el)} · Sans écran · ${ETAT_ECRAN[etatSansEcran(o)]}`;
+    if (el.type === 'evenement') return `${plage(el)} · Événement`;
     const ob = el.objectif && S.objectifs.find(x => x.id === el.objectif);
     return `${plage(el)} · ${cat(el.cat).nom}${!o.fait && courage(el) ? ` · 🔥 repoussée ${el.reports} fois` : ''}${!o.fait && S.partis[o.cle] ? ' · laissée partir' : ''}${ob ? ' · 🎯 ' + ob.titre : ''}`;
   }
