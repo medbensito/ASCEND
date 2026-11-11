@@ -1,9 +1,12 @@
   // ---------- Morceaux communs ----------
-  const plage = el => el.flou ? `Dans la journée · ${duree(el.fin - el.debut)}` : `${hhmm(el.debut)} – ${finTexte(el.fin)}`;
+  // Événement sur la journée (flou) : « Toute la journée », ou sa période s'il dure plusieurs jours (finLe)
+  const jourCourt = k => fmt(k, { day: 'numeric', month: 'short' });
+  const periode = el => el.date.slice(0, 7) === el.finLe.slice(0, 7) ? `Du ${parse(el.date).getDate()} au ${jourCourt(el.finLe)}` : `Du ${jourCourt(el.date)} au ${jourCourt(el.finLe)}`;
+  const plage = el => el.type === 'evenement' && el.flou ? (el.finLe ? periode(el) : 'Toute la journée') : el.flou ? `Dans la journée · ${duree(el.fin - el.debut)}` : `${hhmm(el.debut)} – ${finTexte(el.fin)}`;
   const ptsTexte = n => `${n > 0 ? '+' : ''}${n} pt${Math.abs(n) > 1 ? 's' : ''}`;
   function description(o) {
     const el = o.el, l = look(el);
-    let d = `${el.titre}, ${o.k === aujourdhui() ? '' : jourLong(o.k) + ', '}de ${hhmm(el.debut)} à ${finTexte(el.fin)}, ${l.nom}`;
+    let d = `${el.titre}, ${o.k === aujourdhui() ? '' : jourLong(o.k) + ', '}${el.type === 'evenement' && el.flou ? (el.finLe ? `du ${jourLong(el.date).toLowerCase()} au ${jourLong(el.finLe).toLowerCase()}, jour ${ecart(el.date, o.k) + 1} sur ${ecart(el.date, el.finLe) + 1}` : 'toute la journée') : el.flou ? 'dans la journée' : `de ${hhmm(el.debut)} à ${finTexte(el.fin)}`}, ${l.nom}`;
     if (el.rep) d += ', ' + REPET[el.rep.freq].toLowerCase();
     if (el.type === 'libre') d += ', ' + ETAT_LIBRE[etatLibre(o)];
     if (el.type === 'sansecran') d += ', ' + ETAT_ECRAN[etatSansEcran(o)];
@@ -29,7 +32,7 @@
     const el = o.el;
     if (el.type === 'libre') return `${plage(el)} · Pour moi · ${ETAT_LIBRE[etatLibre(o)]}`;
     if (el.type === 'sansecran') return `${plage(el)} · Sans écran · ${ETAT_ECRAN[etatSansEcran(o)]}`;
-    if (el.type === 'evenement') return `${plage(el)} · Événement`;
+    if (el.type === 'evenement') return `${plage(el)}${el.finLe ? ` · jour ${ecart(el.date, o.k) + 1}/${ecart(el.date, el.finLe) + 1}` : ''} · Événement`;
     const ob = el.objectif && S.objectifs.find(x => x.id === el.objectif);
     return `${plage(el)} · ${cat(el.cat).nom}${!o.fait && courage(el) ? ` · 🔥 repoussée ${el.reports} fois` : ''}${!o.fait && S.partis[o.cle] ? ' · laissée partir' : ''}${ob ? ' · 🎯 ' + ob.titre : ''}`;
   }

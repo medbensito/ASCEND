@@ -93,6 +93,10 @@
         const quoi = o.el.type === 'sansecran' ? '📵 Moment sans écran' : o.el.type === 'evenement' ? '📅 Événement' : `${cat(o.el.cat).icone} ${cat(o.el.cat).nom} · +${valeur(o.el)} pts`;
         if (at >= debutJour) res.push({ at, titre: o.el.titre, corps: `${R.delai >= 60 ? 'Dans 1 h' : 'Dans ' + R.delai + ' min'} · ${plage(o.el)} · ${quoi}`, tag: o.cle });
       });
+      if (R.avant) occs.filter(o => o.el.type === 'evenement' && o.el.flou && (!o.el.finLe || o.k === o.el.date)).forEach(o => {
+        const at = parse(k).getTime() - 6 * 36e5;                    // la veille à 18 h
+        if (at >= debutJour) res.push({ at, titre: o.el.titre, corps: `Demain · ${o.el.finLe ? plage(o.el).toLowerCase() : 'toute la journée'} · 📅 Événement`, tag: o.cle });
+      });
       if (R.matin) {
         const at = parse(k).getTime() + R.heureMatin * 6e4, c = at >= debutJour && texteMatin(k);
         if (c) res.push({ at, titre: `Bonjour ${S.profil.prenom || ''} 👋`.trim(), corps: c, tag: 'matin-' + k });

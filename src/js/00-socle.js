@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 23;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 24;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -132,6 +132,7 @@
       el.faits = estObjet(el.faits) ? el.faits : {};
       if (!['tache', 'libre', 'sansecran', 'evenement'].includes(el.type)) el.type = 'tache';
       if (el.objectif === undefined) el.objectif = null;
+      if (el.finLe && !(el.type === 'evenement' && el.flou && !el.rep && typeof el.finLe === 'string' && el.finLe > el.date)) delete el.finLe;
     });
     S.elements = S.elements.filter(el => !el.rep || !el.rep.jusqua || el.rep.jusqua >= el.date);
     S.habitudes = S.habitudes.filter(h => h && h.id && h.titre);
@@ -199,7 +200,7 @@
   // ---------- Occurrences ----------
   function tombe(el, k) {
     if (k < el.date) return false;
-    if (!el.rep) return k === el.date;
+    if (!el.rep) return el.finLe ? k <= el.finLe : k === el.date;      // finLe : dernier jour d'un événement sur plusieurs jours
     if (el.rep.jusqua && k > el.rep.jusqua) return false;
     if (el.exceptions[k]) return false;
     const d = parse(k), d0 = parse(el.date);
