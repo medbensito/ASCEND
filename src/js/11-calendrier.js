@@ -1,6 +1,6 @@
   // ---------- Calendrier ----------
   function vueCalendrier() {
-    const mois = S.vueCal !== 'jour';
+    const v = S.vueCal === 'jour' ? 'jour' : S.vueCal === 'mois' ? 'mois' : 'semaine';
     return `
       <header class="tete">
         <div><h1>Calendrier</h1><p>Planifie. Organise. Réussis.</p></div>
@@ -10,10 +10,11 @@
         </div>
       </header>
       <div class="segments" role="group" aria-label="Affichage">
-        <button type="button" aria-pressed="${mois}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
-        <button type="button" aria-pressed="${!mois}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+        <button type="button" aria-pressed="${v === 'semaine'}" data-vue-cal="semaine" data-focus="vc-semaine">Semaine</button>
+        <button type="button" aria-pressed="${v === 'jour'}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+        <button type="button" aria-pressed="${v === 'mois'}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
       </div>
-      ${mois ? vueMois() : vueJour()}`;
+      ${v === 'mois' ? vueMois() : v === 'jour' ? vueJour() : vueSemaine()}`;
   }
 
   // Mois : la grille de la maquette, avec des points sous les jours, et la liste du jour choisi en dessous

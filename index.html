@@ -759,6 +759,65 @@ html.paysage .pay:has(.ajuste) .fab { width: 46px; height: 46px; right: 2px; bot
 .refl-rappel { display: flex; gap: 12px; align-items: center; padding: 12px 16px; font-size: 15px; }
 .refl-rappel > span:last-child { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
 .refl-rappel small { color: var(--accent-texte); font-size: 12px; font-weight: 650; }
+
+/* ===== Vue Semaine ===== */
+.sem-nav { padding: 0; }
+.sem-nav h2 { display: grid; gap: 2px; text-align: center; font-size: 18px; font-weight: 600; }
+.sem-nav h2 small { color: var(--doux); font-size: 12.5px; font-weight: 500; }
+.sem-bandeau { display: flex; gap: 8px; overflow-x: auto; margin: 0 -20px; padding: 2px 20px 4px; scrollbar-width: none; }
+.sem-bandeau::-webkit-scrollbar { display: none; }
+.sem-puce { flex: none; display: grid; grid-template-columns: auto auto; align-items: center; gap: 3px 6px; min-height: 48px; padding: 7px 12px; border-radius: 16px; border: 1px solid var(--trait); background: rgba(255, 255, 255, .05); color: var(--texte); }
+.sem-puce span { font-size: 16px; }
+.sem-puce b { font-size: 13.5px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.sem-puce i { grid-column: 1 / -1; display: flex; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .12); overflow: hidden; min-width: 54px; }
+.sem-puce u { background: var(--c); height: 100%; }
+.sem-puce s { background: color-mix(in srgb, var(--c) 40%, transparent); height: 100%; }
+.sem-puce.ok b { color: var(--vert); }
+.sem-puce.manque { border-color: rgba(255, 181, 71, .6); }
+.sem-puce.manque b { color: var(--orange); }
+.sem-puce[aria-expanded="true"] { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .6); }
+.sem-detail { display: grid; gap: 10px; padding: 14px 16px; font-size: 14.5px; }
+.sem-detail .bouton.petit { font-size: 13.5px; padding: 0 12px; line-height: 1.15; }
+.sem-jours { display: grid; gap: 6px; }
+.sem-jour { display: grid; gap: 8px; padding: 6px 0 10px; border-top: 1px solid var(--trait); }
+.sem-jour:first-child { border-top: 0; }
+.sem-jour-tete { display: flex; align-items: center; gap: 8px; }
+.sem-nom { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 10px; min-height: 44px; padding: 0 2px; border: 0; background: none; color: inherit; text-align: left; }
+.sem-nom b { font-size: 16px; font-weight: 650; letter-spacing: -.01em; }
+.sem-nom small { margin-left: auto; color: var(--doux); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.sem-nom .chevron { color: var(--pale); font-size: 12px; }
+.sem-auj { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .08em; color: var(--sur-accent); background: var(--accent); padding: 3px 8px; border-radius: 999px; align-self: center; }
+.sem-jour.auj .sem-nom b { color: #fff; }
+.sem-jour.passe .sem-nom b { color: var(--doux); font-weight: 550; }
+.sem-jour.passe { padding: 0; gap: 0; }
+.sem-jour.passe .lignes { padding-bottom: 10px; }
+.sem-jour.charge .sem-nom small { color: var(--orange); }
+.sem-plus { width: 38px; height: 38px; flex: none; }
+.sem-plus svg { width: 16px; height: 16px; }
+.sem-jour .ligne { min-height: 56px; padding: 9px 14px; }
+
+/* ===== Feuille courte ===== */
+.puces { display: flex; gap: 8px; overflow-x: auto; margin: 0 -18px; padding: 2px 18px; scrollbar-width: none; }
+.puces::-webkit-scrollbar { display: none; }
+.puce { flex: none; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--trait-fort); background: rgba(255, 255, 255, .05); color: var(--texte); font-size: 14px; font-weight: 550; white-space: nowrap; }
+.puce[aria-pressed="true"] { background: var(--accent); color: var(--sur-accent); border-color: transparent; font-weight: 650; box-shadow: 0 0 14px rgba(255, 240, 215, .25); }
+.t-date { margin-top: 8px; }
+.t-resume { text-align: center; font-size: 14px; font-weight: 600; color: var(--accent-texte); min-height: 20px; }
+.t-plus summary { display: flex; align-items: baseline; gap: 8px; min-height: 44px; padding: 0 2px; font-size: 15px; font-weight: 600; cursor: pointer; list-style: none; }
+.t-plus summary::-webkit-details-marker { display: none; }
+.t-plus summary::before { content: "▸"; color: var(--pale); }
+.t-plus[open] summary::before { content: "▾"; }
+.t-plus summary small { color: var(--doux); font-size: 12.5px; font-weight: 500; }
+
+/* ===== Accueil : Maintenant ===== */
+.mnt { display: grid; gap: 8px; padding: 14px 16px; border-left: 3px solid var(--c); }
+.mnt h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--accent-texte); }
+.mnt-ligne { display: flex; align-items: center; gap: 12px; }
+.mnt-ligne .ouvrir { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0; border: 0; background: none; color: inherit; text-align: left; }
+.mnt-ligne .quoi { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.mnt-ligne .quoi b { font-size: 18px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mnt-ligne .quoi small { color: var(--doux); font-size: 13px; }
+.mnt-ligne .pts { color: var(--accent-texte); font-weight: 600; font-size: 13.5px; }
 /* ===== Refonte (édition 11) : noir profond, verre, platine, arcs de lumière ===== */
 :root {
   --fond: #050506;
@@ -1060,7 +1119,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 15;                      // édition de l'app, comme le cache du service worker (ascend-15)
+  const EDITION = 16;                      // édition de l'app, comme le cache du service worker (ascend-16)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -1131,7 +1190,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
     priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], energie: {}, reflexions: {}, conseilsVus: {},
-    onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
+    onglet: 'accueil', vueCal: 'semaine', semaineVue: true, vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
   });
@@ -1149,6 +1208,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     });
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (typeof S.vu !== 'string') S.vu = null;
+    if (!S.semaineVue) { S.semaineVue = true; S.vueCal = 'semaine'; }      // édition 16 : la Semaine devient la vue par défaut, une fois
+    if (!['semaine', 'jour', 'mois'].includes(S.vueCal)) S.vueCal = 'semaine';
     Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.identites = (Array.isArray(S.identites) ? S.identites : []).filter(x => x && x.id && typeof x.nom === 'string' && x.nom.trim()).slice(0, 4);
@@ -1339,6 +1400,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
 
   // ---------- État de l'écran (non enregistré) ----------
   const U = {
+    semOuverts: new Set(), semCat: null,     // vue Semaine : jours passés dépliés, catégorie dont le détail est ouvert
     onglet: ['accueil', 'calendrier', 'objectifs', 'progression'].includes(S.onglet) ? S.onglet : 'accueil',
     date: aujourdhui(),
     selection: null, brouillon: null, defile: {}, edition: null, avaler: 0,
@@ -1872,10 +1934,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         ${courbePoints()}
         <p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
       </section>
-      ${carteSemaine()}
+      ${carteMaintenant()}
       ${carteEnergie(false)}
       ${carteCoach()}
-      ${carteIdentites()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
       ${val.map(o => `<div class="carte a-valider" style="--c:${JOMO.sansecran.couleur}">
         <p>📵 Moment sans écran terminé : <b>${esc(o.el.titre)}</b>. Tu l'as tenu ?<small>${o.k === auj ? '' : cap(quandJour(o.k)) + ', '}${plage(o.el)} · +${CONFIG.points.sansecran} pts si tenu</small></p>
@@ -1885,8 +1946,6 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <div class="boutons${resteT ? ' deux' : ''}">${resteT ? `<button type="button" class="bouton petit" data-action="alleger" data-focus="alleger">Reporter ${resteT > 1 ? 'mes ' + resteT + ' tâches' : 'ma tâche'} à demain</button>` : ''}
           <button type="button" class="bouton petit secondaire" data-action="fin-difficile" data-focus="dur">Finalement, ça va</button></div></section>` : ''}
       ${cartePasFaites()}
-      ${cartePriorites()}
-      ${rappelChange()}
       <section aria-labelledby="auj-titre">
         <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
         <div class="lignes">
@@ -1896,6 +1955,10 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         </div>
         ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
       </section>
+      ${cartePriorites()}
+      ${rappelChange()}
+      ${carteSemaine()}
+      ${carteIdentites()}
       <div class="duo">
         <button type="button" class="carte mini" data-action="serie" data-focus="serie" aria-label="Série actuelle : ${pluriel(s, 'jour')} d'affilée avec toutes tes habitudes. Meilleure : ${pluriel(Math.max(S.meilleureSerie, s), 'jour')}.">
           <span class="titre-mini" aria-hidden="true">🔥 Série</span><b aria-hidden="true">${s} j</b><small aria-hidden="true">${sd.pardons.length && ecart(sd.pardons[0], auj) < CONFIG.pardon ? '🛟 1 jour pardonné' : 'Meilleure : ' + Math.max(S.meilleureSerie, s) + ' j'}</small></button>
@@ -1908,7 +1971,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   }
   // ---------- Calendrier ----------
   function vueCalendrier() {
-    const mois = S.vueCal !== 'jour';
+    const v = S.vueCal === 'jour' ? 'jour' : S.vueCal === 'mois' ? 'mois' : 'semaine';
     return `
       <header class="tete">
         <div><h1>Calendrier</h1><p>Planifie. Organise. Réussis.</p></div>
@@ -1918,10 +1981,11 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         </div>
       </header>
       <div class="segments" role="group" aria-label="Affichage">
-        <button type="button" aria-pressed="${mois}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
-        <button type="button" aria-pressed="${!mois}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+        <button type="button" aria-pressed="${v === 'semaine'}" data-vue-cal="semaine" data-focus="vc-semaine">Semaine</button>
+        <button type="button" aria-pressed="${v === 'jour'}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+        <button type="button" aria-pressed="${v === 'mois'}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
       </div>
-      ${mois ? vueMois() : vueJour()}`;
+      ${v === 'mois' ? vueMois() : v === 'jour' ? vueJour() : vueSemaine()}`;
   }
 
   // Mois : la grille de la maquette, avec des points sous les jours, et la liste du jour choisi en dessous
@@ -2979,6 +3043,119 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (a.type === 'jour') { U.onglet = S.onglet = 'calendrier'; S.vueCal = 'jour'; U.date = a.arg; U.recentrer = true; ecrire(); return render('tab-calendrier'); }
     if (a.type === 'objectif') { const [id, n] = a.arg.split('|'), k = S.categories.find(x => x.id === id); if (!k) return; k.objectif = +n; S.conseilsVus[c.id] = auj; sauver(); U.garderDefilement = true; render('coach'); return dire(`${k.nom} : ${n} par semaine. Tiens-le, puis remonte. 💪`); }
   }
+  // ---------- Vue Semaine ----------
+  // Le cœur du calendrier : les objectifs de la semaine (fait / prévu), puis les 7 jours, chacun avec sa charge et ses éléments.
+  // Les jours passés sont repliés. U.semOuverts : jours passés dépliés ; U.semCat : catégorie dont le détail est ouvert.
+  // Objectif d'une catégorie cette semaine : faits, à venir (tâches et habitudes prévues d'ici dimanche, pas encore faites), manque.
+  function avancementCat(c, lundi) {
+    const auj = aujourdhui(), dim = decaler(lundi, 6);
+    const faits = faitsCat(c.id, lundi, dim);
+    let venir = 0;
+    for (let k = lundi < auj ? auj : lundi; k <= dim; k = decaler(k, 1)) {
+      duJour(k).forEach(o => { if (o.el.type === 'tache' && o.el.cat === c.id && !o.fait && !S.partis[o.cle] && (k > auj || o.el.fin > minNow())) venir++; });
+      S.habitudes.forEach(h => { if (h.cat === c.id && habitudeDue(h, k) && !h.faits[k]) venir++; });
+    }
+    return { c, faits, venir, objectif: c.objectif, atteint: faits >= c.objectif, manque: Math.max(0, c.objectif - faits - venir) };
+  }
+  // Un créneau à proposer pour une catégorie : un jour restant sans elle, à son heure et sa durée habituelles (sinon 18 h, 1 h)
+  function creneauPourCat(c, lundi) {
+    const auj = aujourdhui(), dim = decaler(lundi, 6), heures = {}, durees = {};
+    for (let k = decaler(auj, -60), i = 0; i < 60; k = decaler(k, 1), i++) duJour(k).forEach(o => { if (o.el.type === 'tache' && o.el.cat === c.id) { heures[o.el.debut] = (heures[o.el.debut] || 0) + 1; const d = o.el.fin - o.el.debut; durees[d] = (durees[d] || 0) + 1; } });
+    const plus = t => { const l = Object.keys(t).sort((a, b) => t[b] - t[a]); return l.length ? +l[0] : null; };
+    const debut = plus(heures) != null ? plus(heures) : 18 * 60, du = plus(durees) || 60;
+    const jours = [];
+    for (let k = lundi < auj ? auj : lundi; k <= dim; k = decaler(k, 1)) jours.push(k);
+    const sans = jours.filter(k => !duJour(k).some(o => o.el.cat === c.id && o.el.type === 'tache'));
+    const tot = Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas;
+    for (const k of sans.concat(jours.filter(k => !sans.includes(k)))) {
+      const min = k === auj ? tot : 0;
+      if (debut >= min && debut + du <= 1440 && libreA(k, debut, debut + du)) return { k, debut, fin: debut + du };
+      const p = creneauLibre(k, du, null, Math.max(min, 8 * 60));
+      if (p) return p;
+    }
+    return null;
+  }
+  function bandeauSemaine(lundi) {
+    const enCours = lundi === lundiDe(aujourdhui());
+    const l = S.categories.filter(c => c.active && c.objectif > 0).map(c => avancementCat(c, lundi));
+    const prio = prioritesDe(lundi);
+    if (!l.length && !prio.length) return '';
+    const puces = l.map(x => { const pf = Math.min(100, x.faits / x.objectif * 100), pv = Math.min(100 - pf, x.venir / x.objectif * 100), alerte = enCours && x.manque > 0;
+      return `<button type="button" class="sem-puce${x.atteint ? ' ok' : ''}${alerte ? ' manque' : ''}" style="--c:${x.c.couleur}" data-sem-cat="${esc(x.c.id)}" aria-expanded="${U.semCat === x.c.id}" data-focus="sp${esc(x.c.id)}"
+        aria-label="${esc(x.c.nom)} : ${pluriel(x.faits, 'faite')} sur ${x.objectif}${enCours && x.venir ? `, ${x.venir} de plus de prévu` : ''}${x.atteint ? ', objectif atteint' : alerte ? `, il en manque ${x.manque}` : ''}">
+        <span aria-hidden="true">${x.c.icone}</span><b aria-hidden="true">${x.faits}/${x.objectif}${x.atteint ? ' ✓' : ''}</b><i aria-hidden="true"><u style="width:${pf}%"></u><s style="width:${enCours ? pv : 0}%"></s></i></button>`; }).join('');
+    const pr = prio.length ? `<button type="button" class="sem-puce prio" data-action="bilan-semaine" data-focus="sp-prio" aria-label="Priorités : ${prio.filter(p => p.fait).length} sur ${prio.length} tenues. Ouvrir le bilan"><span aria-hidden="true">🎯</span><b aria-hidden="true">${prio.filter(p => p.fait).length}/${prio.length}</b></button>` : '';
+    const x = l.find(y => y.c.id === U.semCat);
+    let detail = '';
+    if (x) {
+      const p = enCours && x.manque > 0 ? creneauPourCat(x.c, lundi) : null;
+      detail = `<div class="carte sem-detail" role="group" aria-label="${esc(x.c.nom)} cette semaine">
+        <p><b>${esc(x.c.nom)}</b> · ${pluriel(x.faits, 'faite')}${enCours && x.venir ? `, ${x.venir} de plus de prévu${x.venir > 1 ? 'es' : 'e'}` : ''} · objectif ${x.objectif}</p>
+        ${x.atteint ? `<p class="note">Objectif atteint. 🏆 Bonus de +${bonusSemaine(x.c)} pts à la fin de la semaine.</p>`
+          : !enCours ? '' : x.manque ? `<p class="note">Il en manque ${x.manque} pour atteindre l'objectif${p ? ` : ${quandJour(p.k)} à ${hhmm(p.debut)}, c'est libre.` : '.'}</p>
+            <div class="boutons${p ? ' deux' : ''}">${p ? `<button type="button" class="bouton petit" data-sem-ajout="${esc(x.c.id)}|${p.k}|${p.debut}|${p.fin}" data-focus="sem-ajout">Ajouter ${quandCourt(p.k).toLowerCase()} ${hhmm(p.debut)}</button>` : ''}
+              <button type="button" class="bouton petit secondaire" data-sem-autre="${esc(x.c.id)}" data-focus="sem-autre">Autre moment…</button></div>`
+            : `<p class="note">Tout est prévu : il reste à le faire. 💪</p>`}</div>`;
+    }
+    return `<div class="sem-bandeau" role="group" aria-label="Objectifs de la semaine">${puces}${pr}</div>${detail}`;
+  }
+  function vueSemaine() {
+    const auj = aujourdhui(), lundi = lundiDe(U.date), plafond = S.reglages.plafond;
+    let jours = '';
+    for (let i = 0; i < 7; i++) {
+      const k = decaler(lundi, i), occs = duJour(k), m = minutesPrevues(k), passe = k < auj, ouvert = !passe || U.semOuverts.has(k);
+      const taches = occs.filter(o => o.el.type === 'tache'), faites = taches.filter(o => o.fait).length;
+      const nom = `${JOURS_COURTS_3[i]} ${parse(k).getDate()}`;
+      const resume = passe ? (taches.length ? `${faites} / ${taches.length} faites` : occs.length ? pluriel(occs.length, 'élément') : 'rien de prévu') : (m ? `${duree(m)}${m > plafond ? ' · chargée' : ''}` : 'libre');
+      jours += `<section class="sem-jour${k === auj ? ' auj' : ''}${passe ? ' passe' : ''}${m > plafond && !passe ? ' charge' : ''}" aria-labelledby="sj-${k}">
+        <div class="sem-jour-tete">
+          <button type="button" class="sem-nom" id="sj-${k}" ${passe ? `data-sem-plier="${k}" aria-expanded="${ouvert}"` : `data-ouvrir-jour="${k}"`} data-focus="sj${k}" aria-label="${jourLong(k)}${k === auj ? ", aujourd'hui" : ''} : ${resume}${passe ? '' : '. Voir la journée'}">
+            <b aria-hidden="true">${nom}</b>${k === auj ? '<span class="sem-auj" aria-hidden="true">Aujourd\'hui</span>' : ''}<small aria-hidden="true">${resume}</small>${passe ? `<span class="chevron" aria-hidden="true">${ouvert ? '▴' : '▾'}</span>` : ''}</button>
+          ${passe ? '' : `<button type="button" class="icone-bouton sem-plus" data-sem-plus="${k}" aria-label="Ajouter ${quandJour(k)}" data-focus="s+${k}">${ICONE.plus}</button>`}
+        </div>
+        ${ouvert && occs.length ? `<div class="lignes">${occs.map(o => ligneOcc(o, true)).join('')}</div>` : ''}
+      </section>`;
+    }
+    return `
+      <div class="cal-tete sem-nav">
+        <button type="button" class="icone-bouton" data-nav="-1" aria-label="Semaine précédente" data-focus="nav-1">${ICONE.gauche}</button>
+        <h2 id="sem-nom" aria-live="polite">${lundi === lundiDe(auj) ? 'Cette semaine' : cap(texteSemaine(lundi))}<small>${lundi === lundiDe(auj) ? texteSemaine(lundi) : lundi === decaler(lundiDe(auj), 7) ? 'La semaine prochaine' : lundi === decaler(lundiDe(auj), -7) ? 'La semaine passée' : ''}</small></h2>
+        <button type="button" class="icone-bouton" data-nav="1" aria-label="Semaine suivante" data-focus="nav1">${ICONE.droite}</button>
+      </div>
+      ${bandeauSemaine(lundi)}
+      <div class="sem-jours" data-balayage="semaine">${jours}</div>`;
+  }
+  const JOURS_COURTS_3 = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  // Clics propres à la semaine ; renvoie vrai si le clic est traité
+  function clicSemaine(d) {
+    if (d.semCat) { U.semCat = U.semCat === d.semCat ? null : d.semCat; U.garderDefilement = true; render('sp' + d.semCat); return true; }
+    if (d.semPlier) { if (U.semOuverts.has(d.semPlier)) U.semOuverts.delete(d.semPlier); else U.semOuverts.add(d.semPlier); U.garderDefilement = true; render('sj' + d.semPlier); return true; }
+    if (d.semPlus) { const auj = aujourdhui(), k = d.semPlus, debut = k === auj ? prochaineHeure() : 9 * 60; ouvrirTache(null, { date: k, debut, fin: Math.min(debut + CONFIG.duree, 1440) }); return true; }
+    if (d.semAutre) { ouvrirTache(null, { cat: d.semAutre }); return true; }
+    if (d.semAjout) {
+      const [id, k, debut, fin] = d.semAjout.split('|'), c = cat(id);
+      S.elements.push({ id: uid(), type: 'tache', titre: c.nom, cat: c.id, date: k, debut: +debut, fin: +fin, rep: null, exceptions: {}, faits: {}, objectif: null, creeLe: Date.now() });
+      sauver(); U.garderDefilement = true; render('sp' + id);
+      dire(`${c.icone} ${c.nom} : ${quandJour(k)} à ${hhmm(+debut)}. +${c.points} pts une fois faite.`);
+      return true;
+    }
+    return false;
+  }
+
+  // ---------- Accueil : « Maintenant » ----------
+  // Ce qui est en cours, sinon ce qui vient ensuite aujourd'hui
+  function carteMaintenant() {
+    const auj = aujourdhui(), now = minNow();
+    const l = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait) && o.el.fin > now);
+    const o = l.find(x => x.el.debut <= now) || l[0];
+    if (!o) return '';
+    const enCours = o.el.debut <= now, lk = look(o.el), dans = o.el.debut - now;
+    const quand = enCours ? `jusqu'à ${finTexte(o.el.fin)}` : `${hhmm(o.el.debut)} · dans ${duree(dans)}`;
+    return `<section class="carte mnt" style="--c:${lk.couleur}" aria-labelledby="mnt-titre">
+        <h2 id="mnt-titre">${enCours ? 'Maintenant' : 'Ensuite'}</h2>
+        <div class="mnt-ligne">${o.el.type === 'tache' ? rondCoche(o.cle, o.fait, `${o.el.titre} : à faire`, 'data-cocher') : `<span class="tuile petite" aria-hidden="true">${lk.icone}</span>`}
+          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="${enCours ? 'Maintenant' : 'Ensuite'} : ${esc(o.el.titre)}, ${quand}. Ouvrir"><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>${quand} · ${esc(lk.nom)}</small></span>${ptsElement(o)}</button></div></section>`;
+  }
   // ---------- Questions (remplacent confirm) ----------
   function demander(titreQ, texte, options) {
     return new Promise(resoudre => {
@@ -3057,19 +3234,23 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         </div>
         <label class="champ-nom">${ICONE.crayon}<span class="masque">Nom</span><input name="titre" maxlength="80" autocomplete="off" value="${esc(m.titre)}"></label>
         <div id="t-cat-zone"><span class="etiquette" id="t-cat-lib">Catégorie</span>
-          <div class="groupe"><button type="button" class="rang" data-t="cat" id="t-cat" aria-describedby="t-cat-lib"></button></div></div>
-        <div><span class="etiquette" id="t-quand">Date &amp; heure</span>
-          <div class="groupe" role="group" aria-labelledby="t-quand">
-            <label class="rang"><span><span class="ic">${ICONE.calendrier}</span>Date</span><input type="date" name="date" value="${m.date}" required></label>
-            <div class="horaires"><label>Début<input type="time" name="debut" step="900" value="${hhmm(m.debut)}" required></label><label>Fin<input type="time" name="fin" step="900" value="${finTexte(m.fin) === '24:00' ? '00:00' : hhmm(m.fin)}" required></label></div>
-          </div></div>
+          <div class="puces" role="group" aria-labelledby="t-cat-lib" id="t-cats"></div></div>
+        <div><span class="etiquette" id="t-quand">Quand</span>
+          <div class="puces" role="group" aria-labelledby="t-quand" id="t-jours"></div>
+          <div class="groupe t-date"><label class="rang"><span><span class="ic">${ICONE.calendrier}</span>Date</span><input type="date" name="date" value="${m.date}" required></label></div></div>
+        <div><span class="etiquette" id="t-heure">Heure</span>
+          <div class="puces" role="group" aria-labelledby="t-heure" id="t-heures"></div>
+          <div class="groupe" style="margin-top:8px"><div class="horaires"><label>Début<input type="time" name="debut" step="900" value="${hhmm(m.debut)}" required></label><label>Fin<input type="time" name="fin" step="900" value="${finTexte(m.fin) === '24:00' ? '00:00' : hhmm(m.fin)}" required></label></div></div></div>
+        <div><span class="etiquette" id="t-duree">Durée</span>
+          <div class="puces" role="group" aria-labelledby="t-duree" id="t-durees"></div></div>
+        <p class="t-resume" id="t-resume"></p>
+        <details class="t-plus"${m.rep || m.objectif ? ' open' : ''}><summary>Plus d'options<small>répéter, objectif lié</small></summary>
         <div class="groupe">
-          <div class="rang"><span><span class="ic" style="color:var(--orange)">${ICONE.etoile}</span>Points</span><span class="val" id="t-pts"></span></div>
           <label class="rang"><span><span class="ic">${ICONE.repeter}</span>Répéter</span><span class="interrupteur"><input type="checkbox" role="switch" name="repeter"${m.rep ? ' checked' : ''}><i></i></span></label>
           <label class="rang" id="t-freq"><span>Fréquence</span><select name="freq">${Object.keys(REPET).map(f => `<option value="${f}"${(m.rep ? m.rep.freq : 'semaine') === f ? ' selected' : ''}>${REPET[f]}</option>`).join('')}</select></label>
           <label class="rang" id="t-jusqua"><span>Jusqu'au <span class="sous">facultatif</span></span><input type="date" name="jusqua" value="${m.rep && m.rep.jusqua ? m.rep.jusqua : ''}"></label>
           <label class="rang" id="t-obj"><span><span class="ic">${ICONE.cible}</span>Objectif lié</span><select name="objectif"><option value="">Aucun</option>${objs.map(x => `<option value="${x.id}"${x.id === m.objectif ? ' selected' : ''}>${esc(x.titre)}</option>`).join('')}</select></label>
-        </div>
+        </div></details>
         <p class="note" id="t-regle"></p>
         <p class="erreur" id="t-erreur" role="alert"></p>
         ${o ? `<div class="boutons">${el.type === 'tache' ? `<button type="button" class="bouton secondaire" data-t="minuteur">${ICONE.chrono} Lancer le minuteur</button>` : ''}
@@ -3089,15 +3270,24 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     champT('titre').placeholder = type === 'tache' ? 'Nom de la tâche…' : JOMO[type].nom;
     $('#t-cat-zone').hidden = type !== 'tache';
     $('#t-obj').hidden = type !== 'tache' || !S.objectifs.length;
-    // Le bouton n'est redessiné que si la catégorie change : sinon un toucher qui suit la fin de la saisie (blur → change) serait perdu
-    if ($('#t-cat').dataset.cat !== c.id) {
-      $('#t-cat').dataset.cat = c.id;
-      $('#t-cat').innerHTML = `<span><span class="tuile" style="--c:${c.couleur}" aria-hidden="true">${c.icone}</span><b>${esc(c.nom)}</b></span><span class="val">${ICONE.droite}</span>`;
-      $('#t-cat').setAttribute('aria-label', `Catégorie : ${c.nom}. Changer`);
-    }
+    // Puces : catégories, jours, heures, durées (redessinées seulement si elles changent, pour ne pas perdre un toucher en cours)
+    const poser = (zone, html) => { const z = $(zone); if (z.dataset.h !== html) { z.dataset.h = html; z.innerHTML = html; } };
+    const puce = (attr, val, texte, actif, label) => `<button type="button" class="puce" ${attr}="${val}" aria-pressed="${actif}"${label ? ` aria-label="${label}"` : ''}>${texte}</button>`;
+    const cats = catsActives().slice(); if (!cats.some(x => x.id === c.id)) cats.unshift(c);
+    poser('#t-cats', cats.map(x => puce('data-t-cat', esc(x.id), `<span aria-hidden="true">${x.icone}</span> ${esc(x.nom)}`, x.id === c.id)).join('')
+      + `<button type="button" class="puce" data-t="cat" id="t-cat" aria-label="Toutes les catégories">⋯</button>`);
+    const auj = aujourdhui(), date = champT('date').value, deb = versMin(champT('debut').value), du = U.edition.duree > 0 ? U.edition.duree : 60;
+    poser('#t-jours', [0, 1, 2, 3, 4, 5, 6].map(i => { const k = decaler(auj, i); return puce('data-t-jour', k, i === 0 ? "Aujourd'hui" : i === 1 ? 'Demain' : cap(fmt(k, { weekday: 'short', day: 'numeric' })).replace('.', ''), k === date, i > 1 ? jourLong(k) : ''); }).join(''));
+    const sans = U.edition.o ? U.edition.o.cle : null;
+    const libre = /^\d{4}-\d{2}-\d{2}$/.test(date) ? creneauLibre(date, du, sans, date === auj ? Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas : 8 * 60) : null;
+    const heures = [9 * 60, 12 * 60, 14 * 60, 18 * 60, 20 * 60].filter(h => !libre || h !== libre.debut);
+    poser('#t-heures', (libre ? puce('data-t-heure', libre.debut, `Libre · ${hhmm(libre.debut)}`, deb === libre.debut, `Prochain créneau libre : ${hhmm(libre.debut)}`) : '') + heures.map(h => puce('data-t-heure', h, hhmm(h), deb === h)).join(''));
+    poser('#t-durees', [15, 30, 60, 90, 120].map(x => puce('data-t-duree', x, duree(x), du === x)).join(''));
+    const fin = versMin(champT('fin').value);
+    $('#t-resume').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) && deb != null && fin != null ? `${cap(quandJour(date))} · ${hhmm(deb)} – ${finTexte(fin === 0 ? 1440 : fin)} · ${duree(du)}` : '';
     const rep = champT('repeter').checked;
     $('#t-freq').hidden = $('#t-jusqua').hidden = !rep;
-    $('#t-pts').textContent = `+${type === 'tache' ? c.points : CONFIG.points[type]} pts`;
+    $('#t-resume').textContent += $('#t-resume').textContent ? ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts` : '';
     $('#t-regle').textContent = {
       tache: `Rapporte les points de « ${c.nom} » une fois faite, si elle est prévue avant son début. Compte dans l'objectif de la semaine.`,
       libre: `JOMO : +${CONFIG.points.libre} pts si aucune tâche ne vient empiéter sur ce créneau jusqu'au bout (${CONFIG.points.libreMin} min au moins, ${CONFIG.points.libresParJour} par jour).`,
@@ -3194,6 +3384,20 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     setTimeout(() => dire(`Attention : ça empiète sur « ${l.el.titre} » (${plage(l.el)}).`), 300);
     return true;
   }
+  // Puces de la feuille courte : un toucher règle la catégorie, le jour, l'heure ou la durée
+  TD.addEventListener('click', e => {
+    const b = e.target.closest('.puce');
+    if (!b || b.dataset.t) return;
+    const d = b.dataset, dureeAct = U.edition.duree > 0 ? U.edition.duree : 60;
+    const poserFin = (debut, du) => { champT('fin').value = hhmm(Math.min(debut + du, 1440) % 1440); };
+    if (d.tCat) U.edition.cat = d.tCat;
+    if (d.tJour) champT('date').value = d.tJour;
+    if (d.tHeure) { champT('debut').value = hhmm(+d.tHeure); poserFin(+d.tHeure, dureeAct); }
+    if (d.tDuree) { U.edition.duree = +d.tDuree; const deb = versMin(champT('debut').value); if (deb != null) poserFin(deb, +d.tDuree); }
+    majTache();
+    const sel = d.tCat ? `[data-t-cat="${CSS.escape(d.tCat)}"]` : d.tJour ? `[data-t-jour="${d.tJour}"]` : d.tHeure ? `[data-t-heure="${d.tHeure}"]` : `[data-t-duree="${d.tDuree}"]`;
+    const f = TD.querySelector(sel); if (f) f.focus();
+  });
   TD.addEventListener('click', async e => {
     const b = e.target.closest('[data-t]');
     if (!b) return;
@@ -4484,7 +4688,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   }
   function naviguer(sens) {
     U.selection = null; U.brouillon = null;
-    if (S.vueCal === 'jour') U.date = decaler(U.date, sens); else U.date = moisPlus(U.date, sens);
+    if (S.vueCal === 'jour') U.date = decaler(U.date, sens); else if (S.vueCal === 'mois' || paysage()) U.date = moisPlus(U.date, sens); else U.date = decaler(U.date, 7 * sens);
     U.garderDefilement = true;
     render();
   }
@@ -4706,6 +4910,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (d.aller) return allerA(d.aller);
     if (d.choisir) { U.date = d.choisir; U.garderDefilement = true; return render(); }
     if (d.ouvrirJour) return allerA(d.ouvrirJour, 'jour');
+    if (clicSemaine(d)) return;
     const a = d.action;
     if (a === 'remplir' && U.brouillon) return ouvrirTache(null, { date: U.brouillon.k, debut: U.brouillon.debut, fin: U.brouillon.fin });
     if (a === 'ajouter') {

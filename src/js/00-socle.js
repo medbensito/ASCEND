@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 15;                      // édition de l'app, comme le cache du service worker (ascend-15)
+  const EDITION = 16;                      // édition de l'app, comme le cache du service worker (ascend-16)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -73,7 +73,7 @@
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
     priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], energie: {}, reflexions: {}, conseilsVus: {},
-    onglet: 'accueil', vueCal: 'mois', vueObj: 'habitudes', periode: 30,
+    onglet: 'accueil', vueCal: 'semaine', semaineVue: true, vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
   });
@@ -91,6 +91,8 @@
     });
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (typeof S.vu !== 'string') S.vu = null;
+    if (!S.semaineVue) { S.semaineVue = true; S.vueCal = 'semaine'; }      // édition 16 : la Semaine devient la vue par défaut, une fois
+    if (!['semaine', 'jour', 'mois'].includes(S.vueCal)) S.vueCal = 'semaine';
     Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.identites = (Array.isArray(S.identites) ? S.identites : []).filter(x => x && x.id && typeof x.nom === 'string' && x.nom.trim()).slice(0, 4);
@@ -281,6 +283,7 @@
 
   // ---------- État de l'écran (non enregistré) ----------
   const U = {
+    semOuverts: new Set(), semCat: null,     // vue Semaine : jours passés dépliés, catégorie dont le détail est ouvert
     onglet: ['accueil', 'calendrier', 'objectifs', 'progression'].includes(S.onglet) ? S.onglet : 'accueil',
     date: aujourdhui(),
     selection: null, brouillon: null, defile: {}, edition: null, avaler: 0,

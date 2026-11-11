@@ -76,19 +76,23 @@
         </div>
         <label class="champ-nom">${ICONE.crayon}<span class="masque">Nom</span><input name="titre" maxlength="80" autocomplete="off" value="${esc(m.titre)}"></label>
         <div id="t-cat-zone"><span class="etiquette" id="t-cat-lib">Catégorie</span>
-          <div class="groupe"><button type="button" class="rang" data-t="cat" id="t-cat" aria-describedby="t-cat-lib"></button></div></div>
-        <div><span class="etiquette" id="t-quand">Date &amp; heure</span>
-          <div class="groupe" role="group" aria-labelledby="t-quand">
-            <label class="rang"><span><span class="ic">${ICONE.calendrier}</span>Date</span><input type="date" name="date" value="${m.date}" required></label>
-            <div class="horaires"><label>Début<input type="time" name="debut" step="900" value="${hhmm(m.debut)}" required></label><label>Fin<input type="time" name="fin" step="900" value="${finTexte(m.fin) === '24:00' ? '00:00' : hhmm(m.fin)}" required></label></div>
-          </div></div>
+          <div class="puces" role="group" aria-labelledby="t-cat-lib" id="t-cats"></div></div>
+        <div><span class="etiquette" id="t-quand">Quand</span>
+          <div class="puces" role="group" aria-labelledby="t-quand" id="t-jours"></div>
+          <div class="groupe t-date"><label class="rang"><span><span class="ic">${ICONE.calendrier}</span>Date</span><input type="date" name="date" value="${m.date}" required></label></div></div>
+        <div><span class="etiquette" id="t-heure">Heure</span>
+          <div class="puces" role="group" aria-labelledby="t-heure" id="t-heures"></div>
+          <div class="groupe" style="margin-top:8px"><div class="horaires"><label>Début<input type="time" name="debut" step="900" value="${hhmm(m.debut)}" required></label><label>Fin<input type="time" name="fin" step="900" value="${finTexte(m.fin) === '24:00' ? '00:00' : hhmm(m.fin)}" required></label></div></div></div>
+        <div><span class="etiquette" id="t-duree">Durée</span>
+          <div class="puces" role="group" aria-labelledby="t-duree" id="t-durees"></div></div>
+        <p class="t-resume" id="t-resume"></p>
+        <details class="t-plus"${m.rep || m.objectif ? ' open' : ''}><summary>Plus d'options<small>répéter, objectif lié</small></summary>
         <div class="groupe">
-          <div class="rang"><span><span class="ic" style="color:var(--orange)">${ICONE.etoile}</span>Points</span><span class="val" id="t-pts"></span></div>
           <label class="rang"><span><span class="ic">${ICONE.repeter}</span>Répéter</span><span class="interrupteur"><input type="checkbox" role="switch" name="repeter"${m.rep ? ' checked' : ''}><i></i></span></label>
           <label class="rang" id="t-freq"><span>Fréquence</span><select name="freq">${Object.keys(REPET).map(f => `<option value="${f}"${(m.rep ? m.rep.freq : 'semaine') === f ? ' selected' : ''}>${REPET[f]}</option>`).join('')}</select></label>
           <label class="rang" id="t-jusqua"><span>Jusqu'au <span class="sous">facultatif</span></span><input type="date" name="jusqua" value="${m.rep && m.rep.jusqua ? m.rep.jusqua : ''}"></label>
           <label class="rang" id="t-obj"><span><span class="ic">${ICONE.cible}</span>Objectif lié</span><select name="objectif"><option value="">Aucun</option>${objs.map(x => `<option value="${x.id}"${x.id === m.objectif ? ' selected' : ''}>${esc(x.titre)}</option>`).join('')}</select></label>
-        </div>
+        </div></details>
         <p class="note" id="t-regle"></p>
         <p class="erreur" id="t-erreur" role="alert"></p>
         ${o ? `<div class="boutons">${el.type === 'tache' ? `<button type="button" class="bouton secondaire" data-t="minuteur">${ICONE.chrono} Lancer le minuteur</button>` : ''}
@@ -108,15 +112,24 @@
     champT('titre').placeholder = type === 'tache' ? 'Nom de la tâche…' : JOMO[type].nom;
     $('#t-cat-zone').hidden = type !== 'tache';
     $('#t-obj').hidden = type !== 'tache' || !S.objectifs.length;
-    // Le bouton n'est redessiné que si la catégorie change : sinon un toucher qui suit la fin de la saisie (blur → change) serait perdu
-    if ($('#t-cat').dataset.cat !== c.id) {
-      $('#t-cat').dataset.cat = c.id;
-      $('#t-cat').innerHTML = `<span><span class="tuile" style="--c:${c.couleur}" aria-hidden="true">${c.icone}</span><b>${esc(c.nom)}</b></span><span class="val">${ICONE.droite}</span>`;
-      $('#t-cat').setAttribute('aria-label', `Catégorie : ${c.nom}. Changer`);
-    }
+    // Puces : catégories, jours, heures, durées (redessinées seulement si elles changent, pour ne pas perdre un toucher en cours)
+    const poser = (zone, html) => { const z = $(zone); if (z.dataset.h !== html) { z.dataset.h = html; z.innerHTML = html; } };
+    const puce = (attr, val, texte, actif, label) => `<button type="button" class="puce" ${attr}="${val}" aria-pressed="${actif}"${label ? ` aria-label="${label}"` : ''}>${texte}</button>`;
+    const cats = catsActives().slice(); if (!cats.some(x => x.id === c.id)) cats.unshift(c);
+    poser('#t-cats', cats.map(x => puce('data-t-cat', esc(x.id), `<span aria-hidden="true">${x.icone}</span> ${esc(x.nom)}`, x.id === c.id)).join('')
+      + `<button type="button" class="puce" data-t="cat" id="t-cat" aria-label="Toutes les catégories">⋯</button>`);
+    const auj = aujourdhui(), date = champT('date').value, deb = versMin(champT('debut').value), du = U.edition.duree > 0 ? U.edition.duree : 60;
+    poser('#t-jours', [0, 1, 2, 3, 4, 5, 6].map(i => { const k = decaler(auj, i); return puce('data-t-jour', k, i === 0 ? "Aujourd'hui" : i === 1 ? 'Demain' : cap(fmt(k, { weekday: 'short', day: 'numeric' })).replace('.', ''), k === date, i > 1 ? jourLong(k) : ''); }).join(''));
+    const sans = U.edition.o ? U.edition.o.cle : null;
+    const libre = /^\d{4}-\d{2}-\d{2}$/.test(date) ? creneauLibre(date, du, sans, date === auj ? Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas : 8 * 60) : null;
+    const heures = [9 * 60, 12 * 60, 14 * 60, 18 * 60, 20 * 60].filter(h => !libre || h !== libre.debut);
+    poser('#t-heures', (libre ? puce('data-t-heure', libre.debut, `Libre · ${hhmm(libre.debut)}`, deb === libre.debut, `Prochain créneau libre : ${hhmm(libre.debut)}`) : '') + heures.map(h => puce('data-t-heure', h, hhmm(h), deb === h)).join(''));
+    poser('#t-durees', [15, 30, 60, 90, 120].map(x => puce('data-t-duree', x, duree(x), du === x)).join(''));
+    const fin = versMin(champT('fin').value);
+    $('#t-resume').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) && deb != null && fin != null ? `${cap(quandJour(date))} · ${hhmm(deb)} – ${finTexte(fin === 0 ? 1440 : fin)} · ${duree(du)}` : '';
     const rep = champT('repeter').checked;
     $('#t-freq').hidden = $('#t-jusqua').hidden = !rep;
-    $('#t-pts').textContent = `+${type === 'tache' ? c.points : CONFIG.points[type]} pts`;
+    $('#t-resume').textContent += $('#t-resume').textContent ? ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts` : '';
     $('#t-regle').textContent = {
       tache: `Rapporte les points de « ${c.nom} » une fois faite, si elle est prévue avant son début. Compte dans l'objectif de la semaine.`,
       libre: `JOMO : +${CONFIG.points.libre} pts si aucune tâche ne vient empiéter sur ce créneau jusqu'au bout (${CONFIG.points.libreMin} min au moins, ${CONFIG.points.libresParJour} par jour).`,
@@ -213,6 +226,20 @@
     setTimeout(() => dire(`Attention : ça empiète sur « ${l.el.titre} » (${plage(l.el)}).`), 300);
     return true;
   }
+  // Puces de la feuille courte : un toucher règle la catégorie, le jour, l'heure ou la durée
+  TD.addEventListener('click', e => {
+    const b = e.target.closest('.puce');
+    if (!b || b.dataset.t) return;
+    const d = b.dataset, dureeAct = U.edition.duree > 0 ? U.edition.duree : 60;
+    const poserFin = (debut, du) => { champT('fin').value = hhmm(Math.min(debut + du, 1440) % 1440); };
+    if (d.tCat) U.edition.cat = d.tCat;
+    if (d.tJour) champT('date').value = d.tJour;
+    if (d.tHeure) { champT('debut').value = hhmm(+d.tHeure); poserFin(+d.tHeure, dureeAct); }
+    if (d.tDuree) { U.edition.duree = +d.tDuree; const deb = versMin(champT('debut').value); if (deb != null) poserFin(deb, +d.tDuree); }
+    majTache();
+    const sel = d.tCat ? `[data-t-cat="${CSS.escape(d.tCat)}"]` : d.tJour ? `[data-t-jour="${d.tJour}"]` : d.tHeure ? `[data-t-heure="${d.tHeure}"]` : `[data-t-duree="${d.tDuree}"]`;
+    const f = TD.querySelector(sel); if (f) f.focus();
+  });
   TD.addEventListener('click', async e => {
     const b = e.target.closest('[data-t]');
     if (!b) return;

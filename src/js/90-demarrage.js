@@ -44,7 +44,7 @@
   }
   function naviguer(sens) {
     U.selection = null; U.brouillon = null;
-    if (S.vueCal === 'jour') U.date = decaler(U.date, sens); else U.date = moisPlus(U.date, sens);
+    if (S.vueCal === 'jour') U.date = decaler(U.date, sens); else if (S.vueCal === 'mois' || paysage()) U.date = moisPlus(U.date, sens); else U.date = decaler(U.date, 7 * sens);
     U.garderDefilement = true;
     render();
   }
@@ -266,6 +266,7 @@
     if (d.aller) return allerA(d.aller);
     if (d.choisir) { U.date = d.choisir; U.garderDefilement = true; return render(); }
     if (d.ouvrirJour) return allerA(d.ouvrirJour, 'jour');
+    if (clicSemaine(d)) return;
     const a = d.action;
     if (a === 'remplir' && U.brouillon) return ouvrirTache(null, { date: U.brouillon.k, debut: U.brouillon.debut, fin: U.brouillon.fin });
     if (a === 'ajouter') {
