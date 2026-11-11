@@ -86,10 +86,9 @@
     const st = statsSemaine(lundiDe(aujourdhui()));
     if (st.taux == null) return '';
     const pc = Math.round(st.taux * 100), d = st.diff;
-    return `<button type="button" class="carte sem-carte" data-action="bilan-semaine" data-focus="sem" aria-label="Ta progression cette semaine : ${pc} % de tes objectifs${d == null ? '' : `, ${d > 0 ? '+' : ''}${Math.round(d * 100)} % de points par rapport à la semaine dernière`}. Ouvrir le bilan">
-        <span class="sem-haut" aria-hidden="true"><span>Ta progression cette semaine</span><b>${pc}<small>%</small></b></span>
-        <span class="sem-barre" aria-hidden="true"><i style="width:${Math.max(pc, 2)}%"></i></span>
-        ${d == null ? '<span class="sem-bas" aria-hidden="true">Objectifs de la semaine</span>' : `<span class="sem-bas" aria-hidden="true"><b class="${d > .005 ? 'hausse' : d < -.005 ? 'baisse' : ''}">${d > 0 ? '+' : ''}${Math.round(d * 100)} %</b> vs semaine dernière</span>`}</button>`;
+    return `<button type="button" class="carte mini sem-carte" data-action="bilan-semaine" data-focus="sem" aria-label="Ta progression cette semaine : ${pc} % de tes objectifs${d == null ? '' : `, ${d > 0 ? '+' : ''}${Math.round(d * 100)} % de points par rapport à la semaine dernière`}. Ouvrir le bilan">
+        <span class="titre-mini" aria-hidden="true">📈 Semaine</span><b aria-hidden="true">${pc}<small> %</small></b>
+        <small aria-hidden="true">${d == null ? 'des objectifs' : `<b class="${d > .005 ? 'hausse' : d < -.005 ? 'baisse' : ''}">${d > 0 ? '+' : ''}${Math.round(d * 100)} %</b> de points`}</small></button>`;
   }
   function vueAccueil() {
     const auj = aujourdhui(), P = palier(), suiv = palierSuivant(), g = gainDuJour(auj);
@@ -108,8 +107,8 @@
         <p class="total"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b><small>pts</small>
           <span class="${g ? '' : 'zero'}">${g > 0 ? ICONE.hausse : ''}${g ? (g > 0 ? '+' : '') + nombre(g) : '+0'}<span class="masque"> aujourd'hui</span></span></p>
         ${courbePoints()}
-        <p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
-        <p class="niveau">${pastilleRecompenses()}</p>
+        <div class="niveau-rang"><p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
+        <p class="niveau">${pastilleRecompenses()}</p></div>
       </section>
       ${carteMaintenant()}
       ${carteEnergie(false)}
@@ -134,15 +133,15 @@
       </section>
       ${cartePriorites()}
       ${rappelChange()}
-      ${carteSemaine()}
-      ${carteIdentites()}
-      <div class="duo">
+      <div class="duo${carteSemaine() ? ' trio' : ''}">
+        ${carteSemaine()}
         <button type="button" class="carte mini" data-action="serie" data-focus="serie" aria-label="Série actuelle : ${pluriel(s, 'jour')} d'affilée avec toutes tes habitudes. Meilleure : ${pluriel(Math.max(S.meilleureSerie, s), 'jour')}.">
           <span class="titre-mini" aria-hidden="true">🔥 Série</span><b aria-hidden="true">${s} j</b><small aria-hidden="true">${sd.pardons.length && ecart(sd.pardons[0], auj) < CONFIG.pardon ? '🛟 1 jour pardonné' : 'Meilleure : ' + Math.max(S.meilleureSerie, s) + ' j'}</small></button>
         <button type="button" class="carte mini" data-action="minuteur" data-focus="minuteur" aria-label="${M ? 'Concentration en cours : ouvrir le minuteur' : `Concentration : ${duree(foc.total)} aujourd'hui. Lancer une session`}">
-          <span class="titre-mini" aria-hidden="true">⏱️ Concentration</span>
+          <span class="titre-mini" aria-hidden="true">⏱️ Focus</span>
           <b aria-hidden="true" ${M ? 'data-reste-mini' : ''}>${M ? texteMinuteurCourt() : duree(foc.total)}</b>
           <small aria-hidden="true">${M ? ({ travail: 'Session en cours', pause: 'Pause', pret: 'Prêt à reprendre' }[M.phase]) : 'Lancer une session'}</small></button>
       </div>
+      ${carteIdentites()}
       ${carteEnergie(true)}`;
   }

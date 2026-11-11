@@ -179,3 +179,61 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
 .onglets { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 68px minmax(0, 1fr) minmax(0, 1fr); }
 .onglet span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 359px) { .onglets { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 58px minmax(0, 1fr) minmax(0, 1fr); padding-left: 6px; padding-right: 6px; gap: 2px; } .onglet { font-size: 9.5px; } .onglet-plus { width: 52px; height: 52px; } }
+
+/* ===== Accueil resserré (édition 20) ===== */
+.ecran:has(> .salut) { gap: 14px; padding-top: calc(var(--haut-sur) + 14px); }
+.salut h1 { font-size: 22px; }
+.salut p { font-size: 13.5px; margin-top: 2px; }
+.salut .avatar { width: 40px; height: 40px; font-size: 13px; }
+.points .total b { font-size: 48px; }
+.points .courbe { height: 58px; margin-top: -10px; margin-bottom: -4px; }
+.niveau-rang { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.niveau-rang .niveau { min-width: 0; margin: 0; }
+.niveau-rang .niveau > span, .niveau-rang .rec-pastille { min-height: 32px; font-size: 12px; }
+.niveau-rang .niveau small { display: none; }
+.mnt { padding: 10px 14px; gap: 4px; }
+.mnt-ligne .quoi b { font-size: 16.5px; }
+/* Énergie : une seule ligne */
+.ecran > .energie { grid-template-columns: auto 1fr; align-items: center; gap: 10px; padding: 8px 10px 8px 14px; }
+.ecran > .energie h2 { font-size: 13.5px; font-weight: 550; color: var(--doux); }
+.ecran > .energie .en-choix { gap: 4px; }
+.ecran > .energie .en-choix button { min-height: 44px; padding: 2px; border-radius: 12px; border-color: transparent; background: none; }
+.ecran > .energie .en-choix button small { display: none; }
+.ecran > .energie .en-choix button[aria-checked="true"] { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .6); }
+/* Coach, alertes, entrées : plus bas */
+.ecran > .coach { gap: 8px; padding: 12px 14px; }
+.ecran > .coach p { font-size: 14px; line-height: 1.4; }
+.ecran > .coach .bouton.petit, .ecran > .difficile .bouton.petit { min-height: 40px; }
+.ecran > .difficile { gap: 8px; padding: 12px 14px; }
+.ecran > .b-entree { min-height: 52px; padding: 8px 12px; }
+.ecran > .b-entree .tuile { width: 34px; height: 34px; font-size: 16px; }
+.ecran > .b-entree .quoi b { font-size: 14.5px; }
+.ecran > .b-entree .quoi small { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Aujourd'hui : lignes plus basses */
+.ecran:has(> .salut) .lignes .ligne { min-height: 56px; padding: 9px 14px; }
+.ecran:has(> .salut) .section-tete { margin-bottom: 8px; }
+.dur-lien { min-height: 36px; margin-top: 2px; font-size: 12.5px; }
+/* Priorités, identités : rangs compacts */
+.prio.pad, .idt.pad { padding: 10px 14px; }
+.prio .section-tete h2, .idt .section-tete h2 { font-size: 15px; }
+.prio-ligne { min-height: 40px; }
+.prio-ligne span { font-size: 14.5px; }
+.refl-rappel { padding: 8px 14px; font-size: 14px; }
+.idt .idt-ligne { min-height: 44px; padding: 4px 0; }
+.idt .idt-ligne .tuile { width: 32px; height: 32px; font-size: 16px; }
+.idt .idt-ligne .barre-obj, .idt .idt-ligne:not(.dort) .quoi small { display: none; }
+.idt .idt-ligne .quoi b { font-size: 14.5px; }
+.idt .idt-val { display: flex; align-items: baseline; gap: 4px; }
+.idt .idt-val b { font-size: 18px; font-weight: 400; }
+/* Semaine · Série · Concentration sur une ligne */
+.duo.trio { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.duo .mini { padding: 10px 12px; min-height: 0; gap: 2px; text-align: left; }
+.duo .mini b { font-size: 22px; }
+.duo .mini b small { font-size: 12px; font-weight: 400; color: var(--doux); }
+.duo .mini .titre-mini { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.duo .mini > small { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.duo.trio .mini { padding: 10px 10px; }
+.mini.sem-carte { display: grid; background: var(--verre); border: 1px solid var(--trait); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 18px 40px rgba(0, 0, 0, .42); width: auto; }
+.mini.sem-carte small b { font-size: 11px; font-weight: 700; }
+.mini.sem-carte small b.hausse { color: var(--vert); }
+.mini.sem-carte small b.baisse { color: #ff8a9a; }
