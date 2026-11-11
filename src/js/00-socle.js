@@ -2,13 +2,14 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 18;                      // édition de l'app, comme le cache du service worker (ascend-18)
+  const EDITION = 19;                      // édition de l'app, comme le cache du service worker (ascend-19)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
   const CONFIG = {
     pardon: 7,             // la série pardonne un jour raté tous les 7 jours
     difficilesParSemaine: 2,
+    courage: { reports: 2, bonus: .5 },   // une tâche repoussée 2 fois ou plus rapporte 50 % de plus une fois faite
     absence: 3,            // jours sans ouvrir l'app avant l'accueil « content de te revoir »
     heure: 60,             // px par heure dans la grille (= --H)
     pas: 15,               // minutes : les plages se calent au quart d'heure
@@ -72,7 +73,7 @@
     minuteur: null,            // { phase: 'travail' | 'pause' | 'pret', fin, reste, cle, cat, titre, cycle, debut }
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
-    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], aCaser: [], energie: {}, reflexions: {}, conseilsVus: {},
+    priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], aCaser: [], recompenses: [], achats: [], energie: {}, reflexions: {}, conseilsVus: {},
     onglet: 'accueil', vueCal: 'semaine', semaineVue: true, vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -91,6 +92,7 @@
     });
     if (typeof S.bilanVu !== 'string') S.bilanVu = null;
     if (typeof S.vu !== 'string') S.vu = null;
+    ['recompenses', 'achats'].forEach(c => { S[c] = (Array.isArray(S[c]) ? S[c] : []).filter(x => x && x.id && typeof x.titre === 'string' && x.prix > 0); });
     S.aCaser = (Array.isArray(S.aCaser) ? S.aCaser : []).filter(x => x && x.id && typeof x.titre === 'string' && x.titre.trim()).slice(0, 50);
     S.aCaser.forEach(x => { x.duree = Math.min(Math.max(+x.duree || 60, 15), 240); if (!S.categories.some(c => c.id === x.cat)) x.cat = S.categories[0].id; });
     if (!S.semaineVue) { S.semaineVue = true; S.vueCal = 'semaine'; }      // édition 16 : la Semaine devient la vue par défaut, une fois
@@ -225,9 +227,11 @@
   function appliquer(o, champs, portee) {
     const el = o.el;
     const final = Object.assign({}, { date: o.k }, champs);
+    const repoussee = el.type === 'tache' && !el.faits[o.k] && final.date > o.k;        // reportée à plus tard, sans être faite
     if (!el.rep) {
       const fait = !!el.faits[o.k];
       Object.assign(el, final);
+      if (repoussee) el.reports = (el.reports || 0) + 1;
       el.faits = fait ? { [el.date]: true } : {};
       if (!el.rep) el.exceptions = {};
       transferer(o.cle, el.id + '|' + el.date);
@@ -237,7 +241,7 @@
       const fait = !!el.faits[o.k];
       el.exceptions[o.k] = true;
       delete el.faits[o.k];
-      const n = Object.assign(copie(el), final, { id: uid(), rep: null, exceptions: {}, faits: {}, serie: el.id });
+      const n = Object.assign(copie(el), final, { id: uid(), rep: null, exceptions: {}, faits: {}, serie: el.id, reports: repoussee ? 1 : 0 });
       if (fait) n.faits[n.date] = true;
       S.elements.push(n);
       transferer(o.cle, n.id + '|' + n.date);

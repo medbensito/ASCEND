@@ -29,7 +29,7 @@
     if (el.type === 'libre') return `${plage(el)} · Pour moi · ${ETAT_LIBRE[etatLibre(o)]}`;
     if (el.type === 'sansecran') return `${plage(el)} · Sans écran · ${ETAT_ECRAN[etatSansEcran(o)]}`;
     const ob = el.objectif && S.objectifs.find(x => x.id === el.objectif);
-    return `${plage(el)} · ${cat(el.cat).nom}${!o.fait && S.partis[o.cle] ? ' · laissée partir' : ''}${ob ? ' · 🎯 ' + ob.titre : ''}`;
+    return `${plage(el)} · ${cat(el.cat).nom}${!o.fait && courage(el) ? ` · 🔥 repoussée ${el.reports} fois` : ''}${!o.fait && S.partis[o.cle] ? ' · laissée partir' : ''}${ob ? ' · 🎯 ' + ob.titre : ''}`;
   }
   // Ligne d'un élément. cocheGauche : la case à gauche (accueil), sinon à droite après l'icône (calendrier)
   function ligneOcc(o, cocheGauche) {
@@ -109,6 +109,7 @@
           <span class="${g ? '' : 'zero'}">${g > 0 ? ICONE.hausse : ''}${g ? (g > 0 ? '+' : '') + nombre(g) : '+0'}<span class="masque"> aujourd'hui</span></span></p>
         ${courbePoints()}
         <p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
+        <p class="niveau">${pastilleRecompenses()}</p>
       </section>
       ${carteMaintenant()}
       ${carteEnergie(false)}

@@ -287,6 +287,7 @@
     if (a === 'priorites') return ouvrirPriorites();
     if (a === 'pas-faites') return ouvrirPasFaites();
     if (a === 'identites') return ouvrirIdentites();
+    if (a === 'recompenses') return ouvrirRecompenses();
     if (a === 'difficile') return jourDifficile();
     if (a === 'fin-difficile') { delete S.difficiles[aujourdhui()]; sauver(); U.garderDefilement = true; render('dur'); return dire('Mode jour difficile retiré.'); }
     if (a === 'alleger') return allegerJournee();

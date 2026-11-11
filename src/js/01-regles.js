@@ -33,7 +33,9 @@
     if (p.pts) { S.points = Math.max(0, S.points - p.pts); noterGain(-p.pts, p.jour, p.type, p.cat); }
     return p.pts || 0;
   }
-  const valeur = el => el.type === 'tache' ? cat(el.cat).points : CONFIG.points[el.type];
+  // Bonus courage : une tâche repoussée plusieurs fois vaut plus le jour où on la fait enfin
+  const courage = el => el.type === 'tache' && (el.reports || 0) >= CONFIG.courage.reports;
+  const valeur = el => el.type !== 'tache' ? CONFIG.points[el.type] : courage(el) ? Math.round(cat(el.cat).points * (1 + CONFIG.courage.bonus) / 5) * 5 : cat(el.cat).points;
 
   // Temps pour moi : grignoté si une tâche empiète dessus
   const grignoteurs = o => duJour(o.k).filter(x => x.el.type === 'tache' && x.el.debut < o.el.fin && x.el.fin > o.el.debut);
@@ -102,7 +104,7 @@
     const pts = valeur(o.el);
     if (!prevue(o)) return 'Bien joué ! Pas de points : elle a été ajoutée après son début.';
     if (debutOcc(o) > Date.now()) return `Faite en avance : +${pts} pts ${o.k === aujourdhui() ? 'à ' + hhmm(o.el.debut) : quandJour(o.k)}.`;
-    return `+${gagner(o.cle, pts, o.k, 'tache', cat(o.el.cat).id)} pts${echoIdentite(o.el.cat)}`;
+    return `+${gagner(o.cle, pts, o.k, 'tache', cat(o.el.cat).id)} pts${courage(o.el) ? ' · 🔥 bonus courage' : ''}${echoIdentite(o.el.cat)}`;
   }
   // Moment sans écran : tenu ou pas (on peut changer d'avis)
   function validerSansEcran(o, tenu) {
