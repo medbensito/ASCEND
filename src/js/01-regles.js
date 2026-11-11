@@ -1,10 +1,18 @@
   nettoyer();
 
   // ---------- Paliers de l'emblème ----------
-  const palierDe = pts => CONFIG.paliers.reduce((a, p) => (pts >= p.seuil ? p : a), CONFIG.paliers[0]);
-  const palier = () => palierDe(S.points);
-  const palierSuivant = () => CONFIG.paliers.find(p => p.seuil > S.points) || null;
-  const niveauIdx = () => CONFIG.paliers.indexOf(palier());
+  // Dix niveaux nommés, puis des niveaux sans fin : Zénith II, III… tous les CONFIG.sansFin points (même look, même emblème)
+  const DERNIER = CONFIG.paliers.length - 1;
+  const romain = n => [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']].reduce((t, [v, s]) => { while (n >= v) { t += s; n -= v; } return t; }, '');
+  function palierN(n) {
+    if (n <= DERNIER) return CONFIG.paliers[Math.max(0, n)];
+    const Z = CONFIG.paliers[DERNIER];
+    return Object.assign({}, Z, { nom: `${Z.nom} ${romain(n - DERNIER + 1)}`, seuil: Z.seuil + (n - DERNIER) * CONFIG.sansFin });
+  }
+  const niveauDe = pts => { const Z = CONFIG.paliers[DERNIER]; return pts >= Z.seuil ? DERNIER + Math.floor((pts - Z.seuil) / CONFIG.sansFin) : CONFIG.paliers.reduce((a, p, i) => (pts >= p.seuil ? i : a), 0); };
+  const niveauIdx = () => niveauDe(S.points);
+  const palier = () => palierN(niveauIdx());
+  const palierSuivant = () => palierN(niveauIdx() + 1);
 
   // ---------- Points ----------
   // Tout gain ou retrait passe par ici : le total, le journal par jour et par catégorie restent d'accord.
@@ -24,7 +32,7 @@
     noterGain(pts, jour, type, catId);
     U.reaction = true;
     const apres = palier();
-    if (apres.id !== avant.id) U.palierAtteint = apres;
+    if (apres.seuil !== avant.seuil) U.palierAtteint = apres;
     S.niveauMax = Math.max(S.niveauMax || 0, niveauIdx());
     return pts;
   }

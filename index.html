@@ -942,6 +942,8 @@ dialog#fete::backdrop { background: #050506; }
 html.paysage .fe-embleme { width: 90px; height: 90px; }
 html.paysage .fe-chiffres { display: none; }
 @media (max-width: 359px) { .fe-chiffres b { font-size: 18px; } }
+.n-suite { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--doux); font-size: 13.5px; line-height: 1.4; }
+.n-suite span:first-child { flex: none; width: 40px; text-align: center; font-size: 26px; font-weight: 300; color: var(--accent-texte); }
 /* ===== Refonte (édition 11) : noir profond, verre, platine, arcs de lumière ===== */
 :root {
   --fond: #050506;
@@ -1323,7 +1325,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 22;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 23;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -1341,6 +1343,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
     // Dix niveaux. Chacun débloque un look : c = dégradé de l'accent, texte = couleur des textes d'accent, arc = teinte des arcs de lumière
+    sansFin: 5000,         // après le dernier niveau, un niveau de plus tous les 5 000 points (Zénith II, III…)
     paliers: [
       { id: 'eclat', nom: 'Éclat', seuil: 0, look: 'Platine', c: ['#faf7f2', '#ddd5c8', '#bdb2a2'], texte: '#e4d3b3', arc: '255, 236, 210' },
       { id: 'lueur', nom: 'Lueur', seuil: 250, look: 'Argent', c: ['#ffffff', '#dbe0ea', '#aab2c2'], texte: '#d3dae8', arc: '214, 224, 245' },
@@ -1427,7 +1430,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     S.aCaser.forEach(x => { x.duree = Math.min(Math.max(+x.duree || 60, 15), 240); if (!S.categories.some(c => c.id === x.cat)) x.cat = S.categories[0].id; });
     if (!S.semaineVue) { S.semaineVue = true; S.vueCal = 'semaine'; }      // édition 16 : la Semaine devient la vue par défaut, une fois
     if (!['semaine', 'jour', 'mois'].includes(S.vueCal)) S.vueCal = 'semaine';
-    S.niveauMax = Math.max(CONFIG.paliers.reduce((a, p, i) => (S.points >= p.seuil ? i : a), 0), Math.min(+S.niveauMax || 0, CONFIG.paliers.length - 1));
+    S.niveauMax = Math.max(CONFIG.paliers.reduce((a, p, i) => (S.points >= p.seuil ? i : a), 0), Math.min(+S.niveauMax || 0, 9999));
     S.niveauFete = Math.max(0, +S.niveauFete || 0);
     if (!CONFIG.paliers.some((p, i) => p.id === S.look && i <= S.niveauMax)) S.look = null;
     Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });
@@ -1631,10 +1634,18 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   nettoyer();
 
   // ---------- Paliers de l'emblème ----------
-  const palierDe = pts => CONFIG.paliers.reduce((a, p) => (pts >= p.seuil ? p : a), CONFIG.paliers[0]);
-  const palier = () => palierDe(S.points);
-  const palierSuivant = () => CONFIG.paliers.find(p => p.seuil > S.points) || null;
-  const niveauIdx = () => CONFIG.paliers.indexOf(palier());
+  // Dix niveaux nommés, puis des niveaux sans fin : Zénith II, III… tous les CONFIG.sansFin points (même look, même emblème)
+  const DERNIER = CONFIG.paliers.length - 1;
+  const romain = n => [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']].reduce((t, [v, s]) => { while (n >= v) { t += s; n -= v; } return t; }, '');
+  function palierN(n) {
+    if (n <= DERNIER) return CONFIG.paliers[Math.max(0, n)];
+    const Z = CONFIG.paliers[DERNIER];
+    return Object.assign({}, Z, { nom: `${Z.nom} ${romain(n - DERNIER + 1)}`, seuil: Z.seuil + (n - DERNIER) * CONFIG.sansFin });
+  }
+  const niveauDe = pts => { const Z = CONFIG.paliers[DERNIER]; return pts >= Z.seuil ? DERNIER + Math.floor((pts - Z.seuil) / CONFIG.sansFin) : CONFIG.paliers.reduce((a, p, i) => (pts >= p.seuil ? i : a), 0); };
+  const niveauIdx = () => niveauDe(S.points);
+  const palier = () => palierN(niveauIdx());
+  const palierSuivant = () => palierN(niveauIdx() + 1);
 
   // ---------- Points ----------
   // Tout gain ou retrait passe par ici : le total, le journal par jour et par catégorie restent d'accord.
@@ -1654,7 +1665,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     noterGain(pts, jour, type, catId);
     U.reaction = true;
     const apres = palier();
-    if (apres.id !== avant.id) U.palierAtteint = apres;
+    if (apres.seuil !== avant.seuil) U.palierAtteint = apres;
     S.niveauMax = Math.max(S.niveauMax || 0, niveauIdx());
     return pts;
   }
@@ -4471,7 +4482,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     $('#n-corps').innerHTML = `
       <section class="carte n-tete" aria-label="Niveau ${i + 1}, ${P.nom}. ${nombre(S.points)} points${suiv ? `, encore ${nombre(suiv.seuil - S.points)} avant ${suiv.nom}` : ''}">
         <span class="n-embleme" aria-hidden="true">${embleme(P.id)}</span>
-        <div aria-hidden="true"><small>Niveau ${i + 1} sur ${CONFIG.paliers.length}</small><b>${P.nom}</b>
+        <div aria-hidden="true"><small>Niveau ${i + 1}${i <= DERNIER ? ` sur ${CONFIG.paliers.length}` : ''}</small><b>${P.nom}</b>
           <span class="barre-obj"><i style="width:${pc}%"></i></span>
           <span class="note">${suiv ? `Encore ${nombre(suiv.seuil - S.points)} pts avant ${suiv.nom}` : 'Le sommet. Tu y es.'}</span></div>
       </section>
@@ -4485,6 +4496,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
           <span class="quoi" aria-hidden="true"><b>${p.nom}</b><small>Niveau ${n + 1} · ${nombre(p.seuil)} pts</small></span>
           <span class="n-look" aria-hidden="true"><i style="background:${degrade(p)}"></i>${p.look}</span>
           <span class="n-etat" aria-hidden="true">${mis ? ICONE.coche : ouvert ? '' : '🔒'}</span></button>`; }).join('')}</div></div>
+      <p class="carte n-suite"><span aria-hidden="true">∞</span><span>Après Zénith, l'ascension continue : un niveau de plus tous les ${nombre(CONFIG.sansFin)} pts (Zénith II, III…).${i >= DERNIER ? ` Prochain : ${suiv.nom}, à ${nombre(suiv.seuil)} pts.` : ''}</span></p>
       <p class="note" style="text-align:center">Un niveau atteint reste débloqué, même si tes points redescendent.</p>`;
     if (focus) { const c = ND.querySelector(`[data-focus="${CSS.escape(focus)}"]`); if (c) c.focus(); }
   }
@@ -4512,7 +4524,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const i = niveauIdx();
     if (i <= S.niveauFete || i === 0) return;
     if (V.etat !== 'ouvert' || document.querySelector('dialog[open]')) return;      // on attend que l'écran soit libre
-    const P = CONFIG.paliers[i], suiv = palierSuivant(), nouveaux = i - S.niveauFete, garde = S.look && S.look !== P.id ? lookActif() : null;
+    const P = palierN(i), suiv = palierSuivant(), nouveaux = Math.min(i, DERNIER) - Math.min(S.niveauFete, DERNIER), garde = S.look && S.look !== P.id ? lookActif() : null;
     S.niveauFete = i; S.niveauMax = Math.max(S.niveauMax, i);
     ecrire();
     const faites = Object.keys(S.payes).filter(k => S.payes[k].type === 'tache' && S.payes[k].pts > 0).length;
@@ -4523,13 +4535,13 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       <div class="fe-embleme" aria-hidden="true">${embleme(P.id)}</div>
       <p class="fe-sur">Niveau ${i + 1}</p>
       <h2 id="fe-titre">${P.nom}</h2>
-      <p id="fe-texte">${nombre(P.seuil)} points franchis. ${nouveaux > 1 ? `Tes niveaux t'ont débloqué ${nouveaux} looks, jusqu'au look ${P.look}.` : `Tu débloques le look ${P.look}.`}</p>
+      <p id="fe-texte">${nombre(P.seuil)} points franchis. ${nouveaux > 1 ? `Tes niveaux t'ont débloqué ${nouveaux} looks, jusqu'au look ${P.look}.` : nouveaux === 1 ? `Tu débloques le look ${P.look}.` : `Au-delà du sommet, tu continues de monter. Le look ${P.look} te suit.`}</p>
       <ul class="fe-chiffres" aria-label="Ton chemin jusqu'ici">
         <li><b>${nombre(S.points)}</b><small>points</small></li>
         <li><b>${nombre(faites)}</b><small>${faites > 1 ? 'tâches faites' : 'tâche faite'}</small></li>
         <li><b>${nombre(Math.max(S.meilleureSerie || 0, serie()))}</b><small>meilleure série</small></li>
       </ul>
-      <p class="fe-suite">${suiv ? `Prochain niveau : ${suiv.nom}, à ${nombre(suiv.seuil)} pts` : 'Tu es au sommet. Make everyday matter.'}${jours > 1 ? ` · jour ${nombre(jours)} sur ASCEND` : ''}</p>
+      <p class="fe-suite">Prochain niveau : ${suiv.nom}, à ${nombre(suiv.seuil)} pts${jours > 1 ? ` · jour ${nombre(jours)} sur ASCEND` : ''}</p>
       <div class="fe-boutons">
         ${garde ? `<button type="button" class="bouton" data-fe="porter">Porter le look ${P.look}</button><button type="button" class="lien" data-fe="garder">Garder mon look ${garde.look}</button>`
           : `<button type="button" class="bouton" data-fe="ok">Continuer</button>${nouveaux > 1 ? `<button type="button" class="lien" data-fe="looks">Voir mes looks</button>` : ''}`}

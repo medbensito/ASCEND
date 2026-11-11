@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 22;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 23;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -20,6 +20,7 @@
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
     // Dix niveaux. Chacun débloque un look : c = dégradé de l'accent, texte = couleur des textes d'accent, arc = teinte des arcs de lumière
+    sansFin: 5000,         // après le dernier niveau, un niveau de plus tous les 5 000 points (Zénith II, III…)
     paliers: [
       { id: 'eclat', nom: 'Éclat', seuil: 0, look: 'Platine', c: ['#faf7f2', '#ddd5c8', '#bdb2a2'], texte: '#e4d3b3', arc: '255, 236, 210' },
       { id: 'lueur', nom: 'Lueur', seuil: 250, look: 'Argent', c: ['#ffffff', '#dbe0ea', '#aab2c2'], texte: '#d3dae8', arc: '214, 224, 245' },
@@ -106,7 +107,7 @@
     S.aCaser.forEach(x => { x.duree = Math.min(Math.max(+x.duree || 60, 15), 240); if (!S.categories.some(c => c.id === x.cat)) x.cat = S.categories[0].id; });
     if (!S.semaineVue) { S.semaineVue = true; S.vueCal = 'semaine'; }      // édition 16 : la Semaine devient la vue par défaut, une fois
     if (!['semaine', 'jour', 'mois'].includes(S.vueCal)) S.vueCal = 'semaine';
-    S.niveauMax = Math.max(CONFIG.paliers.reduce((a, p, i) => (S.points >= p.seuil ? i : a), 0), Math.min(+S.niveauMax || 0, CONFIG.paliers.length - 1));
+    S.niveauMax = Math.max(CONFIG.paliers.reduce((a, p, i) => (S.points >= p.seuil ? i : a), 0), Math.min(+S.niveauMax || 0, 9999));
     S.niveauFete = Math.max(0, +S.niveauFete || 0);
     if (!CONFIG.paliers.some((p, i) => p.id === S.look && i <= S.niveauMax)) S.look = null;
     Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });

@@ -347,3 +347,5 @@ dialog#fete::backdrop { background: #050506; }
 html.paysage .fe-embleme { width: 90px; height: 90px; }
 html.paysage .fe-chiffres { display: none; }
 @media (max-width: 359px) { .fe-chiffres b { font-size: 18px; } }
+.n-suite { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--doux); font-size: 13.5px; line-height: 1.4; }
+.n-suite span:first-child { flex: none; width: 40px; text-align: center; font-size: 26px; font-weight: 300; color: var(--accent-texte); }

@@ -24,7 +24,7 @@
     $('#n-corps').innerHTML = `
       <section class="carte n-tete" aria-label="Niveau ${i + 1}, ${P.nom}. ${nombre(S.points)} points${suiv ? `, encore ${nombre(suiv.seuil - S.points)} avant ${suiv.nom}` : ''}">
         <span class="n-embleme" aria-hidden="true">${embleme(P.id)}</span>
-        <div aria-hidden="true"><small>Niveau ${i + 1} sur ${CONFIG.paliers.length}</small><b>${P.nom}</b>
+        <div aria-hidden="true"><small>Niveau ${i + 1}${i <= DERNIER ? ` sur ${CONFIG.paliers.length}` : ''}</small><b>${P.nom}</b>
           <span class="barre-obj"><i style="width:${pc}%"></i></span>
           <span class="note">${suiv ? `Encore ${nombre(suiv.seuil - S.points)} pts avant ${suiv.nom}` : 'Le sommet. Tu y es.'}</span></div>
       </section>
@@ -38,6 +38,7 @@
           <span class="quoi" aria-hidden="true"><b>${p.nom}</b><small>Niveau ${n + 1} · ${nombre(p.seuil)} pts</small></span>
           <span class="n-look" aria-hidden="true"><i style="background:${degrade(p)}"></i>${p.look}</span>
           <span class="n-etat" aria-hidden="true">${mis ? ICONE.coche : ouvert ? '' : '🔒'}</span></button>`; }).join('')}</div></div>
+      <p class="carte n-suite"><span aria-hidden="true">∞</span><span>Après Zénith, l'ascension continue : un niveau de plus tous les ${nombre(CONFIG.sansFin)} pts (Zénith II, III…).${i >= DERNIER ? ` Prochain : ${suiv.nom}, à ${nombre(suiv.seuil)} pts.` : ''}</span></p>
       <p class="note" style="text-align:center">Un niveau atteint reste débloqué, même si tes points redescendent.</p>`;
     if (focus) { const c = ND.querySelector(`[data-focus="${CSS.escape(focus)}"]`); if (c) c.focus(); }
   }
@@ -65,7 +66,7 @@
     const i = niveauIdx();
     if (i <= S.niveauFete || i === 0) return;
     if (V.etat !== 'ouvert' || document.querySelector('dialog[open]')) return;      // on attend que l'écran soit libre
-    const P = CONFIG.paliers[i], suiv = palierSuivant(), nouveaux = i - S.niveauFete, garde = S.look && S.look !== P.id ? lookActif() : null;
+    const P = palierN(i), suiv = palierSuivant(), nouveaux = Math.min(i, DERNIER) - Math.min(S.niveauFete, DERNIER), garde = S.look && S.look !== P.id ? lookActif() : null;
     S.niveauFete = i; S.niveauMax = Math.max(S.niveauMax, i);
     ecrire();
     const faites = Object.keys(S.payes).filter(k => S.payes[k].type === 'tache' && S.payes[k].pts > 0).length;
@@ -76,13 +77,13 @@
       <div class="fe-embleme" aria-hidden="true">${embleme(P.id)}</div>
       <p class="fe-sur">Niveau ${i + 1}</p>
       <h2 id="fe-titre">${P.nom}</h2>
-      <p id="fe-texte">${nombre(P.seuil)} points franchis. ${nouveaux > 1 ? `Tes niveaux t'ont débloqué ${nouveaux} looks, jusqu'au look ${P.look}.` : `Tu débloques le look ${P.look}.`}</p>
+      <p id="fe-texte">${nombre(P.seuil)} points franchis. ${nouveaux > 1 ? `Tes niveaux t'ont débloqué ${nouveaux} looks, jusqu'au look ${P.look}.` : nouveaux === 1 ? `Tu débloques le look ${P.look}.` : `Au-delà du sommet, tu continues de monter. Le look ${P.look} te suit.`}</p>
       <ul class="fe-chiffres" aria-label="Ton chemin jusqu'ici">
         <li><b>${nombre(S.points)}</b><small>points</small></li>
         <li><b>${nombre(faites)}</b><small>${faites > 1 ? 'tâches faites' : 'tâche faite'}</small></li>
         <li><b>${nombre(Math.max(S.meilleureSerie || 0, serie()))}</b><small>meilleure série</small></li>
       </ul>
-      <p class="fe-suite">${suiv ? `Prochain niveau : ${suiv.nom}, à ${nombre(suiv.seuil)} pts` : 'Tu es au sommet. Make everyday matter.'}${jours > 1 ? ` · jour ${nombre(jours)} sur ASCEND` : ''}</p>
+      <p class="fe-suite">Prochain niveau : ${suiv.nom}, à ${nombre(suiv.seuil)} pts${jours > 1 ? ` · jour ${nombre(jours)} sur ASCEND` : ''}</p>
       <div class="fe-boutons">
         ${garde ? `<button type="button" class="bouton" data-fe="porter">Porter le look ${P.look}</button><button type="button" class="lien" data-fe="garder">Garder mon look ${garde.look}</button>`
           : `<button type="button" class="bouton" data-fe="ok">Continuer</button>${nouveaux > 1 ? `<button type="button" class="lien" data-fe="looks">Voir mes looks</button>` : ''}`}
