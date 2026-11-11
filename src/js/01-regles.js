@@ -4,6 +4,7 @@
   const palierDe = pts => CONFIG.paliers.reduce((a, p) => (pts >= p.seuil ? p : a), CONFIG.paliers[0]);
   const palier = () => palierDe(S.points);
   const palierSuivant = () => CONFIG.paliers.find(p => p.seuil > S.points) || null;
+  const niveauIdx = () => CONFIG.paliers.indexOf(palier());
 
   // ---------- Points ----------
   // Tout gain ou retrait passe par ici : le total, le journal par jour et par catégorie restent d'accord.
@@ -24,6 +25,7 @@
     U.reaction = true;
     const apres = palier();
     if (apres.id !== avant.id) U.palierAtteint = apres;
+    S.niveauMax = Math.max(S.niveauMax || 0, niveauIdx());
     return pts;
   }
   function reprendre(cle) {

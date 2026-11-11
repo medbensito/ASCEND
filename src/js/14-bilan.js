@@ -240,8 +240,8 @@
   function proposerBilan() {
     if (V.etat !== 'ouvert' || document.querySelector('dialog[open]')) return;
     const auj = aujourdhui(), lundi = lundiDe(auj);
-    if (S.bilanVu === lundi || decaler(lundi, -1) < (S.depuis || auj)) return;
-    if (auj === lundi && minNow() < 5 * 60) return;
+    if (S.bilanVu === lundi || decaler(lundi, -1) < (S.depuis || auj)) return feterNiveau();
+    if (auj === lundi && minNow() < 5 * 60) return feterNiveau();
     S.bilanVu = lundi;
     ecrire();
     ouvrirBilan(decaler(lundi, -7), true);

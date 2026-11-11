@@ -33,7 +33,7 @@
   }
   function feliciter() {
     if (U.objectifAtteint) { const ob = U.objectifAtteint; U.objectifAtteint = null; setTimeout(() => dire(`🎯 Objectif atteint : « ${ob.titre} » ! Bonus +${cat(ob.cat).points * CONFIG.points.bonusObjectif} pts.`), 900); }
-    if (U.palierAtteint) { const p = U.palierAtteint; U.palierAtteint = null; setTimeout(() => dire(`✨ Nouveau palier : ${p.nom} !`), 1800); }
+    U.palierAtteint = null; setTimeout(feterNiveau, 1200);
   }
   // Ferme la feuille au toucher de « data-fermer »
   document.addEventListener('click', e => { const b = e.target.closest('[data-fermer]'); if (b) { const d = b.closest('dialog'); if (d) d.close(); } });

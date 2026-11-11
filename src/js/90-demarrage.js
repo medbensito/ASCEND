@@ -8,6 +8,7 @@
   function render(focus) {
     const f = focus || signatureFocus();
     const E = $('#ecran');
+    appliquerLook();
     const ancien = $('#ecran .defile');
     if (ancien && !ancien.classList.contains('ajuste')) U.defile[ancien.dataset.defile] = ancien.scrollTop;
     if (U.recentrer) { U.defile = {}; U.recentrer = false; }
@@ -288,6 +289,7 @@
     if (a === 'pas-faites') return ouvrirPasFaites();
     if (a === 'identites') return ouvrirIdentites();
     if (a === 'recompenses') return ouvrirRecompenses();
+    if (a === 'niveaux') return ouvrirNiveaux();
     if (a === 'difficile') return jourDifficile();
     if (a === 'fin-difficile') { delete S.difficiles[aujourdhui()]; sauver(); U.garderDefilement = true; render('dur'); return dire('Mode jour difficile retiré.'); }
     if (a === 'alleger') return allegerJournee();

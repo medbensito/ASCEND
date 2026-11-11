@@ -888,6 +888,60 @@ html.paysage .sem7 .bloc .b-texte b { font-size: 11px; white-space: nowrap; over
 .types { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .types label { font-size: 12.5px; white-space: nowrap; padding: 0 2px; }
 @media (max-width: 359px) { .types label { font-size: 11.5px; } }
+
+/* ===== Niveaux et looks (édition 22) ===== */
+.niveau > button { color: var(--texte); font-family: inherit; }
+.n-tete { display: flex; align-items: center; gap: 16px; padding: 18px; }
+.n-tete > div { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.n-tete small { color: var(--accent-texte); font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: .1em; }
+.n-tete b { font-size: 26px; font-weight: 300; letter-spacing: -.02em; }
+.n-tete .barre-obj { margin: 4px 0 2px; }
+.n-embleme { flex: none; width: 76px; height: 76px; display: block; }
+.n-embleme.petit { width: 40px; height: 40px; }
+.n-embleme .embleme { position: static; width: 100%; height: 100%; display: block; }
+.n-auto { padding: 12px 16px; min-height: 60px; }
+.n-ligne { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 14px; color: inherit; text-align: left; font: inherit; }
+.n-ligne .quoi { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.n-ligne .quoi b { font-size: 15.5px; font-weight: 600; }
+.n-ligne .quoi small { color: var(--doux); font-size: 12.5px; }
+.n-look { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--doux); white-space: nowrap; }
+.n-look i { width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35); }
+.n-etat { flex: none; width: 22px; display: grid; place-items: center; color: var(--accent-texte); font-size: 14px; }
+.n-etat svg { width: 20px; height: 20px; }
+.n-ligne.mis { border-color: var(--accent-texte); box-shadow: inset 0 0 0 1px var(--accent-texte), 0 18px 40px rgba(0, 0, 0, .42); }
+.n-ligne.ferme .n-embleme, .n-ligne.ferme .n-look i { filter: grayscale(1); opacity: .45; }
+.n-ligne.ferme .quoi b { color: var(--doux); }
+
+dialog#fete { width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; border: 0; padding: 0; background: #050506; color: var(--texte); overflow: hidden; }
+dialog#fete[open] { display: grid; }
+dialog#fete::backdrop { background: #050506; }
+.fe-corps { position: relative; display: grid; align-content: center; justify-items: center; gap: 10px; text-align: center; overflow-y: auto;
+  padding: calc(env(safe-area-inset-top) + 24px) 28px calc(env(safe-area-inset-bottom) + 24px); }
+.fe-rayons { position: absolute; left: 50%; top: 34%; width: 150vmax; height: 150vmax; margin: -75vmax 0 0 -75vmax; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(var(--arc), .13) 0 5deg, transparent 5deg 20deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0, transparent 46%); mask-image: radial-gradient(circle, #000 0, transparent 46%);
+  animation: fe-tourne 50s linear infinite, fe-paraitre 1.4s ease both; }
+.fe-corps > :not(.fe-rayons) { position: relative; animation: aube .8s cubic-bezier(.2, .8, .2, 1) both; }
+.fe-embleme { width: min(190px, 46vw); height: min(190px, 46vw); filter: drop-shadow(0 0 34px rgba(var(--arc), .55)); animation: fe-eclore 1.1s cubic-bezier(.2, 1.3, .3, 1) both !important; }
+.fe-embleme .embleme { position: static; width: 100%; height: 100%; display: block; }
+.fe-sur { margin-top: 8px; color: var(--accent-texte); font-size: 13px; font-weight: 650; text-transform: uppercase; letter-spacing: .22em; animation-delay: .35s !important; }
+.fe-corps h2 { font-size: 48px; font-weight: 250; letter-spacing: -.03em; line-height: 1.05; background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; animation-delay: .45s !important; }
+#fe-texte { max-width: 320px; color: var(--doux); font-size: 15px; line-height: 1.45; animation-delay: .6s !important; }
+.fe-chiffres { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 360px; margin: 14px 0 4px; padding: 0; animation-delay: .75s !important; }
+.fe-chiffres li { display: grid; gap: 2px; padding: 12px 6px; border-radius: 16px; background: rgba(255, 255, 255, .05); border: 1px solid var(--trait); }
+.fe-chiffres b { font-size: 22px; font-weight: 300; font-variant-numeric: tabular-nums; }
+.fe-chiffres small { color: var(--doux); font-size: 11.5px; }
+.fe-suite { color: var(--doux); font-size: 13px; animation-delay: .85s !important; }
+.fe-boutons { display: grid; gap: 6px; width: 100%; max-width: 360px; margin-top: 16px; animation-delay: 1s !important; }
+.fe-boutons .lien { min-height: 44px; justify-self: center; }
+@keyframes fe-tourne { to { transform: rotate(360deg); } }
+@keyframes fe-paraitre { from { opacity: 0; } }
+@keyframes fe-eclore { from { opacity: 0; transform: scale(.4) rotate(-30deg); } }
+@media (prefers-reduced-motion: reduce) { .fe-rayons, .fe-embleme, .fe-corps > :not(.fe-rayons) { animation: none !important; } }
+@media (max-height: 620px) { .fe-embleme { width: 110px; height: 110px; } .fe-corps h2 { font-size: 36px; } .fe-chiffres { margin-top: 6px; } }
+html.paysage .fe-embleme { width: 90px; height: 90px; }
+html.paysage .fe-chiffres { display: none; }
+@media (max-width: 359px) { .fe-chiffres b { font-size: 18px; } }
 /* ===== Refonte (édition 11) : noir profond, verre, platine, arcs de lumière ===== */
 :root {
   --fond: #050506;
@@ -904,6 +958,7 @@ html.paysage .sem7 .bloc .b-texte b { font-size: 11px; white-space: nowrap; over
   --accent: linear-gradient(135deg, #faf7f2 0%, #ddd5c8 55%, #bdb2a2 100%);
   --sur-accent: #0a0a0c;
   --accent-texte: #e4d3b3;
+  --arc: 255, 236, 210;
   --anneau: rgba(255, 255, 255, .42);
   --focus: #ffffff;
   --rayon: 22px;
@@ -914,9 +969,9 @@ body {
   background-color: var(--fond);
   background-image:
     radial-gradient(circle at 128% -6%, transparent 0 57.6%, rgba(255, 255, 255, .22) 58%, rgba(255, 255, 255, .05) 58.5%, transparent 66%),
-    radial-gradient(circle at -40% 118%, transparent 0 63.7%, rgba(255, 236, 210, .13) 64%, rgba(255, 255, 255, .03) 64.5%, transparent 71%),
+    radial-gradient(circle at -40% 118%, transparent 0 63.7%, rgba(var(--arc), .16) 64%, rgba(255, 255, 255, .03) 64.5%, transparent 71%),
     radial-gradient(90% 45% at 100% 0%, rgba(190, 190, 215, .16), transparent 70%),
-    radial-gradient(80% 40% at 0% 100%, rgba(255, 226, 190, .07), transparent 70%);
+    radial-gradient(80% 40% at 0% 100%, rgba(var(--arc), .09), transparent 70%);
   font-size: 15px;
   letter-spacing: -.005em;
 }
@@ -985,7 +1040,7 @@ body {
 .points .total span { font-size: 14px; font-weight: 600; }
 .points .courbe { position: relative; display: block; left: auto; right: auto; bottom: auto; width: calc(100% + 40px); margin: -6px -20px -8px; height: 104px; opacity: 1; }
 .niveau { display: flex; justify-content: center; }
-.niveau > span { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 14px 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 550; color: var(--texte);
+.niveau > span, .niveau > button { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 14px 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 550; color: var(--texte);
   background: rgba(255, 255, 255, .06); border: 1px solid var(--trait-fort); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12); }
 .niveau .embleme { position: static; width: 22px; height: 22px; }
 .niveau small { color: var(--doux); font-size: 12.5px; font-weight: 500; }
@@ -1059,10 +1114,10 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
 .marque > b { animation-delay: .12s; }
 .marque > small { animation-delay: .24s; }
 .points { min-width: 0; }
-.niveau > span { max-width: 100%; min-width: 0; }
+.niveau > span, .niveau > button { max-width: 100%; min-width: 0; }
 .niveau b { white-space: nowrap; font-weight: 550; }
 .niveau small { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 359px) { .niveau > span { font-size: 12px; gap: 6px; padding-right: 12px; } .points .total b { font-size: 52px; } }
+@media (max-width: 359px) { .niveau > span, .niveau > button { font-size: 12px; gap: 6px; padding-right: 12px; } .points .total b { font-size: 52px; } }
 .points .courbe { width: min(100vw, 640px); margin: -6px 0 -8px calc(50% - min(50vw, 320px)); }
 .points .total { flex-wrap: wrap; }
 .app { grid-template-columns: minmax(0, 1fr); }
@@ -1079,7 +1134,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
 .points .courbe { height: 58px; margin-top: -10px; margin-bottom: -4px; }
 .niveau-rang { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .niveau-rang .niveau { min-width: 0; margin: 0; }
-.niveau-rang .niveau > span, .niveau-rang .rec-pastille { min-height: 32px; font-size: 12px; }
+.niveau-rang .niveau > span, .niveau-rang .niveau > button, .niveau-rang .rec-pastille { min-height: 32px; font-size: 12px; }
 .niveau-rang .niveau small { display: none; }
 .mnt { padding: 10px 14px; gap: 4px; }
 .mnt-ligne .quoi b { font-size: 16.5px; }
@@ -1159,6 +1214,14 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   <div class="f-corps" id="r-corps"></div>
   <div class="f-pied" id="r-pied"></div>
 </dialog>
+
+<dialog class="feuille haute page" id="niveaux" aria-labelledby="n-titre">
+  <div class="f-haut"><button type="button" class="f-icone" data-fermer aria-label="Fermer"></button><h2 id="n-titre">Niveaux et looks</h2><span></span></div>
+  <p class="f-msg" role="status" aria-live="polite"></p>
+  <div class="f-corps" id="n-corps"></div>
+</dialog>
+
+<dialog id="fete" aria-labelledby="fe-titre" aria-describedby="fe-texte"><div class="fe-corps" id="fe-corps"></div></dialog>
 
 <dialog class="feuille haute" id="profil" aria-labelledby="p-titre">
   <div class="f-haut"><span></span><h2 id="p-titre">Profil</h2><button type="button" class="f-ok" data-fermer>OK</button></div>
@@ -1260,7 +1323,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 21;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 22;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -1277,12 +1340,18 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     points: { libre: 30, sansecran: 40, evenement: 0, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
+    // Dix niveaux. Chacun débloque un look : c = dégradé de l'accent, texte = couleur des textes d'accent, arc = teinte des arcs de lumière
     paliers: [
-      { id: 'eclat', nom: 'Éclat', seuil: 0 },
-      { id: 'cristal', nom: 'Cristal', seuil: 500 },
-      { id: 'etoile', nom: 'Étoile', seuil: 1500 },
-      { id: 'constellation', nom: 'Constellation', seuil: 4000 },
-      { id: 'nova', nom: 'Nova', seuil: 10000 }
+      { id: 'eclat', nom: 'Éclat', seuil: 0, look: 'Platine', c: ['#faf7f2', '#ddd5c8', '#bdb2a2'], texte: '#e4d3b3', arc: '255, 236, 210' },
+      { id: 'lueur', nom: 'Lueur', seuil: 250, look: 'Argent', c: ['#ffffff', '#dbe0ea', '#aab2c2'], texte: '#d3dae8', arc: '214, 224, 245' },
+      { id: 'cristal', nom: 'Cristal', seuil: 500, look: 'Glacier', c: ['#f1f9ff', '#bfdcf5', '#8db9e2'], texte: '#b9d8f5', arc: '170, 212, 255' },
+      { id: 'prisme', nom: 'Prisme', seuil: 1000, look: 'Améthyste', c: ['#f7f1ff', '#d6c4f8', '#aa94e2'], texte: '#d5c4f8', arc: '200, 170, 255' },
+      { id: 'etoile', nom: 'Étoile', seuil: 1500, look: 'Or', c: ['#fff7dc', '#f1d68c', '#d0aa52'], texte: '#f1d68c', arc: '255, 214, 130' },
+      { id: 'comete', nom: 'Comète', seuil: 2500, look: 'Jade', c: ['#ecfff8', '#a9ecd7', '#70ceb3'], texte: '#a9ecd7', arc: '130, 235, 200' },
+      { id: 'constellation', nom: 'Constellation', seuil: 4000, look: 'Saphir', c: ['#eff3ff', '#b6c5ff', '#8498ee'], texte: '#bac8ff', arc: '140, 165, 255' },
+      { id: 'aurore', nom: 'Aurore', seuil: 6000, look: 'Or rose', c: ['#fff1ee', '#f8c5be', '#e29c99'], texte: '#f8c5be', arc: '255, 170, 165' },
+      { id: 'nova', nom: 'Nova', seuil: 10000, look: 'Ambre', c: ['#fff2de', '#ffca8c', '#f19c54'], texte: '#ffca8c', arc: '255, 170, 90' },
+      { id: 'zenith', nom: 'Zénith', seuil: 15000, look: 'Iris', c: ['#ffffff', '#ffe7b3', '#f6bbd9', '#b9c5ff'], texte: '#ffe7b3', arc: '225, 185, 255' }
     ]
   };
   let H = CONFIG.heure;                    // px par heure ; téléphone couché, la vue Jour l'ajuste pour montrer toute la journée
@@ -1334,6 +1403,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
     priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], aCaser: [], recompenses: [], achats: [], energie: {}, reflexions: {}, conseilsVus: {},
+    look: null, niveauMax: 0, niveauFete: 0,   // look choisi (null = celui du niveau), plus haut niveau atteint, dernier niveau fêté
     onglet: 'accueil', vueCal: 'semaine', semaineVue: true, vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -1357,6 +1427,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     S.aCaser.forEach(x => { x.duree = Math.min(Math.max(+x.duree || 60, 15), 240); if (!S.categories.some(c => c.id === x.cat)) x.cat = S.categories[0].id; });
     if (!S.semaineVue) { S.semaineVue = true; S.vueCal = 'semaine'; }      // édition 16 : la Semaine devient la vue par défaut, une fois
     if (!['semaine', 'jour', 'mois'].includes(S.vueCal)) S.vueCal = 'semaine';
+    S.niveauMax = Math.max(CONFIG.paliers.reduce((a, p, i) => (S.points >= p.seuil ? i : a), 0), Math.min(+S.niveauMax || 0, CONFIG.paliers.length - 1));
+    S.niveauFete = Math.max(0, +S.niveauFete || 0);
+    if (!CONFIG.paliers.some((p, i) => p.id === S.look && i <= S.niveauMax)) S.look = null;
     Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.identites = (Array.isArray(S.identites) ? S.identites : []).filter(x => x && x.id && typeof x.nom === 'string' && x.nom.trim()).slice(0, 4);
@@ -1561,6 +1634,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   const palierDe = pts => CONFIG.paliers.reduce((a, p) => (pts >= p.seuil ? p : a), CONFIG.paliers[0]);
   const palier = () => palierDe(S.points);
   const palierSuivant = () => CONFIG.paliers.find(p => p.seuil > S.points) || null;
+  const niveauIdx = () => CONFIG.paliers.indexOf(palier());
 
   // ---------- Points ----------
   // Tout gain ou retrait passe par ici : le total, le journal par jour et par catégorie restent d'accord.
@@ -1581,6 +1655,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     U.reaction = true;
     const apres = palier();
     if (apres.id !== avant.id) U.palierAtteint = apres;
+    S.niveauMax = Math.max(S.niveauMax || 0, niveauIdx());
     return pts;
   }
   function reprendre(cle) {
@@ -1956,21 +2031,24 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       return p.map((pt, i) => { const q = p[(i + 1) % 8]; return `<path d="M${cx} ${cy}L${pt[0].toFixed(1)} ${pt[1].toFixed(1)}L${q[0].toFixed(1)} ${q[1].toFixed(1)}z" fill="${i % 2 ? `url(#ec${n})` : `url(#ef${n})`}"/>`; }).join('');
     };
     const simple = (cx, cy, R, r, c) => `<path d="M${etoile(cx, cy, R, r).map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L')}z" fill="${c}"/>`;
-    const niveau = CONFIG.paliers.findIndex(p => p.id === id);
+    const rang = Math.max(0, CONFIG.paliers.findIndex(p => p.id === id)), P = CONFIG.paliers[rang];
+    const niveau = Math.floor(rang / 2);                 // cinq formes ; les deux niveaux d'une même forme se distinguent par la couleur et un anneau
+    const c0 = P.c[0], c1 = P.c[1], c2 = P.c[P.c.length - 1];
     const R = [26, 32, 34, 30, 32][niveau] || 26;
     let fond = '', extra = '';
-    if (niveau >= 2) extra += [0, 1, 2, 3].map(i => { const a = Math.PI / 4 + i * Math.PI / 2; return `<path d="M${50 + 14 * Math.cos(a)} ${50 + 14 * Math.sin(a)}L${50 + 30 * Math.cos(a)} ${50 + 30 * Math.sin(a)}" stroke="#f2ece3" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>`; }).join('');
+    if (rang % 2) fond += `<circle cx="50" cy="50" r="46" fill="none" stroke="${c1}" stroke-width="1" opacity=".5" stroke-dasharray="1.5 5" stroke-linecap="round"/>`;
+    if (niveau >= 2) extra += [0, 1, 2, 3].map(i => { const a = Math.PI / 4 + i * Math.PI / 2; return `<path d="M${50 + 14 * Math.cos(a)} ${50 + 14 * Math.sin(a)}L${50 + 30 * Math.cos(a)} ${50 + 30 * Math.sin(a)}" stroke="${c0}" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>`; }).join('');
     if (niveau >= 3) {
       const pts = [[18, 24], [84, 30], [78, 82]];
-      extra += `<path d="M18 24L50 50L84 30M50 50L78 82" stroke="#efe9df" stroke-width=".9" opacity=".55" fill="none"/>` + pts.map(([x, y]) => simple(x, y, 6, 1.8, '#f4eee6')).join('');
+      extra += `<path d="M18 24L50 50L84 30M50 50L78 82" stroke="${c1}" stroke-width=".9" opacity=".55" fill="none"/>` + pts.map(([x, y]) => simple(x, y, 6, 1.8, c0)).join('');
     }
-    if (niveau >= 4) fond = `<circle cx="50" cy="50" r="44" fill="url(#eh${n})"/><circle cx="50" cy="50" r="40" fill="none" stroke="#f1ebe2" stroke-width="1" opacity=".5"/>`;
+    if (niveau >= 4) fond += `<circle cx="50" cy="50" r="44" fill="url(#eh${n})"/><circle cx="50" cy="50" r="40" fill="none" stroke="${c0}" stroke-width="1" opacity=".5"/>`;
     const coeur = niveau === 0 ? simple(50, 50, R, R * .32, `url(#ef${n})`) : facettes(50, 50, R, R * .3);
     return `<svg viewBox="0 0 100 100" aria-hidden="true" class="embleme"><defs>
-      <linearGradient id="ef${n}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4eee6"/><stop offset=".55" stop-color="#ebe5db"/><stop offset="1" stop-color="#e2dcd0"/></linearGradient>
-      <linearGradient id="ec${n}" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8e2d8"/><stop offset="1" stop-color="#303032"/></linearGradient>
-      <radialGradient id="eg${n}"><stop offset="0" stop-color="#ece6dc" stop-opacity=".75"/><stop offset="1" stop-color="#ece6dc" stop-opacity="0"/></radialGradient>
-      <radialGradient id="eh${n}"><stop offset=".55" stop-color="#e8e2d7" stop-opacity="0"/><stop offset=".85" stop-color="#e8e2d7" stop-opacity=".35"/><stop offset="1" stop-color="#e8e2d7" stop-opacity="0"/></radialGradient></defs>
+      <linearGradient id="ef${n}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c0}"/><stop offset=".55" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
+      <linearGradient id="ec${n}" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="#2a2a2e"/></linearGradient>
+      <radialGradient id="eg${n}"><stop offset="0" stop-color="${c1}" stop-opacity=".7"/><stop offset="1" stop-color="${c1}" stop-opacity="0"/></radialGradient>
+      <radialGradient id="eh${n}"><stop offset=".55" stop-color="${c1}" stop-opacity="0"/><stop offset=".85" stop-color="${c1}" stop-opacity=".35"/><stop offset="1" stop-color="${c1}" stop-opacity="0"/></radialGradient></defs>
       ${fond}<circle cx="50" cy="50" r="${R * 0.9}" fill="url(#eg${n})"/>${extra}${coeur}</svg>`;
   }
   // ---------- Morceaux communs ----------
@@ -2084,7 +2162,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <p class="total"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b><small>pts</small>
           <span class="${g ? '' : 'zero'}">${g > 0 ? ICONE.hausse : ''}${g ? (g > 0 ? '+' : '') + nombre(g) : '+0'}<span class="masque"> aujourd'hui</span></span></p>
         ${courbePoints()}
-        <div class="niveau-rang"><p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
+        <div class="niveau-rang"><p class="niveau palier"><button type="button" data-action="niveaux" data-focus="niveaux" aria-label="Niveau ${niveauIdx() + 1}, ${P.nom}${suiv ? `, encore ${nombre(suiv.seuil - S.points)} points avant ${suiv.nom}` : ''}. Voir les niveaux et les looks">${embleme(P.id)}<b aria-hidden="true">Niveau ${niveauIdx() + 1} · ${P.nom}</b>${suiv ? `<small aria-hidden="true">encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</button></p>
         <p class="niveau">${pastilleRecompenses()}</p></div>
       </section>
       ${carteMaintenant()}
@@ -2734,8 +2812,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   function proposerBilan() {
     if (V.etat !== 'ouvert' || document.querySelector('dialog[open]')) return;
     const auj = aujourdhui(), lundi = lundiDe(auj);
-    if (S.bilanVu === lundi || decaler(lundi, -1) < (S.depuis || auj)) return;
-    if (auj === lundi && minNow() < 5 * 60) return;
+    if (S.bilanVu === lundi || decaler(lundi, -1) < (S.depuis || auj)) return feterNiveau();
+    if (auj === lundi && minNow() < 5 * 60) return feterNiveau();
     S.bilanVu = lundi;
     ecrire();
     ouvrirBilan(decaler(lundi, -7), true);
@@ -3520,7 +3598,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   }
   function feliciter() {
     if (U.objectifAtteint) { const ob = U.objectifAtteint; U.objectifAtteint = null; setTimeout(() => dire(`🎯 Objectif atteint : « ${ob.titre} » ! Bonus +${cat(ob.cat).points * CONFIG.points.bonusObjectif} pts.`), 900); }
-    if (U.palierAtteint) { const p = U.palierAtteint; U.palierAtteint = null; setTimeout(() => dire(`✨ Nouveau palier : ${p.nom} !`), 1800); }
+    U.palierAtteint = null; setTimeout(feterNiveau, 1200);
   }
   // Ferme la feuille au toucher de « data-fermer »
   document.addEventListener('click', e => { const b = e.target.closest('[data-fermer]'); if (b) { const d = b.closest('dialog'); if (d) d.close(); } });
@@ -4099,6 +4177,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       </div></fieldset>
       <fieldset><legend>Ton univers</legend><div class="groupe">
         <button type="button" class="rang" data-p="identites"><span><span class="ic">🧭</span><span>Qui je deviens<span class="sous">${S.identites.length ? esc(S.identites.map(x => x.nom).join(' · ')) : 'Choisis 1 à 4 identités'}</span></span></span><span class="val">${ICONE.droite}</span></button>
+        <button type="button" class="rang" data-p="niveaux"><span><span class="ic">✨</span><span>Niveaux et looks<span class="sous">Niveau ${niveauIdx() + 1} · ${P.nom} · look ${lookActif().look}</span></span></span><span class="val">${ICONE.droite}</span></button>
         <button type="button" class="rang" data-p="recompenses"><span><span class="ic">🎁</span><span>Récompenses<span class="sous">${nombre(solde())} pts à dépenser</span></span></span><span class="val">${ICONE.droite}</span></button>
         <button type="button" class="rang" data-p="categories"><span><span class="ic">🗂️</span><span>Catégories<span class="sous">${S.categories.filter(c => c.active).length} actives · points et objectifs par semaine</span></span></span><span class="val">${ICONE.droite}</span></button>
         <label class="rang"><span><span class="ic">⚖️</span><span>Plafond par jour<span class="sous">JOMO : au-delà, ASCEND te prévient</span></span></span><select data-reglage="plafond">${plafonds.map(m => `<option value="${m}"${m === R.plafond ? ' selected' : ''}>${duree(m)}</option>`).join('')}</select></label>
@@ -4144,6 +4223,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (b && b.dataset.p === 'categories') ouvrirCategories();
     if (b && b.dataset.p === 'identites') ouvrirIdentites();
     if (b && b.dataset.p === 'recompenses') ouvrirRecompenses();
+    if (b && b.dataset.p === 'niveaux') ouvrirNiveaux();
     if (b && b.dataset.p === 'copier-mesures') {
       const t = `ASCEND édition ${EDITION} · ` + $('#p-diag').innerText.replace(/\n/g, ' · ');
       const fini = ok => dire(ok ? 'Mesures copiées : colle-les dans la conversation avec Claude.' : 'Copie impossible : fais une capture d\'écran de ces lignes.');
@@ -4365,6 +4445,108 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const texte = pret ? `${pret.icone} ${esc(pret.titre)} : tu peux te l'offrir` : prochaine ? `${prochaine.icone} encore ${nombre(prochaine.prix - s)} pts` : S.recompenses.length ? `${nombre(s)} pts à dépenser` : 'Choisis tes récompenses';
     return `<button type="button" class="rec-pastille${pret ? ' pret' : ''}" data-action="recompenses" data-focus="rec" aria-label="Récompenses : ${nombre(s)} points à dépenser. ${pret ? `Tu peux t'offrir ${esc(pret.titre)}` : prochaine ? `Encore ${nombre(prochaine.prix - s)} points pour ${esc(prochaine.titre)}` : ''}"><span aria-hidden="true">🎁</span><span aria-hidden="true">${texte}</span></button>`;
   }
+  // ---------- Niveaux et looks ----------
+  // Dix niveaux (CONFIG.paliers). Chaque niveau atteint débloque un look : la couleur d'accent de toute l'app et l'emblème.
+  // S.look = null : on porte le look de son niveau ; sinon l'identifiant d'un niveau déjà atteint (S.niveauMax).
+  // S.niveauFete = le dernier niveau fêté : un niveau perdu puis regagné n'est pas fêté deux fois.
+  function lookActif() { return CONFIG.paliers.find((p, i) => p.id === S.look && i <= S.niveauMax) || palier(); }
+  const degrade = p => `linear-gradient(135deg, ${p.c.map((c, i) => `${c} ${Math.round(i * 100 / (p.c.length - 1))}%`).join(', ')})`;
+  let lookPose = null;
+  function appliquerLook(force) {
+    const p = force || lookActif();
+    if (lookPose === p.id) return;
+    lookPose = p.id;
+    const st = document.documentElement.style;
+    st.setProperty('--accent', degrade(p));
+    st.setProperty('--accent-texte', p.texte);
+    st.setProperty('--arc', p.arc);
+  }
+
+  const ND = $('#niveaux');
+  function ouvrirNiveaux() { renderNiveaux(); if (!ND.open) ND.showModal(); }
+  function renderNiveaux(focus) {
+    const i = niveauIdx(), P = palier(), suiv = palierSuivant(), porte = lookActif();
+    ND.querySelector('.f-icone').innerHTML = ICONE.croix;
+    const pc = suiv ? Math.max(2, Math.round((S.points - P.seuil) / (suiv.seuil - P.seuil) * 100)) : 100;
+    $('#n-corps').innerHTML = `
+      <section class="carte n-tete" aria-label="Niveau ${i + 1}, ${P.nom}. ${nombre(S.points)} points${suiv ? `, encore ${nombre(suiv.seuil - S.points)} avant ${suiv.nom}` : ''}">
+        <span class="n-embleme" aria-hidden="true">${embleme(P.id)}</span>
+        <div aria-hidden="true"><small>Niveau ${i + 1} sur ${CONFIG.paliers.length}</small><b>${P.nom}</b>
+          <span class="barre-obj"><i style="width:${pc}%"></i></span>
+          <span class="note">${suiv ? `Encore ${nombre(suiv.seuil - S.points)} pts avant ${suiv.nom}` : 'Le sommet. Tu y es.'}</span></div>
+      </section>
+      <label class="carte rang n-auto"><span><span>Suivre mon niveau<span class="sous">Le look change tout seul à chaque niveau</span></span></span><span class="interrupteur"><input type="checkbox" data-n-auto${S.look ? '' : ' checked'}><i></i></span></label>
+      <div><span class="etiquette" id="n-looks">Tes looks</span>
+      <div class="lignes" role="group" aria-labelledby="n-looks">${CONFIG.paliers.map((p, n) => {
+        const ouvert = n <= S.niveauMax, mis = p.id === porte.id;
+        return `<button type="button" class="carte n-ligne${ouvert ? '' : ' ferme'}${mis ? ' mis' : ''}" data-n-look="${p.id}" data-focus="nl${n}" aria-pressed="${mis}"${ouvert ? '' : ' aria-disabled="true"'}
+          aria-label="Niveau ${n + 1}, ${p.nom}, look ${p.look}. ${ouvert ? (mis ? 'Porté' : 'Débloqué, toucher pour le porter') : `Verrouillé, à ${nombre(p.seuil)} points`}">
+          <span class="n-embleme petit" aria-hidden="true">${embleme(p.id)}</span>
+          <span class="quoi" aria-hidden="true"><b>${p.nom}</b><small>Niveau ${n + 1} · ${nombre(p.seuil)} pts</small></span>
+          <span class="n-look" aria-hidden="true"><i style="background:${degrade(p)}"></i>${p.look}</span>
+          <span class="n-etat" aria-hidden="true">${mis ? ICONE.coche : ouvert ? '' : '🔒'}</span></button>`; }).join('')}</div></div>
+      <p class="note" style="text-align:center">Un niveau atteint reste débloqué, même si tes points redescendent.</p>`;
+    if (focus) { const c = ND.querySelector(`[data-focus="${CSS.escape(focus)}"]`); if (c) c.focus(); }
+  }
+  ND.addEventListener('change', e => {
+    if (!e.target.matches('[data-n-auto]')) return;
+    S.look = e.target.checked ? null : lookActif().id;
+    sauver(); appliquerLook(); renderNiveaux();
+    ND.querySelector('[data-n-auto]').focus();
+    dire(S.look ? `Tu gardes le look ${lookActif().look}, même en changeant de niveau.` : `Le look suit ton niveau : ${lookActif().look}.`);
+  });
+  ND.addEventListener('click', e => {
+    const b = e.target.closest('[data-n-look]');
+    if (!b) return;
+    const n = CONFIG.paliers.findIndex(p => p.id === b.dataset.nLook), p = CONFIG.paliers[n];
+    if (n > S.niveauMax) return dire(`🔒 ${p.nom} se débloque à ${nombre(p.seuil)} pts : encore ${nombre(p.seuil - S.points)}.`);
+    S.look = p.id === palier().id ? null : p.id;
+    sauver(); appliquerLook(); renderNiveaux(b.dataset.focus);
+    dire(`Look ${p.look} porté.`);
+  });
+  ND.addEventListener('close', () => { U.garderDefilement = true; render(); });
+
+  // ----- L'écran de célébration : à chaque niveau franchi, une fois
+  const FD = $('#fete');
+  function feterNiveau() {
+    const i = niveauIdx();
+    if (i <= S.niveauFete || i === 0) return;
+    if (V.etat !== 'ouvert' || document.querySelector('dialog[open]')) return;      // on attend que l'écran soit libre
+    const P = CONFIG.paliers[i], suiv = palierSuivant(), nouveaux = i - S.niveauFete, garde = S.look && S.look !== P.id ? lookActif() : null;
+    S.niveauFete = i; S.niveauMax = Math.max(S.niveauMax, i);
+    ecrire();
+    const faites = Object.keys(S.payes).filter(k => S.payes[k].type === 'tache' && S.payes[k].pts > 0).length;
+    const jours = S.depuis ? ecart(S.depuis, aujourdhui()) + 1 : 0;
+    appliquerLook(P);
+    FD.querySelector('#fe-corps').innerHTML = `
+      <div class="fe-rayons" aria-hidden="true"></div>
+      <div class="fe-embleme" aria-hidden="true">${embleme(P.id)}</div>
+      <p class="fe-sur">Niveau ${i + 1}</p>
+      <h2 id="fe-titre">${P.nom}</h2>
+      <p id="fe-texte">${nombre(P.seuil)} points franchis. ${nouveaux > 1 ? `Tes niveaux t'ont débloqué ${nouveaux} looks, jusqu'au look ${P.look}.` : `Tu débloques le look ${P.look}.`}</p>
+      <ul class="fe-chiffres" aria-label="Ton chemin jusqu'ici">
+        <li><b>${nombre(S.points)}</b><small>points</small></li>
+        <li><b>${nombre(faites)}</b><small>${faites > 1 ? 'tâches faites' : 'tâche faite'}</small></li>
+        <li><b>${nombre(Math.max(S.meilleureSerie || 0, serie()))}</b><small>meilleure série</small></li>
+      </ul>
+      <p class="fe-suite">${suiv ? `Prochain niveau : ${suiv.nom}, à ${nombre(suiv.seuil)} pts` : 'Tu es au sommet. Make everyday matter.'}${jours > 1 ? ` · jour ${nombre(jours)} sur ASCEND` : ''}</p>
+      <div class="fe-boutons">
+        ${garde ? `<button type="button" class="bouton" data-fe="porter">Porter le look ${P.look}</button><button type="button" class="lien" data-fe="garder">Garder mon look ${garde.look}</button>`
+          : `<button type="button" class="bouton" data-fe="ok">Continuer</button>${nouveaux > 1 ? `<button type="button" class="lien" data-fe="looks">Voir mes looks</button>` : ''}`}
+      </div>`;
+    FD.showModal();
+    FD.querySelector('.bouton').focus();
+  }
+  FD.addEventListener('click', e => {
+    const b = e.target.closest('[data-fe]');
+    if (!b) return;
+    if (b.dataset.fe === 'porter') { S.look = null; sauver(); }
+    FD.close();
+    if (b.dataset.fe === 'looks') ouvrirNiveaux();
+  });
+  FD.addEventListener('close', () => { lookPose = null; appliquerLook(); U.garderDefilement = true; render(); });
+  // Un gain peut tomber pendant qu'une feuille est ouverte : on fête dès qu'elle se ferme
+  document.addEventListener('close', e => { if (e.target !== FD && e.target.tagName === 'DIALOG') setTimeout(feterNiveau, 500); }, true);
   // ---------- Rappels (notifications) ----------
   // ASCEND calcule ses rappels des 14 prochains jours et les confie au service (Worker Cloudflare de Guts, partagé),
   // qui les envoie à l'heure par Web Push. L'adresse du service est dans rappels.json.
@@ -5081,6 +5263,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   function render(focus) {
     const f = focus || signatureFocus();
     const E = $('#ecran');
+    appliquerLook();
     const ancien = $('#ecran .defile');
     if (ancien && !ancien.classList.contains('ajuste')) U.defile[ancien.dataset.defile] = ancien.scrollTop;
     if (U.recentrer) { U.defile = {}; U.recentrer = false; }
@@ -5361,6 +5544,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (a === 'pas-faites') return ouvrirPasFaites();
     if (a === 'identites') return ouvrirIdentites();
     if (a === 'recompenses') return ouvrirRecompenses();
+    if (a === 'niveaux') return ouvrirNiveaux();
     if (a === 'difficile') return jourDifficile();
     if (a === 'fin-difficile') { delete S.difficiles[aujourdhui()]; sauver(); U.garderDefilement = true; render('dur'); return dire('Mode jour difficile retiré.'); }
     if (a === 'alleger') return allegerJournee();

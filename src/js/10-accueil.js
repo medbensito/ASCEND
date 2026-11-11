@@ -109,7 +109,7 @@
         <p class="total"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b><small>pts</small>
           <span class="${g ? '' : 'zero'}">${g > 0 ? ICONE.hausse : ''}${g ? (g > 0 ? '+' : '') + nombre(g) : '+0'}<span class="masque"> aujourd'hui</span></span></p>
         ${courbePoints()}
-        <div class="niveau-rang"><p class="niveau palier"><span>${embleme(P.id)}<b>Niveau ${CONFIG.paliers.findIndex(x => x.id === P.id) + 1} · ${P.nom}</b>${suiv ? `<small>encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</span></p>
+        <div class="niveau-rang"><p class="niveau palier"><button type="button" data-action="niveaux" data-focus="niveaux" aria-label="Niveau ${niveauIdx() + 1}, ${P.nom}${suiv ? `, encore ${nombre(suiv.seuil - S.points)} points avant ${suiv.nom}` : ''}. Voir les niveaux et les looks">${embleme(P.id)}<b aria-hidden="true">Niveau ${niveauIdx() + 1} · ${P.nom}</b>${suiv ? `<small aria-hidden="true">encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</button></p>
         <p class="niveau">${pastilleRecompenses()}</p></div>
       </section>
       ${carteMaintenant()}

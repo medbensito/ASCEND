@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 21;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 22;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -19,12 +19,18 @@
     points: { libre: 30, sansecran: 40, evenement: 0, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
+    // Dix niveaux. Chacun débloque un look : c = dégradé de l'accent, texte = couleur des textes d'accent, arc = teinte des arcs de lumière
     paliers: [
-      { id: 'eclat', nom: 'Éclat', seuil: 0 },
-      { id: 'cristal', nom: 'Cristal', seuil: 500 },
-      { id: 'etoile', nom: 'Étoile', seuil: 1500 },
-      { id: 'constellation', nom: 'Constellation', seuil: 4000 },
-      { id: 'nova', nom: 'Nova', seuil: 10000 }
+      { id: 'eclat', nom: 'Éclat', seuil: 0, look: 'Platine', c: ['#faf7f2', '#ddd5c8', '#bdb2a2'], texte: '#e4d3b3', arc: '255, 236, 210' },
+      { id: 'lueur', nom: 'Lueur', seuil: 250, look: 'Argent', c: ['#ffffff', '#dbe0ea', '#aab2c2'], texte: '#d3dae8', arc: '214, 224, 245' },
+      { id: 'cristal', nom: 'Cristal', seuil: 500, look: 'Glacier', c: ['#f1f9ff', '#bfdcf5', '#8db9e2'], texte: '#b9d8f5', arc: '170, 212, 255' },
+      { id: 'prisme', nom: 'Prisme', seuil: 1000, look: 'Améthyste', c: ['#f7f1ff', '#d6c4f8', '#aa94e2'], texte: '#d5c4f8', arc: '200, 170, 255' },
+      { id: 'etoile', nom: 'Étoile', seuil: 1500, look: 'Or', c: ['#fff7dc', '#f1d68c', '#d0aa52'], texte: '#f1d68c', arc: '255, 214, 130' },
+      { id: 'comete', nom: 'Comète', seuil: 2500, look: 'Jade', c: ['#ecfff8', '#a9ecd7', '#70ceb3'], texte: '#a9ecd7', arc: '130, 235, 200' },
+      { id: 'constellation', nom: 'Constellation', seuil: 4000, look: 'Saphir', c: ['#eff3ff', '#b6c5ff', '#8498ee'], texte: '#bac8ff', arc: '140, 165, 255' },
+      { id: 'aurore', nom: 'Aurore', seuil: 6000, look: 'Or rose', c: ['#fff1ee', '#f8c5be', '#e29c99'], texte: '#f8c5be', arc: '255, 170, 165' },
+      { id: 'nova', nom: 'Nova', seuil: 10000, look: 'Ambre', c: ['#fff2de', '#ffca8c', '#f19c54'], texte: '#ffca8c', arc: '255, 170, 90' },
+      { id: 'zenith', nom: 'Zénith', seuil: 15000, look: 'Iris', c: ['#ffffff', '#ffe7b3', '#f6bbd9', '#b9c5ff'], texte: '#ffe7b3', arc: '225, 185, 255' }
     ]
   };
   let H = CONFIG.heure;                    // px par heure ; téléphone couché, la vue Jour l'ajuste pour montrer toute la journée
@@ -76,6 +82,7 @@
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
     priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], aCaser: [], recompenses: [], achats: [], energie: {}, reflexions: {}, conseilsVus: {},
+    look: null, niveauMax: 0, niveauFete: 0,   // look choisi (null = celui du niveau), plus haut niveau atteint, dernier niveau fêté
     onglet: 'accueil', vueCal: 'semaine', semaineVue: true, vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
     rappels: null, coffre: null
@@ -99,6 +106,9 @@
     S.aCaser.forEach(x => { x.duree = Math.min(Math.max(+x.duree || 60, 15), 240); if (!S.categories.some(c => c.id === x.cat)) x.cat = S.categories[0].id; });
     if (!S.semaineVue) { S.semaineVue = true; S.vueCal = 'semaine'; }      // édition 16 : la Semaine devient la vue par défaut, une fois
     if (!['semaine', 'jour', 'mois'].includes(S.vueCal)) S.vueCal = 'semaine';
+    S.niveauMax = Math.max(CONFIG.paliers.reduce((a, p, i) => (S.points >= p.seuil ? i : a), 0), Math.min(+S.niveauMax || 0, CONFIG.paliers.length - 1));
+    S.niveauFete = Math.max(0, +S.niveauFete || 0);
+    if (!CONFIG.paliers.some((p, i) => p.id === S.look && i <= S.niveauMax)) S.look = null;
     Object.keys(S.energie).forEach(k => { const n = +S.energie[k]; if (n >= 1 && n <= 5) S.energie[k] = Math.round(n); else delete S.energie[k]; });
     if (!Array.isArray(S.categories) || !S.categories.length) S.categories = CATS();
     S.identites = (Array.isArray(S.identites) ? S.identites : []).filter(x => x && x.id && typeof x.nom === 'string' && x.nom.trim()).slice(0, 4);

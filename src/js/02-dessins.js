@@ -71,20 +71,23 @@
       return p.map((pt, i) => { const q = p[(i + 1) % 8]; return `<path d="M${cx} ${cy}L${pt[0].toFixed(1)} ${pt[1].toFixed(1)}L${q[0].toFixed(1)} ${q[1].toFixed(1)}z" fill="${i % 2 ? `url(#ec${n})` : `url(#ef${n})`}"/>`; }).join('');
     };
     const simple = (cx, cy, R, r, c) => `<path d="M${etoile(cx, cy, R, r).map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L')}z" fill="${c}"/>`;
-    const niveau = CONFIG.paliers.findIndex(p => p.id === id);
+    const rang = Math.max(0, CONFIG.paliers.findIndex(p => p.id === id)), P = CONFIG.paliers[rang];
+    const niveau = Math.floor(rang / 2);                 // cinq formes ; les deux niveaux d'une même forme se distinguent par la couleur et un anneau
+    const c0 = P.c[0], c1 = P.c[1], c2 = P.c[P.c.length - 1];
     const R = [26, 32, 34, 30, 32][niveau] || 26;
     let fond = '', extra = '';
-    if (niveau >= 2) extra += [0, 1, 2, 3].map(i => { const a = Math.PI / 4 + i * Math.PI / 2; return `<path d="M${50 + 14 * Math.cos(a)} ${50 + 14 * Math.sin(a)}L${50 + 30 * Math.cos(a)} ${50 + 30 * Math.sin(a)}" stroke="#f2ece3" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>`; }).join('');
+    if (rang % 2) fond += `<circle cx="50" cy="50" r="46" fill="none" stroke="${c1}" stroke-width="1" opacity=".5" stroke-dasharray="1.5 5" stroke-linecap="round"/>`;
+    if (niveau >= 2) extra += [0, 1, 2, 3].map(i => { const a = Math.PI / 4 + i * Math.PI / 2; return `<path d="M${50 + 14 * Math.cos(a)} ${50 + 14 * Math.sin(a)}L${50 + 30 * Math.cos(a)} ${50 + 30 * Math.sin(a)}" stroke="${c0}" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>`; }).join('');
     if (niveau >= 3) {
       const pts = [[18, 24], [84, 30], [78, 82]];
-      extra += `<path d="M18 24L50 50L84 30M50 50L78 82" stroke="#efe9df" stroke-width=".9" opacity=".55" fill="none"/>` + pts.map(([x, y]) => simple(x, y, 6, 1.8, '#f4eee6')).join('');
+      extra += `<path d="M18 24L50 50L84 30M50 50L78 82" stroke="${c1}" stroke-width=".9" opacity=".55" fill="none"/>` + pts.map(([x, y]) => simple(x, y, 6, 1.8, c0)).join('');
     }
-    if (niveau >= 4) fond = `<circle cx="50" cy="50" r="44" fill="url(#eh${n})"/><circle cx="50" cy="50" r="40" fill="none" stroke="#f1ebe2" stroke-width="1" opacity=".5"/>`;
+    if (niveau >= 4) fond += `<circle cx="50" cy="50" r="44" fill="url(#eh${n})"/><circle cx="50" cy="50" r="40" fill="none" stroke="${c0}" stroke-width="1" opacity=".5"/>`;
     const coeur = niveau === 0 ? simple(50, 50, R, R * .32, `url(#ef${n})`) : facettes(50, 50, R, R * .3);
     return `<svg viewBox="0 0 100 100" aria-hidden="true" class="embleme"><defs>
-      <linearGradient id="ef${n}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4eee6"/><stop offset=".55" stop-color="#ebe5db"/><stop offset="1" stop-color="#e2dcd0"/></linearGradient>
-      <linearGradient id="ec${n}" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8e2d8"/><stop offset="1" stop-color="#303032"/></linearGradient>
-      <radialGradient id="eg${n}"><stop offset="0" stop-color="#ece6dc" stop-opacity=".75"/><stop offset="1" stop-color="#ece6dc" stop-opacity="0"/></radialGradient>
-      <radialGradient id="eh${n}"><stop offset=".55" stop-color="#e8e2d7" stop-opacity="0"/><stop offset=".85" stop-color="#e8e2d7" stop-opacity=".35"/><stop offset="1" stop-color="#e8e2d7" stop-opacity="0"/></radialGradient></defs>
+      <linearGradient id="ef${n}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c0}"/><stop offset=".55" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
+      <linearGradient id="ec${n}" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="#2a2a2e"/></linearGradient>
+      <radialGradient id="eg${n}"><stop offset="0" stop-color="${c1}" stop-opacity=".7"/><stop offset="1" stop-color="${c1}" stop-opacity="0"/></radialGradient>
+      <radialGradient id="eh${n}"><stop offset=".55" stop-color="${c1}" stop-opacity="0"/><stop offset=".85" stop-color="${c1}" stop-opacity=".35"/><stop offset="1" stop-color="${c1}" stop-opacity="0"/></radialGradient></defs>
       ${fond}<circle cx="50" cy="50" r="${R * 0.9}" fill="url(#eg${n})"/>${extra}${coeur}</svg>`;
   }

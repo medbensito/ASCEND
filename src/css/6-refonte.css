@@ -14,6 +14,7 @@
   --accent: linear-gradient(135deg, #faf7f2 0%, #ddd5c8 55%, #bdb2a2 100%);
   --sur-accent: #0a0a0c;
   --accent-texte: #e4d3b3;
+  --arc: 255, 236, 210;
   --anneau: rgba(255, 255, 255, .42);
   --focus: #ffffff;
   --rayon: 22px;
@@ -24,9 +25,9 @@ body {
   background-color: var(--fond);
   background-image:
     radial-gradient(circle at 128% -6%, transparent 0 57.6%, rgba(255, 255, 255, .22) 58%, rgba(255, 255, 255, .05) 58.5%, transparent 66%),
-    radial-gradient(circle at -40% 118%, transparent 0 63.7%, rgba(255, 236, 210, .13) 64%, rgba(255, 255, 255, .03) 64.5%, transparent 71%),
+    radial-gradient(circle at -40% 118%, transparent 0 63.7%, rgba(var(--arc), .16) 64%, rgba(255, 255, 255, .03) 64.5%, transparent 71%),
     radial-gradient(90% 45% at 100% 0%, rgba(190, 190, 215, .16), transparent 70%),
-    radial-gradient(80% 40% at 0% 100%, rgba(255, 226, 190, .07), transparent 70%);
+    radial-gradient(80% 40% at 0% 100%, rgba(var(--arc), .09), transparent 70%);
   font-size: 15px;
   letter-spacing: -.005em;
 }
@@ -95,7 +96,7 @@ body {
 .points .total span { font-size: 14px; font-weight: 600; }
 .points .courbe { position: relative; display: block; left: auto; right: auto; bottom: auto; width: calc(100% + 40px); margin: -6px -20px -8px; height: 104px; opacity: 1; }
 .niveau { display: flex; justify-content: center; }
-.niveau > span { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 14px 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 550; color: var(--texte);
+.niveau > span, .niveau > button { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 14px 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 550; color: var(--texte);
   background: rgba(255, 255, 255, .06); border: 1px solid var(--trait-fort); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12); }
 .niveau .embleme { position: static; width: 22px; height: 22px; }
 .niveau small { color: var(--doux); font-size: 12.5px; font-weight: 500; }
@@ -169,10 +170,10 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
 .marque > b { animation-delay: .12s; }
 .marque > small { animation-delay: .24s; }
 .points { min-width: 0; }
-.niveau > span { max-width: 100%; min-width: 0; }
+.niveau > span, .niveau > button { max-width: 100%; min-width: 0; }
 .niveau b { white-space: nowrap; font-weight: 550; }
 .niveau small { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 359px) { .niveau > span { font-size: 12px; gap: 6px; padding-right: 12px; } .points .total b { font-size: 52px; } }
+@media (max-width: 359px) { .niveau > span, .niveau > button { font-size: 12px; gap: 6px; padding-right: 12px; } .points .total b { font-size: 52px; } }
 .points .courbe { width: min(100vw, 640px); margin: -6px 0 -8px calc(50% - min(50vw, 320px)); }
 .points .total { flex-wrap: wrap; }
 .app { grid-template-columns: minmax(0, 1fr); }
@@ -189,7 +190,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
 .points .courbe { height: 58px; margin-top: -10px; margin-bottom: -4px; }
 .niveau-rang { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .niveau-rang .niveau { min-width: 0; margin: 0; }
-.niveau-rang .niveau > span, .niveau-rang .rec-pastille { min-height: 32px; font-size: 12px; }
+.niveau-rang .niveau > span, .niveau-rang .niveau > button, .niveau-rang .rec-pastille { min-height: 32px; font-size: 12px; }
 .niveau-rang .niveau small { display: none; }
 .mnt { padding: 10px 14px; gap: 4px; }
 .mnt-ligne .quoi b { font-size: 16.5px; }
