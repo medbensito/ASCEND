@@ -196,7 +196,7 @@
     if (a === 'annuler') { OD.close(); return; }
     if (a === 'ajouter-etape') { ajouterEtape(); return; }
     if (a === 'cat') { ouvrirChoixCat(U.objectif.cat, id => { U.objectif.cat = id; majObjectif('#o-cat'); }); return; }
-    if (a === 'tache') { const ob = U.objectif.ob; OD.close(); ouvrirTache(null, { date: aujourdhui(), debut: prochaineHeure(), fin: Math.min(prochaineHeure() + 60, 1440), cat: ob.cat, objectif: ob.id, titre: '' }); return; }
+    if (a === 'tache') { const ob = U.objectif.ob; OD.close(); ouvrirTache(null, { date: aujourdhui(), cat: ob.cat, objectif: ob.id, titre: '' }); return; }
     if (a === 'supprimer') {
       const ob = U.objectif.ob;
       if (!(await demander('Supprimer cet objectif ?', `« ${ob.titre} » et ses étapes seront supprimés. Les tâches liées restent dans ton calendrier, et les points déjà gagnés restent.`, [{ texte: 'Supprimer', valeur: true, danger: true }, { texte: 'Annuler', valeur: false, clair: true }]))) return;

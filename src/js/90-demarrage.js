@@ -60,7 +60,8 @@
   function cocher(cle) {
     const o = trouver(cle);
     if (!o || o.el.type !== 'tache') return;
-    const msg = basculerTache(o);
+    const e = enCours();
+    const msg = e && e.o.cle === cle ? terminer() : basculerTache(o);          // cocher la tâche commencée, c'est la terminer
     sauver();
     U.garderDefilement = true;
     render();
@@ -274,8 +275,15 @@
     if (a === 'remplir' && U.brouillon) return ouvrirTache(null, { date: U.brouillon.k, debut: U.brouillon.debut, fin: U.brouillon.fin });
     if (a === 'ajouter') {
       const auj = aujourdhui(), k = U.onglet === 'calendrier' ? U.date : auj;
-      const debut = k === auj ? prochaineHeure() : 9 * 60;
-      return ouvrirTache(null, { date: k < auj ? auj : k, debut, fin: Math.min(debut + CONFIG.duree, 1440) });
+      return ouvrirTache(null, { date: k < auj ? auj : k });
+    }
+    if (a === 'commencer' || a === 'terminer') {
+      const msg = a === 'terminer' ? terminer() : (commencer(d.cle) ? `C'est parti. Touche « Terminé » quand tu as fini.` : null);
+      if (!msg) return;
+      sauver(); U.garderDefilement = true; render(a === 'terminer' ? null : 'mnt-go');
+      dire(msg);
+      if (a === 'terminer') feliciter();
+      return;
     }
     if (a === 'aujourdhui') { U.recentrer = true; return allerA(aujourdhui()); }
     if (a === 'voir-tout') { U.onglet = 'calendrier'; S.onglet = 'calendrier'; S.vueCal = 'jour'; U.date = aujourdhui(); ecrire(); return render(); }

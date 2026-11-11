@@ -86,7 +86,7 @@
   function clicSemaine(d) {
     if (d.semCat) { U.semCat = U.semCat === d.semCat ? null : d.semCat; U.garderDefilement = true; render('sp' + d.semCat); return true; }
     if (d.semPlier) { if (U.semOuverts.has(d.semPlier)) U.semOuverts.delete(d.semPlier); else U.semOuverts.add(d.semPlier); U.garderDefilement = true; render('sj' + d.semPlier); return true; }
-    if (d.semPlus) { const auj = aujourdhui(), k = d.semPlus, debut = k === auj ? prochaineHeure() : 9 * 60; ouvrirTache(null, { date: k, debut, fin: Math.min(debut + CONFIG.duree, 1440) }); return true; }
+    if (d.semPlus) { ouvrirTache(null, { date: d.semPlus }); return true; }
     if (d.semAutre) { ouvrirTache(null, { cat: d.semAutre }); return true; }
     if (d.semAjout) {
       const [id, k, debut, fin] = d.semAjout.split('|'), c = cat(id);
@@ -101,14 +101,28 @@
   // ---------- Accueil : « Maintenant » ----------
   // Ce qui est en cours, sinon ce qui vient ensuite aujourd'hui
   function carteMaintenant() {
-    const auj = aujourdhui(), now = minNow();
-    const l = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait) && !o.el.flou && o.el.fin > now);
-    const o = l.find(x => x.el.debut <= now) || l[0];
+    const auj = aujourdhui(), now = minNow(), e = enCours();
+    if (e) {                                   // une tâche commencée : elle passe devant tout
+      const o = e.o, lk = look(o.el), depuis = Math.max(0, Math.round((Date.now() - e.debut) / 6e4));
+      return `<section class="carte mnt encours" style="--c:${lk.couleur}" aria-labelledby="mnt-titre">
+        <h2 id="mnt-titre"><i class="mnt-pouls" aria-hidden="true"></i>En cours</h2>
+        <div class="mnt-ligne"><span class="tuile petite" aria-hidden="true">${lk.icone}</span>
+          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="En cours : ${esc(o.el.titre)}, commencée à ${hhmm(o.el.debut)}, depuis ${duree(depuis)}. Ouvrir"><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>depuis ${hhmm(o.el.debut)} · ${duree(depuis)} · ${esc(lk.nom)}</small></span></button>
+          <button type="button" class="bouton petit mnt-go" data-action="terminer" data-focus="mnt-go">${ICONE.coche} Terminé</button></div></section>`;
+    }
+    const jour = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait));
+    const fixes = jour.filter(o => !o.el.flou && o.el.fin > now), souples = jour.filter(o => o.el.flou && o.el.type === 'tache' && !S.partis[o.cle]);
+    const mom = momentDe(now);
+    // Dans l'ordre : ce qui se passe maintenant à heure fixe, la tâche du moment (ce matin…), la prochaine à heure fixe, une tâche sans heure
+    const o = fixes.find(x => x.el.debut <= now) || souples.find(x => x.el.moment === mom) || fixes[0] || souples.find(x => !x.el.moment || CONFIG.moments[x.el.moment].a > now) || souples[0];
     if (!o) return '';
-    const enCours = o.el.debut <= now, lk = look(o.el), dans = o.el.debut - now;
-    const quand = enCours ? `jusqu'à ${finTexte(o.el.fin)}` : `${hhmm(o.el.debut)} · dans ${duree(dans)}`;
+    const enCoursFixe = !o.el.flou && o.el.debut <= now, lk = look(o.el), dans = o.el.debut - now;
+    const titre = o.el.flou ? (o.el.moment ? (o.el.moment === mom ? CONFIG.moments[mom].ce : CONFIG.moments[o.el.moment].b <= now ? 'À rattraper' : 'Ensuite') : "Aujourd'hui") : enCoursFixe ? 'Maintenant' : 'Ensuite';
+    const quand = o.el.flou ? `${o.el.moment ? CONFIG.moments[o.el.moment].nom : 'Dans la journée'} · ${duree(o.el.fin - o.el.debut)}` : enCoursFixe ? `jusqu'à ${finTexte(o.el.fin)}` : `${hhmm(o.el.debut)} · dans ${duree(dans)}`;
+    const tache = o.el.type === 'tache';
     return `<section class="carte mnt" style="--c:${lk.couleur}" aria-labelledby="mnt-titre">
-        <h2 id="mnt-titre">${enCours ? 'Maintenant' : 'Ensuite'}</h2>
-        <div class="mnt-ligne">${o.el.type === 'tache' ? rondCoche(o.cle, o.fait, `${o.el.titre} : à faire`, 'data-cocher') : `<span class="tuile petite" aria-hidden="true">${lk.icone}</span>`}
-          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="${enCours ? 'Maintenant' : 'Ensuite'} : ${esc(o.el.titre)}, ${quand}. Ouvrir"><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>${quand} · ${esc(lk.nom)}</small></span>${ptsElement(o)}</button></div></section>`;
+        <h2 id="mnt-titre">${titre}</h2>
+        <div class="mnt-ligne">${tache ? rondCoche(o.cle, o.fait, `${o.el.titre} : à faire`, 'data-cocher') : `<span class="tuile petite" aria-hidden="true">${lk.icone}</span>`}
+          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="${titre} : ${esc(o.el.titre)}, ${quand}. Ouvrir"><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>${quand} · ${esc(lk.nom)}</small></span>${tache ? '' : ptsElement(o)}</button>
+          ${tache ? `<button type="button" class="bouton petit secondaire mnt-go" data-action="commencer" data-cle="${o.cle}" data-focus="mnt-go" aria-label="Je commence : ${esc(o.el.titre)}">▶ Je commence</button>` : ''}</div></section>`;
   }

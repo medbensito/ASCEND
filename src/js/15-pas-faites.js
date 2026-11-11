@@ -64,7 +64,7 @@
       corps.innerHTML = `<p class="note">Les 7 derniers jours. Rien de grave : décide, puis passe à autre chose. 🌿</p>` + jours.map(k => `
         <section class="pf-jour" aria-labelledby="pf-${k}"><h3 id="pf-${k}">${k === decaler(aujourdhui(), -1) ? 'Hier' : jourLong(k)}</h3>
           ${l.filter(o => o.k === k).map(o => {
-            const lk = look(o.el), pts = prevue(o) ? `+${valeur(o.el)} pts si faite` : '0 pt (ajoutée après son début)';
+            const lk = look(o.el), pts = prevue(o) ? `+${valeur(o.el)} pts si faite` : '0 pt (ajoutée le jour même)';
             const ouv = P.ouverte === o.cle, props = ouv ? propositions(o) : [];
             return `<div class="carte pf-item" style="--c:${lk.couleur}" role="group" aria-label="${esc(o.el.titre)}, ${esc(quandJour(o.k))}, ${plage(o.el)}, ${esc(lk.nom)}">
               <div class="pf-haut"><span class="tuile petite" aria-hidden="true">${lk.icone}</span><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>${plage(o.el)} · ${esc(lk.nom)} · ${pts}</small></span></div>

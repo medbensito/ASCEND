@@ -65,7 +65,7 @@
 
   // Jour : la grille horaire, avec les gestes (toucher un vide, appui long, glisser, poignées)
   function disposer(liste) {
-    const items = liste.map(o => ({ o, d: o.el.debut, f: Math.max(o.el.fin, o.el.debut + 20) })).sort((a, b) => a.d - b.d || b.f - a.f);
+    const items = liste.map(o => ({ o, d: o.el.debut, f: Math.max(o.el.fin, o.el.debut + Math.ceil(HMIN / H * 60)) })).sort((a, b) => a.d - b.d || b.f - a.f);
     const res = [];
     let groupe = [], finGroupe = -1;
     const fermer = () => { const n = Math.max(...groupe.map(g => g.col)) + 1; groupe.forEach(g => { g.n = n; res.push(g); }); groupe = []; };
@@ -82,18 +82,21 @@
     if (groupe.length) fermer();
     return res;
   }
+  // Le rectangle d'un élément dans la grille : barre de couleur, titre, heures ; grand, il montre aussi la durée et les points
   function bloc(g) {
     const o = g.o, el = o.el, l = look(el);
     const haut = el.debut / 60 * H, hauteur = Math.max((el.fin - el.debut) / 60 * H, HMIN);
-    const court = hauteur < 42;
+    const court = hauteur < 42, grand = hauteur >= 76;
     const choisi = U.selection === o.cle;
     const etat = el.type === 'libre' ? etatLibre(o) : el.type === 'sansecran' ? etatSansEcran(o) : null;
-    const p = S.payes[o.cle];
-    return `<div class="bloc ${el.type}${etat === 'grignote' ? ' grignote' : ''}${o.fait ? ' fait' : ''}${court ? ' court' : ''}${choisi ? ' choisi' : ''}${U.repere === o.cle ? ' repere' : ''}" data-cle="${o.cle}"
+    const p = S.payes[o.cle], e = S.enCours && S.enCours.cle === o.cle && !o.fait;
+    const pied = el.type === 'tache' && !o.fait ? `${duree(el.fin - el.debut)}${prevue(o) ? ` · +${valeur(el)} pts` : ''}` : el.type !== 'tache' ? duree(el.fin - el.debut) : '';
+    return `<div class="bloc ${el.type}${etat === 'grignote' ? ' grignote' : ''}${o.fait ? ' fait' : ''}${court ? ' court' : ''}${grand ? ' grand' : ''}${e ? ' encours' : ''}${choisi ? ' choisi' : ''}${U.repere === o.cle ? ' repere' : ''}" data-cle="${o.cle}"
         style="top:${haut}px;height:${hauteur}px;left:calc(${g.col / g.n * 100}% + 2px);width:calc(${100 / g.n}% - 4px);--c:${l.couleur}">
-      <button type="button" class="b-ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}" data-focus="o${o.cle}"></button>
+      <button type="button" class="b-ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}${e ? ', en cours' : ''}" data-focus="o${o.cle}"></button>
       ${el.type === 'tache' ? rondCoche(o.cle, o.fait, `${el.titre} : ${o.fait ? 'faite' : 'à faire'}`, 'data-cocher') : ''}
-      <span class="b-texte" aria-hidden="true"><b>${l.icone} ${esc(el.titre)}</b><small>${hhmm(el.debut)}${court ? '' : ' – ' + finTexte(el.fin)}${etat ? ' · ' + (el.type === 'libre' ? ETAT_LIBRE[etat] : ETAT_ECRAN[etat]) : ''}</small></span>
+      <span class="b-texte" aria-hidden="true"><b><i class="b-ic">${l.icone}</i> ${esc(el.titre)}</b><small>${e ? 'En cours · depuis ' + hhmm(el.debut) : `${hhmm(el.debut)}${court ? '' : ' – ' + finTexte(el.fin)}${etat ? ' · ' + (el.type === 'libre' ? ETAT_LIBRE[etat] : ETAT_ECRAN[etat]) : ''}${!court && !grand && el.type === 'tache' && !o.fait && prevue(o) ? `<i class="b-plus"> · +${valeur(el)} pts</i>` : ''}`}</small></span>
+      ${grand && pied && !(p && p.pts) ? `<span class="b-pied" aria-hidden="true">${pied}</span>` : ''}
       ${p && p.pts ? `<span class="gain" aria-hidden="true">+${p.pts}</span>` : ''}
       <span class="bord" data-bord="bas" aria-hidden="true"></span>
       ${choisi ? '<span class="poignee haut" data-bord="haut" aria-hidden="true"></span><span class="poignee bas" data-bord="bas" aria-hidden="true"></span>' : ''}
@@ -175,7 +178,7 @@
   const joursPaysage = () => S.vueCal === 'semaine' ? Array.from({ length: 7 }, (_, i) => decaler(lundiDe(U.date), i)) : [U.date];
   function reglerHeure(ajuste) {
     PLAGE.ajuste = ajuste;
-    if (!ajuste) { H = CONFIG.heure; HMIN = 22; }
+    if (!ajuste) { H = CONFIG.heure; HMIN = 30; }
     else {
       const jours = joursPaysage();
       const l = [].concat(...jours.map(k => duJour(k).filter(o => !o.el.flou).map(o => o.el)));

@@ -82,7 +82,7 @@
       duJour(k).forEach(o => {
         if (S.payes[o.cle]) return;
         const t = o.el.type;
-        if (t === 'tache' && o.fait && prevue(o) && debutOcc(o) <= now) { gagner(o.cle, valeur(o.el), k, 'tache', cat(o.el.cat).id); change = true; }
+        if (t === 'tache' && o.fait && prevue(o) && parse(k).getTime() <= now) { gagner(o.cle, valeur(o.el), k, 'tache', cat(o.el.cat).id); change = true; }
         else if (t === 'libre' && finOcc(o) <= now) {
           let raison = null;
           if (!prevue(o)) raison = 'tard';
@@ -112,9 +112,38 @@
     o.el.faits[o.k] = true;
     o.fait = true;
     const pts = valeur(o.el);
-    if (!prevue(o)) return 'Bien joué ! Pas de points : elle a été ajoutée après son début.';
-    if (debutOcc(o) > Date.now()) return `Faite en avance : +${pts} pts ${o.k === aujourdhui() ? 'à ' + hhmm(o.el.debut) : quandJour(o.k)}.`;
+    if (!prevue(o)) return 'Bien joué ! Pas de points : elle a été ajoutée le jour même.';
+    if (o.k > aujourdhui()) return `Faite en avance : +${pts} pts ${quandJour(o.k)}.`;
     return `+${gagner(o.cle, pts, o.k, 'tache', cat(o.el.cat).id)} pts${courage(o.el) ? ' · 🔥 bonus courage' : ''}${echoIdentite(o.el.cat)}`;
+  }
+  // ---------- « Je commence » / « Terminé » : le calendrier se cale sur ce qui se passe vraiment ----------
+  // La tâche commencée, si elle tient toujours (aujourd'hui, pas encore faite)
+  function enCours() {
+    const e = S.enCours, o = e && trouver(e.cle);
+    if (!o || o.fait || o.k !== aujourdhui() || o.el.type !== 'tache') { if (e) S.enCours = null; return null; }
+    return { o, debut: e.debut };
+  }
+  const momentDe = m => m < CONFIG.moments.aprem.a ? 'matin' : m < CONFIG.moments.soir.a ? 'aprem' : 'soir';
+  const cinq = m => Math.floor(m / 5) * 5;
+  // Commencer : la tâche vient se poser maintenant dans la grille, avec sa durée prévue
+  function commencer(cle) {
+    const o = trouver(cle);
+    if (!o || o.el.type !== 'tache' || o.fait || o.k !== aujourdhui()) return null;
+    const debut = Math.min(cinq(minNow()), 1435), du = Math.max(o.el.fin - o.el.debut, 15);
+    const n = appliquer(o, { debut, fin: Math.min(debut + du, 1440), flou: false, moment: null, prevu: o.el.prevu || du }, 'une');
+    S.enCours = { cle: n, debut: Date.now() };
+    return n;
+  }
+  // Terminer : la fin se cale sur maintenant, la tâche est cochée. Renvoie le message.
+  function terminer() {
+    const e = enCours();
+    if (!e) return null;
+    const reel = Math.max(1, Math.round((Date.now() - e.debut) / 6e4)), prevu = e.o.el.prevu || (e.o.el.fin - e.o.el.debut);
+    const fin = Math.min(Math.max(Math.ceil(minNow() / 5) * 5, e.o.el.debut + 5), 1440);
+    const n = trouver(appliquer(e.o, { fin, reel }, 'une'));
+    S.enCours = null;
+    const msg = basculerTache(n);
+    return `Terminée en ${duree(reel)}${Math.abs(reel - prevu) >= 5 ? ` (prévu ${duree(prevu)})` : ''}. ${msg}`;
   }
   // Moment sans écran : tenu ou pas (on peut changer d'avis)
   function validerSansEcran(o, tenu) {

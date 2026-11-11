@@ -39,6 +39,9 @@
     $('#a-titre').textContent = o.el.titre;
     $('#a-corps').innerHTML = `
       <p class="note">${cap(quandJour(o.k))} · ${plage(o.el)} · ${esc(look(o.el).nom)}</p>
+      ${tache && !o.fait && o.k === auj ? (enCours() && enCours().o.cle === o.cle
+        ? `<button type="button" class="bouton" data-a="terminer">${ICONE.coche} Terminé</button>`
+        : `<button type="button" class="bouton" data-a="commencer">▶ Je commence</button>`) : ''}
       ${o.fait ? '' : `<div><span class="etiquette" id="a-rep">Reporter</span>
         <div class="puces" role="group" aria-labelledby="a-rep">${jours.map((k, i) => { const p = creneauReport(o, k); return p ? `<button type="button" class="puce" data-a-jour="${k}|${p.debut}|${p.fin}" data-focus="aj${i}" aria-label="${jourLong(k)}${o.el.flou ? '' : ' à ' + hhmm(p.debut)}">${quandCourt(k)}${o.el.flou ? '' : ' · ' + hhmm(p.debut)}</button>` : ''; }).join('')}</div></div>`}
       <div class="groupe a-liste">
@@ -87,7 +90,7 @@
       if (o.el.type === 'tache' && !(await accepterPlafond(k, o.cle, +debut, +fin))) return;
       const cle = appliquer(o, { date: k, debut: +debut, fin: +fin }, 'une');
       sauver(); AD.close();
-      if (!avertirLibre(cle)) dire(`« ${o.el.titre} » : ${quandJour(k)}${o.el.flou ? ', dans la journée' : ' à ' + hhmm(+debut)}.`);
+      if (!avertirLibre(cle)) dire(`« ${o.el.titre} » : ${quandJour(k)}${o.el.flou ? (o.el.moment ? ', ' + CONFIG.moments[o.el.moment].nom.toLowerCase() : ', dans la journée') : ' à ' + hhmm(+debut)}.`);
       return;
     }
     if (!b) return;
@@ -96,8 +99,10 @@
     if (!o) return;
     if (a === 'caser') { S.aCaser.push({ id: uid(), titre: o.el.titre, cat: o.el.cat, duree: Math.min(Math.max(o.el.fin - o.el.debut, 15), 240) }); supprimerOcc(o, 'une'); sauver(); AD.close(); return dire(`« ${o.el.titre} » est à caser : retrouve-la en bas de la semaine.`); }
     if (a === 'partir') { S.partis[o.cle] = aujourdhui(); sauver(); AD.close(); return dire(`« ${o.el.titre} » : laissée partir. 🍃`); }
+    if (a === 'commencer') { if (!commencer(o.cle)) return; sauver(); AD.close(); return dire(`C'est parti. Touche « Terminé » quand tu as fini.`); }
+    if (a === 'terminer') { const msg = terminer(); if (!msg) return; sauver(); AD.close(); dire(msg); return feliciter(); }
     if (a === 'modifier') { AD.close(); return ouvrirTache(o); }
-    if (a === 'dupliquer') { AD.close(); return ouvrirTache(null, { type: o.el.type, titre: o.el.titre, cat: o.el.cat, date: decaler(aujourdhui(), 1), debut: o.el.debut, fin: o.el.fin, objectif: o.el.objectif || '' }); }
+    if (a === 'dupliquer') { AD.close(); return ouvrirTache(null, { type: o.el.type, titre: o.el.titre, cat: o.el.cat, date: decaler(aujourdhui(), 1), debut: o.el.debut, fin: o.el.fin, flou: !!o.el.flou, moment: o.el.moment || null, objectif: o.el.objectif || '' }); }
     if (a === 'supprimer') {
       let portee = 'une';
       if (o.el.rep) { portee = await demanderPortee('Supprimer'); if (!portee) return; }

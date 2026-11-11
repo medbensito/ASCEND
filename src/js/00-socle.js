@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 24;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 25;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -20,6 +20,8 @@
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
     // Dix niveaux. Chacun débloque un look : c = dégradé de l'accent, texte = couleur des textes d'accent, arc = teinte des arcs de lumière
+    // Planifier par moment : la tâche se fait « le matin », sans heure précise (a, b = bornes du moment, en minutes)
+    moments: { matin: { nom: 'Matin', ce: 'Ce matin', icone: '🌅', a: 6 * 60, b: 12 * 60 }, aprem: { nom: 'Après-midi', ce: 'Cet après-midi', icone: '☀️', a: 12 * 60, b: 18 * 60 }, soir: { nom: 'Soir', ce: 'Ce soir', icone: '🌙', a: 18 * 60, b: 24 * 60 } },
     sansFin: 5000,         // après le dernier niveau, un niveau de plus tous les 5 000 points (Zénith II, III…)
     paliers: [
       { id: 'eclat', nom: 'Éclat', seuil: 0, look: 'Platine', c: ['#faf7f2', '#ddd5c8', '#bdb2a2'], texte: '#e4d3b3', arc: '255, 236, 210' },
@@ -35,7 +37,7 @@
     ]
   };
   let H = CONFIG.heure;                    // px par heure ; téléphone couché, la vue Jour l'ajuste pour montrer toute la journée
-  let HMIN = 22;                           // hauteur minimale d'un bloc
+  let HMIN = 30;                           // hauteur minimale d'un bloc
   const PLAGE = { a: 0, b: 24, dispo: 0, ajuste: false };
   const PALETTE = ['#ff4d6d', '#ffb547', '#7b6cff', '#d78bff', '#ff5e7a', '#4f8bff', '#3ee08f', '#2fd3c5', '#57c3ff', '#ff8a3d', '#f5d547', '#9aa3d9'];
   const NOMS_COULEURS = { '#ff4d6d': 'Rouge', '#ffb547': 'Orange', '#7b6cff': 'Violet', '#d78bff': 'Mauve', '#ff5e7a': 'Rose', '#4f8bff': 'Bleu', '#3ee08f': 'Vert', '#2fd3c5': 'Turquoise', '#57c3ff': 'Ciel', '#ff8a3d': 'Mandarine', '#f5d547': 'Jaune', '#9aa3d9': 'Gris' };
@@ -83,6 +85,7 @@
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
     priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], aCaser: [], recompenses: [], achats: [], energie: {}, reflexions: {}, conseilsVus: {},
+    enCours: null,                              // la tâche commencée (« Je commence ») : { cle, debut }
     look: null, niveauMax: 0, niveauFete: 0,   // look choisi (null = celui du niveau), plus haut niveau atteint, dernier niveau fêté
     onglet: 'accueil', vueCal: 'semaine', semaineVue: true, vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
@@ -132,6 +135,7 @@
       el.faits = estObjet(el.faits) ? el.faits : {};
       if (!['tache', 'libre', 'sansecran', 'evenement'].includes(el.type)) el.type = 'tache';
       if (el.objectif === undefined) el.objectif = null;
+      if (el.moment && !(el.type === 'tache' && el.flou && CONFIG.moments[el.moment])) delete el.moment;
       if (el.finLe && !(el.type === 'evenement' && el.flou && !el.rep && typeof el.finLe === 'string' && el.finLe > el.date)) delete el.finLe;
     });
     S.elements = S.elements.filter(el => !el.rep || !el.rep.jusqua || el.rep.jusqua >= el.date);
@@ -143,6 +147,7 @@
     });
     S.objectifs = S.objectifs.filter(o => o && o.id && o.titre);
     S.objectifs.forEach(o => { if (!Array.isArray(o.etapes)) o.etapes = []; });
+    if (!(estObjet(S.enCours) && typeof S.enCours.cle === 'string' && S.enCours.debut > 0)) S.enCours = null;
     if (S.focus.length > 3000) S.focus = S.focus.slice(-3000);
     if (!S.depuis) S.depuis = aujourdhui();
   }
@@ -224,7 +229,8 @@
   const copie = el => JSON.parse(JSON.stringify(el));
   const debutOcc = o => parse(o.k).getTime() + o.el.debut * 6e4;
   const finOcc = o => parse(o.k).getTime() + o.el.fin * 6e4;
-  const prevue = o => (o.el.creeLe || 0) < debutOcc(o);            // planifiée avant son début
+  // Une tâche compte si elle existait avant le jour J (peu importe l'heure où on la fait) ; un moment JOMO, s'il était prévu avant son début
+  const prevue = o => (o.el.creeLe || 0) < (o.el.type === 'tache' ? parse(o.k).getTime() : debutOcc(o));
 
   function transferer(ancienne, nouvelle) {
     if (ancienne === nouvelle) return;
@@ -291,8 +297,9 @@
   }
   // Minutes de tâches prévues un jour (les chevauchements comptent une fois) : c'est ce qui est comparé au plafond
   function minutesPrevues(k, sans) {
-    const iv = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).sort((a, b) => a[0] - b[0]);
-    let total = 0, d = -1, f = -1;
+    const tous = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans);
+    const iv = tous.filter(o => !o.el.flou).map(o => [o.el.debut, o.el.fin]).sort((a, b) => a[0] - b[0]);
+    let total = tous.filter(o => o.el.flou).reduce((t, o) => t + o.el.fin - o.el.debut, 0), d = -1, f = -1;
     iv.forEach(([a, b]) => { if (a > f) { total += Math.max(0, f - d); d = a; f = b; } else f = Math.max(f, b); });
     return total + Math.max(0, f - d);
   }

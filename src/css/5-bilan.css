@@ -260,7 +260,7 @@ html.paysage .sem7 .bloc .b-texte b { font-size: 11px; white-space: nowrap; over
 .sem7 .colonne + .colonne { border-left: 1px solid var(--trait); }
 .flou-zone { display: grid; gap: 8px; padding: 0 0 10px; }
 .flou-zone .ligne { min-height: 52px; padding: 8px 14px; }
-#form-tache.sans-heure .horaires { opacity: .35; pointer-events: none; }
+#form-tache.sans-heure .horaires { opacity: .45; }
 .sem7 .bloc .b-texte { padding-right: 4px; padding-left: 5px; }
 
 /* ===== Récompenses ===== */

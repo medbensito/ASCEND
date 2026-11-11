@@ -855,7 +855,7 @@ html.paysage .sem7 .bloc .b-texte b { font-size: 11px; white-space: nowrap; over
 .sem7 .colonne + .colonne { border-left: 1px solid var(--trait); }
 .flou-zone { display: grid; gap: 8px; padding: 0 0 10px; }
 .flou-zone .ligne { min-height: 52px; padding: 8px 14px; }
-#form-tache.sans-heure .horaires { opacity: .35; pointer-events: none; }
+#form-tache.sans-heure .horaires { opacity: .45; }
 .sem7 .bloc .b-texte { padding-right: 4px; padding-left: 5px; }
 
 /* ===== Récompenses ===== */
@@ -1185,6 +1185,80 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
 .mini.sem-carte small b.hausse { color: var(--vert); }
 .mini.sem-carte small b.baisse { color: #ff8a9a; }
 
+/* ===== Rectangle d'une tâche dans la grille (édition 25) : verre teinté, barre de couleur, texte net, case facile à toucher ===== */
+.bloc { border-radius: 14px; border: 1px solid color-mix(in srgb, var(--c) 38%, rgba(255, 255, 255, .06));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c) 30%, #17171c) 0%, color-mix(in srgb, var(--c) 13%, #0c0c10) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), 0 6px 16px rgba(0, 0, 0, .35); container-type: inline-size; }
+.bloc::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--c); border-radius: 14px 0 0 14px; box-shadow: 0 0 12px color-mix(in srgb, var(--c) 60%, transparent); pointer-events: none; }
+.bloc .b-texte { gap: 2px; padding: 7px 46px 0 13px; }
+.bloc .b-texte b { font-size: 14.5px; font-weight: 650; letter-spacing: -.01em; line-height: 1.2; color: #fff; }
+.bloc .b-texte .b-ic { font-style: normal; font-size: 13px; margin-right: 1px; }
+.bloc .b-texte small { font-size: 12px; font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--c) 35%, #d6d6dc); }
+.bloc.grand .b-texte { padding-top: 10px; gap: 3px; }
+.bloc.grand .b-texte b { font-size: 15.5px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.bloc.court .b-texte { display: flex; align-items: center; gap: 8px; height: 100%; padding: 0 46px 0 13px; }
+.bloc.court .b-texte b { flex: 0 1 auto; min-width: 0; font-size: 13.5px; }
+.bloc.court .b-texte small { flex: none; }
+.bloc .b-pied { position: absolute; left: 13px; bottom: 8px; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; font-variant-numeric: tabular-nums; color: #e9e9ee;
+  background: rgba(0, 0, 0, .32); border: 1px solid rgba(255, 255, 255, .08); pointer-events: none; }
+.bloc .gain { right: 12px; bottom: 8px; padding: 2px 8px; border-radius: 999px; background: rgba(0, 0, 0, .32); font-size: 11.5px; }
+/* La case : 30 px à l'œil, 46 px sous le doigt */
+.bloc .rond-coche { right: 9px; top: 8px; width: 30px; height: 30px; border-color: color-mix(in srgb, var(--c) 55%, #fff); background: rgba(0, 0, 0, .28); }
+.bloc .rond-coche::before { inset: -8px; }
+.bloc.court .rond-coche { top: 50%; margin-top: 0; transform: translateY(-50%); width: 24px; height: 24px; }
+.bloc.court .rond-coche::before { inset: -11px; }
+.bloc .rond-coche[aria-checked="true"] { background: var(--c); border-color: #fff; color: #0a0a0c; box-shadow: 0 0 12px color-mix(in srgb, var(--c) 60%, transparent); }
+/* Faite : elle s'efface */
+.bloc.fait { background: linear-gradient(135deg, color-mix(in srgb, var(--c) 10%, #121215), #0b0b0e); border-color: rgba(255, 255, 255, .08); box-shadow: none; }
+.bloc.fait::before { opacity: .45; box-shadow: none; }
+.bloc.fait .b-texte b { color: var(--doux); }
+.bloc.fait .b-texte small { color: var(--pale); }
+/* En cours : elle respire */
+.bloc.encours { border-color: var(--c); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 0 0 1px var(--c), 0 0 22px color-mix(in srgb, var(--c) 55%, transparent); animation: bloc-pouls 2.4s ease-in-out infinite; z-index: 2; }
+.bloc.encours .b-texte small { color: #fff; font-weight: 600; }
+@keyframes bloc-pouls { 50% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 0 0 1px var(--c), 0 0 34px color-mix(in srgb, var(--c) 75%, transparent); } }
+/* Moments JOMO et événements : même verre, motif discret */
+.bloc.libre { background: repeating-linear-gradient(135deg, rgba(47, 211, 197, .17) 0 8px, rgba(47, 211, 197, .07) 8px 16px), #0d1213; }
+.bloc.sansecran { background: repeating-linear-gradient(135deg, rgba(87, 195, 255, .17) 0 8px, rgba(87, 195, 255, .06) 8px 16px), #0d1014; }
+.bloc.libre .b-texte, .bloc.sansecran .b-texte, .bloc.evenement .b-texte { padding-right: 12px; }
+.bloc.brouillon { --c: #fff; background: rgba(255, 255, 255, .14); box-shadow: none; }
+.bloc.brouillon::before { display: none; }
+/* Choisie ou soulevée : contour clair, poignées larges */
+.bloc.choisi { box-shadow: 0 0 0 2px #fff, 0 0 22px rgba(255, 255, 255, .28); }
+.bloc.leve { box-shadow: 0 16px 34px rgba(0, 0, 0, .6), 0 0 0 2px #fff; transform: scale(1.015); }
+.bloc .bord { height: 12px; }
+.bloc .poignee { width: 56px; height: 30px; margin-left: -28px; }
+.bloc .poignee::after { width: 36px; height: 6px; }
+.bloc .poignee.haut { top: -15px; }
+.bloc .poignee.bas { bottom: -15px; }
+/* Colonnes étroites (tâches côte à côte) : l'essentiel seulement */
+@container (max-width: 124px) { .b-texte small, .b-pied { display: none; } .bloc .b-texte { padding-right: 40px; } }
+@container (max-width: 96px) { .bloc .rond-coche { display: none; } .bloc .b-texte, .bloc.court .b-texte { padding-right: 6px; padding-left: 10px; } .b-texte .b-ic { display: none; } }
+/* Téléphone couché : rectangles serrés */
+.ajuste .bloc { border-radius: 8px; box-shadow: none; }
+.ajuste .bloc::before { width: 3px; border-radius: 8px 0 0 8px; box-shadow: none; }
+.ajuste .bloc .b-pied { display: none; }
+.ajuste .bloc .b-texte { padding: 3px 44px 0 9px; }
+.ajuste .bloc.court .b-texte { padding: 0 44px 0 9px; }
+.sem7 .bloc { border-radius: 6px; }
+.sem7 .bloc::before { width: 2px; }
+.sem7 .bloc .b-texte, .sem7 .bloc.court .b-texte { padding: 0 3px 0 6px; }
+.sem7 .bloc .b-texte .b-ic { display: none; }
+@media (prefers-reduced-motion: reduce) { .bloc.encours { animation: none; } }
+
+/* ===== Moments et « Je commence » ===== */
+.mnt-go { flex: none; width: auto; min-height: 40px; padding: 0 14px; font-size: 14px; white-space: nowrap; }
+.mnt-go svg { width: 16px; height: 16px; }
+.mnt.encours { border-left-color: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 18px 40px rgba(0, 0, 0, .42); }
+.mnt-pouls { display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); animation: pouls 1.6s ease-in-out infinite; }
+@keyframes pouls { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .mnt-pouls { animation: none; } }
+#t-moment-zone { margin-bottom: 14px; }
+#a-corps > .bouton { margin-bottom: 4px; }
+.bloc .b-plus { font-style: normal; font-weight: 600; color: #fff; }
+.ajuste .bloc .b-plus, .sem7 .bloc .b-plus { display: none; }
+@media (max-width: 359px) { .mnt-ligne { flex-wrap: wrap; } .mnt-ligne .ouvrir { flex: 1 1 60%; } .mnt-go { flex: 1 1 100%; justify-content: center; } }
+
 </style>
 </head>
 <body>
@@ -1325,7 +1399,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 24;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 25;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -1343,6 +1417,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
     // Dix niveaux. Chacun débloque un look : c = dégradé de l'accent, texte = couleur des textes d'accent, arc = teinte des arcs de lumière
+    // Planifier par moment : la tâche se fait « le matin », sans heure précise (a, b = bornes du moment, en minutes)
+    moments: { matin: { nom: 'Matin', ce: 'Ce matin', icone: '🌅', a: 6 * 60, b: 12 * 60 }, aprem: { nom: 'Après-midi', ce: 'Cet après-midi', icone: '☀️', a: 12 * 60, b: 18 * 60 }, soir: { nom: 'Soir', ce: 'Ce soir', icone: '🌙', a: 18 * 60, b: 24 * 60 } },
     sansFin: 5000,         // après le dernier niveau, un niveau de plus tous les 5 000 points (Zénith II, III…)
     paliers: [
       { id: 'eclat', nom: 'Éclat', seuil: 0, look: 'Platine', c: ['#faf7f2', '#ddd5c8', '#bdb2a2'], texte: '#e4d3b3', arc: '255, 236, 210' },
@@ -1358,7 +1434,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     ]
   };
   let H = CONFIG.heure;                    // px par heure ; téléphone couché, la vue Jour l'ajuste pour montrer toute la journée
-  let HMIN = 22;                           // hauteur minimale d'un bloc
+  let HMIN = 30;                           // hauteur minimale d'un bloc
   const PLAGE = { a: 0, b: 24, dispo: 0, ajuste: false };
   const PALETTE = ['#ff4d6d', '#ffb547', '#7b6cff', '#d78bff', '#ff5e7a', '#4f8bff', '#3ee08f', '#2fd3c5', '#57c3ff', '#ff8a3d', '#f5d547', '#9aa3d9'];
   const NOMS_COULEURS = { '#ff4d6d': 'Rouge', '#ffb547': 'Orange', '#7b6cff': 'Violet', '#d78bff': 'Mauve', '#ff5e7a': 'Rose', '#4f8bff': 'Bleu', '#3ee08f': 'Vert', '#2fd3c5': 'Turquoise', '#57c3ff': 'Ciel', '#ff8a3d': 'Mandarine', '#f5d547': 'Jaune', '#9aa3d9': 'Gris' };
@@ -1406,6 +1482,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     reglages: { plafond: 9 * 60, travail: 25, pause: 5 },
     meilleureSerie: 0, meilleureSansEcran: 0,
     priorites: {}, bilanVu: null, partis: {}, difficiles: {}, vu: null, identites: [], aCaser: [], recompenses: [], achats: [], energie: {}, reflexions: {}, conseilsVus: {},
+    enCours: null,                              // la tâche commencée (« Je commence ») : { cle, debut }
     look: null, niveauMax: 0, niveauFete: 0,   // look choisi (null = celui du niveau), plus haut niveau atteint, dernier niveau fêté
     onglet: 'accueil', vueCal: 'semaine', semaineVue: true, vueObj: 'habitudes', periode: 30,
     derniereExport: null, depuis: null,
@@ -1455,6 +1532,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       el.faits = estObjet(el.faits) ? el.faits : {};
       if (!['tache', 'libre', 'sansecran', 'evenement'].includes(el.type)) el.type = 'tache';
       if (el.objectif === undefined) el.objectif = null;
+      if (el.moment && !(el.type === 'tache' && el.flou && CONFIG.moments[el.moment])) delete el.moment;
       if (el.finLe && !(el.type === 'evenement' && el.flou && !el.rep && typeof el.finLe === 'string' && el.finLe > el.date)) delete el.finLe;
     });
     S.elements = S.elements.filter(el => !el.rep || !el.rep.jusqua || el.rep.jusqua >= el.date);
@@ -1466,6 +1544,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     });
     S.objectifs = S.objectifs.filter(o => o && o.id && o.titre);
     S.objectifs.forEach(o => { if (!Array.isArray(o.etapes)) o.etapes = []; });
+    if (!(estObjet(S.enCours) && typeof S.enCours.cle === 'string' && S.enCours.debut > 0)) S.enCours = null;
     if (S.focus.length > 3000) S.focus = S.focus.slice(-3000);
     if (!S.depuis) S.depuis = aujourdhui();
   }
@@ -1547,7 +1626,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   const copie = el => JSON.parse(JSON.stringify(el));
   const debutOcc = o => parse(o.k).getTime() + o.el.debut * 6e4;
   const finOcc = o => parse(o.k).getTime() + o.el.fin * 6e4;
-  const prevue = o => (o.el.creeLe || 0) < debutOcc(o);            // planifiée avant son début
+  // Une tâche compte si elle existait avant le jour J (peu importe l'heure où on la fait) ; un moment JOMO, s'il était prévu avant son début
+  const prevue = o => (o.el.creeLe || 0) < (o.el.type === 'tache' ? parse(o.k).getTime() : debutOcc(o));
 
   function transferer(ancienne, nouvelle) {
     if (ancienne === nouvelle) return;
@@ -1614,8 +1694,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   }
   // Minutes de tâches prévues un jour (les chevauchements comptent une fois) : c'est ce qui est comparé au plafond
   function minutesPrevues(k, sans) {
-    const iv = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).sort((a, b) => a[0] - b[0]);
-    let total = 0, d = -1, f = -1;
+    const tous = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans);
+    const iv = tous.filter(o => !o.el.flou).map(o => [o.el.debut, o.el.fin]).sort((a, b) => a[0] - b[0]);
+    let total = tous.filter(o => o.el.flou).reduce((t, o) => t + o.el.fin - o.el.debut, 0), d = -1, f = -1;
     iv.forEach(([a, b]) => { if (a > f) { total += Math.max(0, f - d); d = a; f = b; } else f = Math.max(f, b); });
     return total + Math.max(0, f - d);
   }
@@ -1716,7 +1797,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       duJour(k).forEach(o => {
         if (S.payes[o.cle]) return;
         const t = o.el.type;
-        if (t === 'tache' && o.fait && prevue(o) && debutOcc(o) <= now) { gagner(o.cle, valeur(o.el), k, 'tache', cat(o.el.cat).id); change = true; }
+        if (t === 'tache' && o.fait && prevue(o) && parse(k).getTime() <= now) { gagner(o.cle, valeur(o.el), k, 'tache', cat(o.el.cat).id); change = true; }
         else if (t === 'libre' && finOcc(o) <= now) {
           let raison = null;
           if (!prevue(o)) raison = 'tard';
@@ -1746,9 +1827,38 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     o.el.faits[o.k] = true;
     o.fait = true;
     const pts = valeur(o.el);
-    if (!prevue(o)) return 'Bien joué ! Pas de points : elle a été ajoutée après son début.';
-    if (debutOcc(o) > Date.now()) return `Faite en avance : +${pts} pts ${o.k === aujourdhui() ? 'à ' + hhmm(o.el.debut) : quandJour(o.k)}.`;
+    if (!prevue(o)) return 'Bien joué ! Pas de points : elle a été ajoutée le jour même.';
+    if (o.k > aujourdhui()) return `Faite en avance : +${pts} pts ${quandJour(o.k)}.`;
     return `+${gagner(o.cle, pts, o.k, 'tache', cat(o.el.cat).id)} pts${courage(o.el) ? ' · 🔥 bonus courage' : ''}${echoIdentite(o.el.cat)}`;
+  }
+  // ---------- « Je commence » / « Terminé » : le calendrier se cale sur ce qui se passe vraiment ----------
+  // La tâche commencée, si elle tient toujours (aujourd'hui, pas encore faite)
+  function enCours() {
+    const e = S.enCours, o = e && trouver(e.cle);
+    if (!o || o.fait || o.k !== aujourdhui() || o.el.type !== 'tache') { if (e) S.enCours = null; return null; }
+    return { o, debut: e.debut };
+  }
+  const momentDe = m => m < CONFIG.moments.aprem.a ? 'matin' : m < CONFIG.moments.soir.a ? 'aprem' : 'soir';
+  const cinq = m => Math.floor(m / 5) * 5;
+  // Commencer : la tâche vient se poser maintenant dans la grille, avec sa durée prévue
+  function commencer(cle) {
+    const o = trouver(cle);
+    if (!o || o.el.type !== 'tache' || o.fait || o.k !== aujourdhui()) return null;
+    const debut = Math.min(cinq(minNow()), 1435), du = Math.max(o.el.fin - o.el.debut, 15);
+    const n = appliquer(o, { debut, fin: Math.min(debut + du, 1440), flou: false, moment: null, prevu: o.el.prevu || du }, 'une');
+    S.enCours = { cle: n, debut: Date.now() };
+    return n;
+  }
+  // Terminer : la fin se cale sur maintenant, la tâche est cochée. Renvoie le message.
+  function terminer() {
+    const e = enCours();
+    if (!e) return null;
+    const reel = Math.max(1, Math.round((Date.now() - e.debut) / 6e4)), prevu = e.o.el.prevu || (e.o.el.fin - e.o.el.debut);
+    const fin = Math.min(Math.max(Math.ceil(minNow() / 5) * 5, e.o.el.debut + 5), 1440);
+    const n = trouver(appliquer(e.o, { fin, reel }, 'une'));
+    S.enCours = null;
+    const msg = basculerTache(n);
+    return `Terminée en ${duree(reel)}${Math.abs(reel - prevu) >= 5 ? ` (prévu ${duree(prevu)})` : ''}. ${msg}`;
   }
   // Moment sans écran : tenu ou pas (on peut changer d'avis)
   function validerSansEcran(o, tenu) {
@@ -2067,18 +2177,18 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   // Événement sur la journée (flou) : « Toute la journée », ou sa période s'il dure plusieurs jours (finLe)
   const jourCourt = k => fmt(k, { day: 'numeric', month: 'short' });
   const periode = el => el.date.slice(0, 7) === el.finLe.slice(0, 7) ? `Du ${parse(el.date).getDate()} au ${jourCourt(el.finLe)}` : `Du ${jourCourt(el.date)} au ${jourCourt(el.finLe)}`;
-  const plage = el => el.type === 'evenement' && el.flou ? (el.finLe ? periode(el) : 'Toute la journée') : el.flou ? `Dans la journée · ${duree(el.fin - el.debut)}` : `${hhmm(el.debut)} – ${finTexte(el.fin)}`;
+  const plage = el => el.type === 'evenement' && el.flou ? (el.finLe ? periode(el) : 'Toute la journée') : el.flou ? `${el.moment ? CONFIG.moments[el.moment].nom : 'Dans la journée'} · ${duree(el.fin - el.debut)}` : `${hhmm(el.debut)} – ${finTexte(el.fin)}`;
   const ptsTexte = n => `${n > 0 ? '+' : ''}${n} pt${Math.abs(n) > 1 ? 's' : ''}`;
   function description(o) {
     const el = o.el, l = look(el);
-    let d = `${el.titre}, ${o.k === aujourdhui() ? '' : jourLong(o.k) + ', '}${el.type === 'evenement' && el.flou ? (el.finLe ? `du ${jourLong(el.date).toLowerCase()} au ${jourLong(el.finLe).toLowerCase()}, jour ${ecart(el.date, o.k) + 1} sur ${ecart(el.date, el.finLe) + 1}` : 'toute la journée') : el.flou ? 'dans la journée' : `de ${hhmm(el.debut)} à ${finTexte(el.fin)}`}, ${l.nom}`;
+    let d = `${el.titre}, ${o.k === aujourdhui() ? '' : jourLong(o.k) + ', '}${el.type === 'evenement' && el.flou ? (el.finLe ? `du ${jourLong(el.date).toLowerCase()} au ${jourLong(el.finLe).toLowerCase()}, jour ${ecart(el.date, o.k) + 1} sur ${ecart(el.date, el.finLe) + 1}` : 'toute la journée') : el.flou ? (el.moment ? CONFIG.moments[el.moment].ce.toLowerCase() : 'dans la journée') : `de ${hhmm(el.debut)} à ${finTexte(el.fin)}`}, ${l.nom}`;
     if (el.rep) d += ', ' + REPET[el.rep.freq].toLowerCase();
     if (el.type === 'libre') d += ', ' + ETAT_LIBRE[etatLibre(o)];
     if (el.type === 'sansecran') d += ', ' + ETAT_ECRAN[etatSansEcran(o)];
     if (el.type === 'tache') d += o.fait ? ', faite' : S.partis[o.cle] ? ', laissée partir' : ', à faire';
     const p = S.payes[o.cle];
     if (p && p.pts) d += `, +${p.pts} points gagnés`;
-    else if (el.type === 'tache' && !prevue(o)) d += ', ne rapporte pas de points (ajoutée après son début)';
+    else if (el.type === 'tache' && !prevue(o)) d += ', ne rapporte pas de points (ajoutée le jour même)';
     else if (el.type === 'tache') d += `, rapporte ${valeur(el)} points`;
     return d;
   }
@@ -2282,7 +2392,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
 
   // Jour : la grille horaire, avec les gestes (toucher un vide, appui long, glisser, poignées)
   function disposer(liste) {
-    const items = liste.map(o => ({ o, d: o.el.debut, f: Math.max(o.el.fin, o.el.debut + 20) })).sort((a, b) => a.d - b.d || b.f - a.f);
+    const items = liste.map(o => ({ o, d: o.el.debut, f: Math.max(o.el.fin, o.el.debut + Math.ceil(HMIN / H * 60)) })).sort((a, b) => a.d - b.d || b.f - a.f);
     const res = [];
     let groupe = [], finGroupe = -1;
     const fermer = () => { const n = Math.max(...groupe.map(g => g.col)) + 1; groupe.forEach(g => { g.n = n; res.push(g); }); groupe = []; };
@@ -2299,18 +2409,21 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (groupe.length) fermer();
     return res;
   }
+  // Le rectangle d'un élément dans la grille : barre de couleur, titre, heures ; grand, il montre aussi la durée et les points
   function bloc(g) {
     const o = g.o, el = o.el, l = look(el);
     const haut = el.debut / 60 * H, hauteur = Math.max((el.fin - el.debut) / 60 * H, HMIN);
-    const court = hauteur < 42;
+    const court = hauteur < 42, grand = hauteur >= 76;
     const choisi = U.selection === o.cle;
     const etat = el.type === 'libre' ? etatLibre(o) : el.type === 'sansecran' ? etatSansEcran(o) : null;
-    const p = S.payes[o.cle];
-    return `<div class="bloc ${el.type}${etat === 'grignote' ? ' grignote' : ''}${o.fait ? ' fait' : ''}${court ? ' court' : ''}${choisi ? ' choisi' : ''}${U.repere === o.cle ? ' repere' : ''}" data-cle="${o.cle}"
+    const p = S.payes[o.cle], e = S.enCours && S.enCours.cle === o.cle && !o.fait;
+    const pied = el.type === 'tache' && !o.fait ? `${duree(el.fin - el.debut)}${prevue(o) ? ` · +${valeur(el)} pts` : ''}` : el.type !== 'tache' ? duree(el.fin - el.debut) : '';
+    return `<div class="bloc ${el.type}${etat === 'grignote' ? ' grignote' : ''}${o.fait ? ' fait' : ''}${court ? ' court' : ''}${grand ? ' grand' : ''}${e ? ' encours' : ''}${choisi ? ' choisi' : ''}${U.repere === o.cle ? ' repere' : ''}" data-cle="${o.cle}"
         style="top:${haut}px;height:${hauteur}px;left:calc(${g.col / g.n * 100}% + 2px);width:calc(${100 / g.n}% - 4px);--c:${l.couleur}">
-      <button type="button" class="b-ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}" data-focus="o${o.cle}"></button>
+      <button type="button" class="b-ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}${e ? ', en cours' : ''}" data-focus="o${o.cle}"></button>
       ${el.type === 'tache' ? rondCoche(o.cle, o.fait, `${el.titre} : ${o.fait ? 'faite' : 'à faire'}`, 'data-cocher') : ''}
-      <span class="b-texte" aria-hidden="true"><b>${l.icone} ${esc(el.titre)}</b><small>${hhmm(el.debut)}${court ? '' : ' – ' + finTexte(el.fin)}${etat ? ' · ' + (el.type === 'libre' ? ETAT_LIBRE[etat] : ETAT_ECRAN[etat]) : ''}</small></span>
+      <span class="b-texte" aria-hidden="true"><b><i class="b-ic">${l.icone}</i> ${esc(el.titre)}</b><small>${e ? 'En cours · depuis ' + hhmm(el.debut) : `${hhmm(el.debut)}${court ? '' : ' – ' + finTexte(el.fin)}${etat ? ' · ' + (el.type === 'libre' ? ETAT_LIBRE[etat] : ETAT_ECRAN[etat]) : ''}${!court && !grand && el.type === 'tache' && !o.fait && prevue(o) ? `<i class="b-plus"> · +${valeur(el)} pts</i>` : ''}`}</small></span>
+      ${grand && pied && !(p && p.pts) ? `<span class="b-pied" aria-hidden="true">${pied}</span>` : ''}
       ${p && p.pts ? `<span class="gain" aria-hidden="true">+${p.pts}</span>` : ''}
       <span class="bord" data-bord="bas" aria-hidden="true"></span>
       ${choisi ? '<span class="poignee haut" data-bord="haut" aria-hidden="true"></span><span class="poignee bas" data-bord="bas" aria-hidden="true"></span>' : ''}
@@ -2392,7 +2505,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   const joursPaysage = () => S.vueCal === 'semaine' ? Array.from({ length: 7 }, (_, i) => decaler(lundiDe(U.date), i)) : [U.date];
   function reglerHeure(ajuste) {
     PLAGE.ajuste = ajuste;
-    if (!ajuste) { H = CONFIG.heure; HMIN = 22; }
+    if (!ajuste) { H = CONFIG.heure; HMIN = 30; }
     else {
       const jours = joursPaysage();
       const l = [].concat(...jours.map(k => duJour(k).filter(o => !o.el.flou).map(o => o.el)));
@@ -2899,7 +3012,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       corps.innerHTML = `<p class="note">Les 7 derniers jours. Rien de grave : décide, puis passe à autre chose. 🌿</p>` + jours.map(k => `
         <section class="pf-jour" aria-labelledby="pf-${k}"><h3 id="pf-${k}">${k === decaler(aujourdhui(), -1) ? 'Hier' : jourLong(k)}</h3>
           ${l.filter(o => o.k === k).map(o => {
-            const lk = look(o.el), pts = prevue(o) ? `+${valeur(o.el)} pts si faite` : '0 pt (ajoutée après son début)';
+            const lk = look(o.el), pts = prevue(o) ? `+${valeur(o.el)} pts si faite` : '0 pt (ajoutée le jour même)';
             const ouv = P.ouverte === o.cle, props = ouv ? propositions(o) : [];
             return `<div class="carte pf-item" style="--c:${lk.couleur}" role="group" aria-label="${esc(o.el.titre)}, ${esc(quandJour(o.k))}, ${plage(o.el)}, ${esc(lk.nom)}">
               <div class="pf-haut"><span class="tuile petite" aria-hidden="true">${lk.icone}</span><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>${plage(o.el)} · ${esc(lk.nom)} · ${pts}</small></span></div>
@@ -3385,7 +3498,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   function clicSemaine(d) {
     if (d.semCat) { U.semCat = U.semCat === d.semCat ? null : d.semCat; U.garderDefilement = true; render('sp' + d.semCat); return true; }
     if (d.semPlier) { if (U.semOuverts.has(d.semPlier)) U.semOuverts.delete(d.semPlier); else U.semOuverts.add(d.semPlier); U.garderDefilement = true; render('sj' + d.semPlier); return true; }
-    if (d.semPlus) { const auj = aujourdhui(), k = d.semPlus, debut = k === auj ? prochaineHeure() : 9 * 60; ouvrirTache(null, { date: k, debut, fin: Math.min(debut + CONFIG.duree, 1440) }); return true; }
+    if (d.semPlus) { ouvrirTache(null, { date: d.semPlus }); return true; }
     if (d.semAutre) { ouvrirTache(null, { cat: d.semAutre }); return true; }
     if (d.semAjout) {
       const [id, k, debut, fin] = d.semAjout.split('|'), c = cat(id);
@@ -3400,16 +3513,30 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   // ---------- Accueil : « Maintenant » ----------
   // Ce qui est en cours, sinon ce qui vient ensuite aujourd'hui
   function carteMaintenant() {
-    const auj = aujourdhui(), now = minNow();
-    const l = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait) && !o.el.flou && o.el.fin > now);
-    const o = l.find(x => x.el.debut <= now) || l[0];
+    const auj = aujourdhui(), now = minNow(), e = enCours();
+    if (e) {                                   // une tâche commencée : elle passe devant tout
+      const o = e.o, lk = look(o.el), depuis = Math.max(0, Math.round((Date.now() - e.debut) / 6e4));
+      return `<section class="carte mnt encours" style="--c:${lk.couleur}" aria-labelledby="mnt-titre">
+        <h2 id="mnt-titre"><i class="mnt-pouls" aria-hidden="true"></i>En cours</h2>
+        <div class="mnt-ligne"><span class="tuile petite" aria-hidden="true">${lk.icone}</span>
+          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="En cours : ${esc(o.el.titre)}, commencée à ${hhmm(o.el.debut)}, depuis ${duree(depuis)}. Ouvrir"><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>depuis ${hhmm(o.el.debut)} · ${duree(depuis)} · ${esc(lk.nom)}</small></span></button>
+          <button type="button" class="bouton petit mnt-go" data-action="terminer" data-focus="mnt-go">${ICONE.coche} Terminé</button></div></section>`;
+    }
+    const jour = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait));
+    const fixes = jour.filter(o => !o.el.flou && o.el.fin > now), souples = jour.filter(o => o.el.flou && o.el.type === 'tache' && !S.partis[o.cle]);
+    const mom = momentDe(now);
+    // Dans l'ordre : ce qui se passe maintenant à heure fixe, la tâche du moment (ce matin…), la prochaine à heure fixe, une tâche sans heure
+    const o = fixes.find(x => x.el.debut <= now) || souples.find(x => x.el.moment === mom) || fixes[0] || souples.find(x => !x.el.moment || CONFIG.moments[x.el.moment].a > now) || souples[0];
     if (!o) return '';
-    const enCours = o.el.debut <= now, lk = look(o.el), dans = o.el.debut - now;
-    const quand = enCours ? `jusqu'à ${finTexte(o.el.fin)}` : `${hhmm(o.el.debut)} · dans ${duree(dans)}`;
+    const enCoursFixe = !o.el.flou && o.el.debut <= now, lk = look(o.el), dans = o.el.debut - now;
+    const titre = o.el.flou ? (o.el.moment ? (o.el.moment === mom ? CONFIG.moments[mom].ce : CONFIG.moments[o.el.moment].b <= now ? 'À rattraper' : 'Ensuite') : "Aujourd'hui") : enCoursFixe ? 'Maintenant' : 'Ensuite';
+    const quand = o.el.flou ? `${o.el.moment ? CONFIG.moments[o.el.moment].nom : 'Dans la journée'} · ${duree(o.el.fin - o.el.debut)}` : enCoursFixe ? `jusqu'à ${finTexte(o.el.fin)}` : `${hhmm(o.el.debut)} · dans ${duree(dans)}`;
+    const tache = o.el.type === 'tache';
     return `<section class="carte mnt" style="--c:${lk.couleur}" aria-labelledby="mnt-titre">
-        <h2 id="mnt-titre">${enCours ? 'Maintenant' : 'Ensuite'}</h2>
-        <div class="mnt-ligne">${o.el.type === 'tache' ? rondCoche(o.cle, o.fait, `${o.el.titre} : à faire`, 'data-cocher') : `<span class="tuile petite" aria-hidden="true">${lk.icone}</span>`}
-          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="${enCours ? 'Maintenant' : 'Ensuite'} : ${esc(o.el.titre)}, ${quand}. Ouvrir"><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>${quand} · ${esc(lk.nom)}</small></span>${ptsElement(o)}</button></div></section>`;
+        <h2 id="mnt-titre">${titre}</h2>
+        <div class="mnt-ligne">${tache ? rondCoche(o.cle, o.fait, `${o.el.titre} : à faire`, 'data-cocher') : `<span class="tuile petite" aria-hidden="true">${lk.icone}</span>`}
+          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="${titre} : ${esc(o.el.titre)}, ${quand}. Ouvrir"><span class="quoi" aria-hidden="true"><b>${esc(o.el.titre)}</b><small>${quand} · ${esc(lk.nom)}</small></span>${tache ? '' : ptsElement(o)}</button>
+          ${tache ? `<button type="button" class="bouton petit secondaire mnt-go" data-action="commencer" data-cle="${o.cle}" data-focus="mnt-go" aria-label="Je commence : ${esc(o.el.titre)}">▶ Je commence</button>` : ''}</div></section>`;
   }
   // ---------- Gestes sur les lignes de tâches, menu d'actions, bac « À caser » ----------
   // Balayer à droite : faite (ou décochée), avec « Annuler ». Balayer à gauche ou appui long : le menu (reporter, à caser, laisser partir…).
@@ -3452,6 +3579,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     $('#a-titre').textContent = o.el.titre;
     $('#a-corps').innerHTML = `
       <p class="note">${cap(quandJour(o.k))} · ${plage(o.el)} · ${esc(look(o.el).nom)}</p>
+      ${tache && !o.fait && o.k === auj ? (enCours() && enCours().o.cle === o.cle
+        ? `<button type="button" class="bouton" data-a="terminer">${ICONE.coche} Terminé</button>`
+        : `<button type="button" class="bouton" data-a="commencer">▶ Je commence</button>`) : ''}
       ${o.fait ? '' : `<div><span class="etiquette" id="a-rep">Reporter</span>
         <div class="puces" role="group" aria-labelledby="a-rep">${jours.map((k, i) => { const p = creneauReport(o, k); return p ? `<button type="button" class="puce" data-a-jour="${k}|${p.debut}|${p.fin}" data-focus="aj${i}" aria-label="${jourLong(k)}${o.el.flou ? '' : ' à ' + hhmm(p.debut)}">${quandCourt(k)}${o.el.flou ? '' : ' · ' + hhmm(p.debut)}</button>` : ''; }).join('')}</div></div>`}
       <div class="groupe a-liste">
@@ -3500,7 +3630,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       if (o.el.type === 'tache' && !(await accepterPlafond(k, o.cle, +debut, +fin))) return;
       const cle = appliquer(o, { date: k, debut: +debut, fin: +fin }, 'une');
       sauver(); AD.close();
-      if (!avertirLibre(cle)) dire(`« ${o.el.titre} » : ${quandJour(k)}${o.el.flou ? ', dans la journée' : ' à ' + hhmm(+debut)}.`);
+      if (!avertirLibre(cle)) dire(`« ${o.el.titre} » : ${quandJour(k)}${o.el.flou ? (o.el.moment ? ', ' + CONFIG.moments[o.el.moment].nom.toLowerCase() : ', dans la journée') : ' à ' + hhmm(+debut)}.`);
       return;
     }
     if (!b) return;
@@ -3509,8 +3639,10 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (!o) return;
     if (a === 'caser') { S.aCaser.push({ id: uid(), titre: o.el.titre, cat: o.el.cat, duree: Math.min(Math.max(o.el.fin - o.el.debut, 15), 240) }); supprimerOcc(o, 'une'); sauver(); AD.close(); return dire(`« ${o.el.titre} » est à caser : retrouve-la en bas de la semaine.`); }
     if (a === 'partir') { S.partis[o.cle] = aujourdhui(); sauver(); AD.close(); return dire(`« ${o.el.titre} » : laissée partir. 🍃`); }
+    if (a === 'commencer') { if (!commencer(o.cle)) return; sauver(); AD.close(); return dire(`C'est parti. Touche « Terminé » quand tu as fini.`); }
+    if (a === 'terminer') { const msg = terminer(); if (!msg) return; sauver(); AD.close(); dire(msg); return feliciter(); }
     if (a === 'modifier') { AD.close(); return ouvrirTache(o); }
-    if (a === 'dupliquer') { AD.close(); return ouvrirTache(null, { type: o.el.type, titre: o.el.titre, cat: o.el.cat, date: decaler(aujourdhui(), 1), debut: o.el.debut, fin: o.el.fin, objectif: o.el.objectif || '' }); }
+    if (a === 'dupliquer') { AD.close(); return ouvrirTache(null, { type: o.el.type, titre: o.el.titre, cat: o.el.cat, date: decaler(aujourdhui(), 1), debut: o.el.debut, fin: o.el.fin, flou: !!o.el.flou, moment: o.el.moment || null, objectif: o.el.objectif || '' }); }
     if (a === 'supprimer') {
       let portee = 'une';
       if (o.el.rep) { portee = await demanderPortee('Supprimer'); if (!portee) return; }
@@ -3643,9 +3775,12 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   const champT = n => TF.elements.namedItem(n);
   function ouvrirTache(o, modele) {
     const el = o ? o.el : null;
-    const m = el ? { type: el.type, titre: el.titre, date: el.finLe ? el.date : o.k, finLe: el.finLe || '', debut: el.debut, fin: el.fin, rep: el.rep, cat: el.cat, objectif: el.objectif || '' }
+    const m = el ? { type: el.type, titre: el.titre, date: el.finLe ? el.date : o.k, finLe: el.finLe || '', moment: el.moment || null, debut: el.debut, fin: el.fin, rep: el.rep, cat: el.cat, objectif: el.objectif || '' }
       : Object.assign({ type: 'tache', titre: '', date: U.date, debut: 9 * 60, fin: 10 * 60, rep: null, cat: (catsActives()[0] || S.categories[0]).id, objectif: '' }, modele);
-    U.edition = { o: o || null, depart: m, duree: m.fin - m.debut, cat: cat(m.cat).id, flou: !!(el ? el.flou : m.flou), nj: m.finLe ? ecart(m.date, m.finLe) + 1 : 1 };
+    // Une nouvelle tâche sans heure imposée se planifie par moment : ce matin, cet après-midi, ce soir
+    const auto = !el && m.type === 'tache' && !(modele && (modele.debut != null || modele.flou));
+    if (auto) { const d0 = m.date === aujourdhui() ? prochaineHeure() : 9 * 60; m.debut = d0; m.fin = Math.min(d0 + CONFIG.duree, 1440); m.flou = true; m.moment = m.date === aujourdhui() ? momentDe(minNow()) : 'matin'; }
+    U.edition = { o: o || null, depart: m, duree: m.fin - m.debut, cat: cat(m.cat).id, flou: !!(el ? el.flou : m.flou), moment: m.moment || null, nj: m.finLe ? ecart(m.date, m.finLe) + 1 : 1 };
     const objs = S.objectifs.filter(x => !x.atteintLe || x.id === m.objectif);
     TF.innerHTML = `
       <div class="f-haut"><button type="button" class="f-icone" data-t="annuler" aria-label="Fermer">${ICONE.croix}</button><h2 id="t-titre"></h2>
@@ -3661,7 +3796,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
         <div><span class="etiquette" id="t-quand">Quand</span>
           <div class="puces" role="group" aria-labelledby="t-quand" id="t-jours"></div>
           <div class="groupe t-date"><label class="rang"><span><span class="ic">${ICONE.calendrier}</span>Date</span><input type="date" name="date" value="${m.date}" required></label></div></div>
-        <div><span class="etiquette" id="t-heure">Heure</span>
+        <div><div id="t-moment-zone"><span class="etiquette" id="t-moment">Moment</span>
+          <div class="puces" role="group" aria-labelledby="t-moment" id="t-moments"></div></div>
+          <span class="etiquette" id="t-heure">Heure</span>
           <div class="puces" role="group" aria-labelledby="t-heure" id="t-heures"></div>
           <div class="groupe" style="margin-top:8px"><div class="horaires"><label>Début<input type="time" name="debut" step="900" value="${hhmm(m.debut)}" required></label><label>Fin<input type="time" name="fin" step="900" value="${finTexte(m.fin) === '24:00' ? '00:00' : hhmm(m.fin)}" required></label></div></div></div>
         <div id="t-duree-zone"><span class="etiquette" id="t-duree">Durée</span>
@@ -3707,24 +3844,30 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const sans = U.edition.o ? U.edition.o.cle : null;
     const libre = /^\d{4}-\d{2}-\d{2}$/.test(date) ? creneauLibre(date, du, sans, date === auj ? Math.ceil((minNow() + 5) / CONFIG.pas) * CONFIG.pas : 8 * 60) : null;
     const heures = [9 * 60, 12 * 60, 14 * 60, 18 * 60, 20 * 60].filter(h => !libre || h !== libre.debut);
-    const journee = U.edition.flou && type === 'evenement';          // événement « toute la journée », sur un ou plusieurs jours
+    const journee = U.edition.flou && !U.edition.moment && type === 'evenement';          // événement « toute la journée », sur un ou plusieurs jours
     const flou = (U.edition.flou && type === 'tache') || journee;
+    const mom = type === 'tache' && U.edition.flou ? U.edition.moment : null;
+    $('#t-moment-zone').hidden = type !== 'tache';
+    $('#t-heure').textContent = type === 'tache' ? 'Ou une heure précise' : 'Heure';
+    poser('#t-moments', type !== 'tache' ? '' : Object.keys(CONFIG.moments).map(id => puce('data-t-moment', id, `<span aria-hidden="true">${CONFIG.moments[id].icone}</span> ${CONFIG.moments[id].nom}`, mom === id)).join('')
+      + puce('data-t-flou', '1', 'Sans heure', flou && !mom && type === 'tache', 'Sans heure : dans la journée'));
     TF.classList.toggle('sans-heure', flou);
     const nj = journee ? U.edition.nj : 1;                           // le nombre de jours tient quand on change le premier jour
     if (/^\d{4}-\d{2}-\d{2}$/.test(date)) champT('finle').value = U.edition.nj > 1 ? decaler(date, U.edition.nj - 1) : '';
     $('#t-duree-zone').hidden = journee; $('#t-fin-zone').hidden = !journee;
     TF.querySelector('.t-plus').hidden = journee && nj > 1;
     poser('#t-njours', [1, 2, 3, 4, 7].map(x => puce('data-t-nj', x, x === 7 ? '1 semaine' : pluriel(x, 'jour'), nj === x)).join(''));
-    poser('#t-heures', (type === 'tache' ? puce('data-t-flou', '1', 'Sans heure', flou, 'Sans heure : dans la journée') : type === 'evenement' ? puce('data-t-flou', '1', 'Toute la journée', journee) : '') + (libre ? puce('data-t-heure', libre.debut, `Libre · ${hhmm(libre.debut)}`, !flou && deb === libre.debut, `Prochain créneau libre : ${hhmm(libre.debut)}`) : '') + heures.map(h => puce('data-t-heure', h, hhmm(h), !flou && deb === h)).join(''));
+    poser('#t-heures', (type === 'evenement' ? puce('data-t-flou', '1', 'Toute la journée', journee) : '') + (libre ? puce('data-t-heure', libre.debut, `Libre · ${hhmm(libre.debut)}`, !flou && deb === libre.debut, `Prochain créneau libre : ${hhmm(libre.debut)}`) : '') + heures.map(h => puce('data-t-heure', h, hhmm(h), !flou && deb === h)).join(''));
     poser('#t-durees', [15, 30, 60, 90, 120].map(x => puce('data-t-duree', x, duree(x), du === x)).join(''));
     const fin = versMin(champT('fin').value);
-    $('#t-resume').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) && deb != null && fin != null ? (journee ? (nj > 1 ? `Du ${fmt(date, { weekday: 'short', day: 'numeric', month: 'short' })} au ${fmt(champT('finle').value, { weekday: 'short', day: 'numeric', month: 'short' })} · ${nj} jours` : `${cap(quandJour(date))} · toute la journée`) : flou ? `${cap(quandJour(date))} · dans la journée · ${duree(du)}` : `${cap(quandJour(date))} · ${hhmm(deb)} – ${finTexte(fin === 0 ? 1440 : fin)} · ${duree(du)}`) : '';
+    $('#t-resume').textContent = /^\d{4}-\d{2}-\d{2}$/.test(date) && deb != null && fin != null ? (journee ? (nj > 1 ? `Du ${fmt(date, { weekday: 'short', day: 'numeric', month: 'short' })} au ${fmt(champT('finle').value, { weekday: 'short', day: 'numeric', month: 'short' })} · ${nj} jours` : `${cap(quandJour(date))} · toute la journée`) : flou ? `${cap(quandJour(date))} · ${mom ? CONFIG.moments[mom].nom.toLowerCase() : 'dans la journée'} · ${duree(du)}` : `${cap(quandJour(date))} · ${hhmm(deb)} – ${finTexte(fin === 0 ? 1440 : fin)} · ${duree(du)}`) : '';
     const rep = champT('repeter').checked;
     $('#t-freq').hidden = $('#t-jusqua').hidden = !rep;
-    $('#t-resume').textContent += $('#t-resume').textContent && type !== 'evenement' ? ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts` : '';
+    const aTemps = /^\d{4}-\d{2}-\d{2}$/.test(date) && (U.edition.o ? U.edition.o.el.creeLe || 0 : Date.now()) < parse(date).getTime();
+    $('#t-resume').textContent += $('#t-resume').textContent && type !== 'evenement' ? (type === 'tache' && !aTemps ? ' · 0 pt' : ` · +${type === 'tache' ? c.points : CONFIG.points[type]} pts`) : '';
     $('#t-regle').textContent = {
       evenement: journee ? 'Un événement sur la journée ne se coche pas et ne rapporte pas de points. Il s\'affiche en haut de chaque jour concerné, sans compter dans ta charge ni bloquer tes créneaux.' : 'Un événement ne se coche pas et ne rapporte pas de points. Il occupe ton temps : il compte dans la charge du jour, et tu reçois un rappel avant.',
-      tache: `Rapporte les points de « ${c.nom} » une fois faite, si elle est prévue avant son début. Compte dans l'objectif de la semaine.`,
+      tache: aTemps ? `Rapporte les points de « ${c.nom} » une fois faite, peu importe l'heure. Compte dans l'objectif de la semaine.` : `Pas de points cette fois : une tâche rapporte si elle est prévue avant le jour même. Elle compte quand même dans l'objectif de la semaine.`,
       libre: `JOMO : +${CONFIG.points.libre} pts si aucune tâche ne vient empiéter sur ce créneau jusqu'au bout (${CONFIG.points.libreMin} min au moins, ${CONFIG.points.libresParJour} par jour).`,
       sansecran: `JOMO : à la fin, ASCEND te demande si tu l'as tenu. +${CONFIG.points.sansecran} pts si oui.`
     }[type];
@@ -3734,6 +3877,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const n = e.target.name;
     if (n === 'finle') { const a = champT('date').value, f = champT('finle').value; U.edition.nj = a && f && f >= a ? Math.min(ecart(a, f) + 1, 366) : 1; }
     if (n === 'debut' || n === 'fin') {
+      U.edition.flou = false; U.edition.moment = null;          // écrire une heure, c'est choisir une heure précise
       const d = versMin(champT('debut').value), f0 = versMin(champT('fin').value);
       if (n === 'debut' && d != null && U.edition.duree > 0) champT('fin').value = hhmm(Math.min(d + U.edition.duree, 1440) % 1440);
       else if (n === 'fin' && d != null && f0 != null) { const f = f0 === 0 ? 1440 : f0; if (f > d) U.edition.duree = f - d; }
@@ -3746,8 +3890,9 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const titre = champT('titre').value.trim() || (type === 'tache' || type === 'evenement' ? '' : JOMO[type].nom);
     if (!titre) return { erreur: type === 'evenement' ? 'Donne un nom à l\'événement.' : 'Donne un nom à la tâche.', champ: champT('titre') };
     if (!champT('date').value) return { erreur: 'Choisis une date.', champ: champT('date') };
-    const journee = U.edition.flou && type === 'evenement';
+    const journee = U.edition.flou && !U.edition.moment && type === 'evenement';
     const flou = (U.edition.flou && type === 'tache') || journee;
+    const moment = type === 'tache' && flou ? U.edition.moment : null;
     let finLe = null;
     if (journee) {
       const f = champT('finle').value;
@@ -3755,26 +3900,27 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
       if (f && ecart(champT('date').value, f) > 365) return { erreur: 'Un événement dure un an au plus.', champ: champT('finle') };
       if (f && f > champT('date').value) finLe = f;
     }
-    const debut = flou ? 0 : versMin(champT('debut').value);
-    let fin = journee ? 0 : flou ? Math.min(Math.max(U.edition.duree > 0 ? U.edition.duree : 60, 15), 240) : versMin(champT('fin').value);
+    const debut = moment ? CONFIG.moments[moment].a : flou ? 0 : versMin(champT('debut').value);
+    let fin = journee ? 0 : flou ? debut + Math.min(Math.max(U.edition.duree > 0 ? U.edition.duree : 60, 15), 240) : versMin(champT('fin').value);
     if (debut == null || fin == null) return { erreur: 'Indique le début et la fin : chaque tâche a sa plage horaire.', champ: champT('debut') };
     if (fin === 0 && debut > 0) fin = 1440;
     if (fin <= debut && !journee) return { erreur: 'La fin doit être après le début.', champ: champT('fin') };
     const rep = finLe ? null : champT('repeter').checked ? { freq: champT('freq').value, jusqua: champT('jusqua').value || null } : null;
     if (rep && rep.jusqua && rep.jusqua < champT('date').value) return { erreur: "« Jusqu'au » doit venir après la date.", champ: champT('jusqua') };
-    return { champs: { type, titre, date: champT('date').value, debut, fin, flou, finLe, rep, cat: type === 'tache' ? U.edition.cat : (U.edition.depart.cat || S.categories[0].id), objectif: type === 'tache' ? (champT('objectif').value || null) : null } };
+    return { champs: { type, titre, date: champT('date').value, debut, fin, flou, moment, finLe, rep, cat: type === 'tache' ? U.edition.cat : (U.edition.depart.cat || S.categories[0].id), objectif: type === 'tache' ? (champT('objectif').value || null) : null } };
   }
   const memeRep = (a, b) => (!a && !b) || (a && b && a.freq === b.freq && (a.jusqua || null) === (b.jusqua || null));
   // Minutes de tâches d'un jour si on y ajoute (ou déplace) une plage
-  function minutesAvec(k, sans, d, f) {
-    const iv = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans).map(o => [o.el.debut, o.el.fin]).concat([[d, f]]).sort((a, b) => a[0] - b[0]);
-    let total = 0, a = -1, b = -1;
+  function minutesAvec(k, sans, d, f, flou) {
+    const tous = duJour(k).filter(o => (o.el.type === 'tache' || o.el.type === 'evenement') && o.cle !== sans);
+    const iv = tous.filter(o => !o.el.flou).map(o => [o.el.debut, o.el.fin]).concat(flou ? [] : [[d, f]]).sort((a, b) => a[0] - b[0]);
+    let total = tous.filter(o => o.el.flou).reduce((t, o) => t + o.el.fin - o.el.debut, 0) + (flou ? f - d : 0), a = -1, b = -1;
     iv.forEach(([x, y]) => { if (x > b) { total += Math.max(0, b - a); a = x; b = y; } else b = Math.max(b, y); });
     return total + Math.max(0, b - a);
   }
   // JOMO : au-dessus du plafond, on demande avant d'ajouter
-  async function accepterPlafond(k, sans, d, f) {
-    const pl = S.reglages.plafond, avant = minutesPrevues(k, sans), apres = minutesAvec(k, sans, d, f);
+  async function accepterPlafond(k, sans, d, f, flou) {
+    const pl = S.reglages.plafond, avant = minutesPrevues(k, sans), apres = minutesAvec(k, sans, d, f, flou);
     if (apres <= pl || apres <= avant) return true;
     return demander('Journée chargée', `Avec cette tâche, ${quandJour(k)} compte ${duree(apres)} de tâches pour un plafond de ${duree(pl)}. Choisir, c'est aussi renoncer : tu la gardes ?`,
       [{ texte: 'Garder quand même', valeur: true }, { texte: 'Revoir', valeur: false, clair: true }]);
@@ -3784,14 +3930,14 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const r = lireTache();
     if (r.erreur) { $('#t-erreur').textContent = r.erreur; r.champ.focus(); return; }
     const o = U.edition.o, ch = r.champs;
-    if (ch.type === 'tache' && !(await accepterPlafond(ch.date, o ? o.cle : null, ch.debut, ch.fin))) return;
+    if (ch.type === 'tache' && !(await accepterPlafond(ch.date, o ? o.cle : null, ch.debut, ch.fin, ch.flou))) return;
     let cle, message = null;
     if (!o) {
       const el = Object.assign({ id: uid(), exceptions: {}, faits: {}, creeLe: Date.now() }, ch);
       S.elements.push(el);
       cle = el.id + '|' + el.date;
       const n = trouver(cle);
-      message = el.type === 'evenement' ? 'Événement ajouté.' : n && !prevue(n) ? (el.type === 'tache' ? 'Tâche ajoutée. Déjà commencée : pas de points cette fois.' : 'Ajouté. Déjà commencé : pas de points cette fois.')
+      message = el.type === 'evenement' ? 'Événement ajouté.' : n && !prevue(n) ? (el.type === 'tache' ? 'Tâche ajoutée. Ajoutée le jour même : pas de points cette fois.' : 'Ajouté. Déjà commencé : pas de points cette fois.')
         : { tache: 'Tâche ajoutée.', libre: 'Temps pour moi protégé. 🌿', sansecran: 'Moment sans écran prévu. 📵' }[el.type];
     } else {
       let portee = 'une';
@@ -3837,12 +3983,13 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     const poserFin = (debut, du) => { champT('fin').value = hhmm(Math.min(debut + du, 1440) % 1440); };
     if (d.tCat) U.edition.cat = d.tCat;
     if (d.tJour) champT('date').value = d.tJour;
-    if (d.tFlou) { U.edition.flou = !U.edition.flou; if (!U.edition.flou && versMin(champT('debut').value) === 0) { champT('debut').value = '09:00'; poserFin(540, dureeAct); } }
+    if (d.tMoment) { U.edition.flou = true; U.edition.moment = d.tMoment; }
+    if (d.tFlou) { const etait = U.edition.flou && !U.edition.moment; U.edition.flou = !etait; U.edition.moment = null; if (!U.edition.flou && versMin(champT('debut').value) === 0) { champT('debut').value = '09:00'; poserFin(540, dureeAct); } }
     if (d.tNj) U.edition.nj = +d.tNj;
-    if (d.tHeure) { U.edition.flou = false; champT('debut').value = hhmm(+d.tHeure); poserFin(+d.tHeure, dureeAct); }
+    if (d.tHeure) { U.edition.flou = false; U.edition.moment = null; champT('debut').value = hhmm(+d.tHeure); poserFin(+d.tHeure, dureeAct); }
     if (d.tDuree) { U.edition.duree = +d.tDuree; const deb = versMin(champT('debut').value); if (deb != null) poserFin(deb, +d.tDuree); }
     majTache();
-    const sel = d.tCat ? `[data-t-cat="${CSS.escape(d.tCat)}"]` : d.tJour ? `[data-t-jour="${d.tJour}"]` : d.tFlou ? '[data-t-flou]' : d.tNj ? `[data-t-nj="${d.tNj}"]` : d.tHeure ? `[data-t-heure="${d.tHeure}"]` : `[data-t-duree="${d.tDuree}"]`;
+    const sel = d.tCat ? `[data-t-cat="${CSS.escape(d.tCat)}"]` : d.tJour ? `[data-t-jour="${d.tJour}"]` : d.tMoment ? `[data-t-moment="${d.tMoment}"]` : d.tFlou ? '[data-t-flou]' : d.tNj ? `[data-t-nj="${d.tNj}"]` : d.tHeure ? `[data-t-heure="${d.tHeure}"]` : `[data-t-duree="${d.tDuree}"]`;
     const f = TD.querySelector(sel); if (f) f.focus();
   });
   TD.addEventListener('click', async e => {
@@ -4086,7 +4233,7 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (a === 'annuler') { OD.close(); return; }
     if (a === 'ajouter-etape') { ajouterEtape(); return; }
     if (a === 'cat') { ouvrirChoixCat(U.objectif.cat, id => { U.objectif.cat = id; majObjectif('#o-cat'); }); return; }
-    if (a === 'tache') { const ob = U.objectif.ob; OD.close(); ouvrirTache(null, { date: aujourdhui(), debut: prochaineHeure(), fin: Math.min(prochaineHeure() + 60, 1440), cat: ob.cat, objectif: ob.id, titre: '' }); return; }
+    if (a === 'tache') { const ob = U.objectif.ob; OD.close(); ouvrirTache(null, { date: aujourdhui(), cat: ob.cat, objectif: ob.id, titre: '' }); return; }
     if (a === 'supprimer') {
       const ob = U.objectif.ob;
       if (!(await demander('Supprimer cet objectif ?', `« ${ob.titre} » et ses étapes seront supprimés. Les tâches liées restent dans ton calendrier, et les points déjà gagnés restent.`, [{ texte: 'Supprimer', valeur: true, danger: true }, { texte: 'Annuler', valeur: false, clair: true }]))) return;
@@ -5354,7 +5501,8 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
   function cocher(cle) {
     const o = trouver(cle);
     if (!o || o.el.type !== 'tache') return;
-    const msg = basculerTache(o);
+    const e = enCours();
+    const msg = e && e.o.cle === cle ? terminer() : basculerTache(o);          // cocher la tâche commencée, c'est la terminer
     sauver();
     U.garderDefilement = true;
     render();
@@ -5568,8 +5716,15 @@ dialog.feuille { background: linear-gradient(180deg, #151517, #0a0a0c 60%); bord
     if (a === 'remplir' && U.brouillon) return ouvrirTache(null, { date: U.brouillon.k, debut: U.brouillon.debut, fin: U.brouillon.fin });
     if (a === 'ajouter') {
       const auj = aujourdhui(), k = U.onglet === 'calendrier' ? U.date : auj;
-      const debut = k === auj ? prochaineHeure() : 9 * 60;
-      return ouvrirTache(null, { date: k < auj ? auj : k, debut, fin: Math.min(debut + CONFIG.duree, 1440) });
+      return ouvrirTache(null, { date: k < auj ? auj : k });
+    }
+    if (a === 'commencer' || a === 'terminer') {
+      const msg = a === 'terminer' ? terminer() : (commencer(d.cle) ? `C'est parti. Touche « Terminé » quand tu as fini.` : null);
+      if (!msg) return;
+      sauver(); U.garderDefilement = true; render(a === 'terminer' ? null : 'mnt-go');
+      dire(msg);
+      if (a === 'terminer') feliciter();
+      return;
     }
     if (a === 'aujourdhui') { U.recentrer = true; return allerA(aujourdhui()); }
     if (a === 'voir-tout') { U.onglet = 'calendrier'; S.onglet = 'calendrier'; S.vueCal = 'jour'; U.date = aujourdhui(); ecrire(); return render(); }
