@@ -1,0 +1,53 @@
+/* ===== Édition 32 : lancement, de la nuit à l'aube ===== */
+.lancement { position: fixed; inset: 0; z-index: 60; display: block; overflow: hidden; pointer-events: none;
+  background: #1a1814; background-image: none; transition: opacity .6s ease .15s, visibility .75s; }
+.lancement .scene, .lancement > .marque { display: none; }
+.l-nuit, .l-jour { position: absolute; inset: 0; display: grid; place-items: center; padding-bottom: 10vh; }
+.l-nuit { background: #1a1814; color: #f6f3ec; }
+/* Une lueur chaude naît au sommet, juste avant le jour */
+.l-nuit::before { content: ""; position: absolute; inset: 0; opacity: 0;
+  background: radial-gradient(circle at var(--cx, 50%) var(--cy, 40%), rgba(231, 194, 122, .38), rgba(231, 194, 122, .08) 22vmax, transparent 48vmax); }
+.l-jour { background: #f6f3ec; color: #1a1814; clip-path: circle(0 at var(--cx, 50%) var(--cy, 40%)); }
+.l-marque { position: relative; display: grid; justify-items: center; gap: 22px; text-align: center; }
+.l-marque svg { width: 76px; height: 76px; overflow: visible; }
+.l-marque b { font-size: 26px; font-weight: 300; letter-spacing: .62em; margin-right: -.62em; color: currentColor; }
+.l-marque small { font-size: 10px; font-weight: 500; letter-spacing: .42em; margin-right: -.42em; text-transform: uppercase; opacity: .62; }
+.l-crete { stroke-dasharray: 120; stroke-dashoffset: 120; }
+.l-sol { stroke-dasharray: 72; stroke-dashoffset: 72; opacity: .4; }
+.l-point { transform-box: fill-box; transform-origin: center; transform: scale(0); }
+.l-marque b, .l-marque small { opacity: 0; transform: translateY(8px); }
+
+/* Le spectacle : la crête se trace (0,15 → 1,05 s), le point se pose (0,95 s), le jour s'ouvre depuis le point (1,15 → 2 s) */
+.lancement.joue .l-crete { animation: l-trace .9s cubic-bezier(.55, .1, .3, 1) .15s forwards; }
+.lancement.joue .l-sol { animation: l-trace .8s cubic-bezier(.4, 0, .2, 1) .1s forwards; }
+.lancement.joue .l-point { animation: l-pose .45s cubic-bezier(.3, 1.6, .5, 1) .95s forwards; }
+.lancement.joue .l-marque b { animation: l-monte .7s cubic-bezier(.2, .8, .2, 1) .7s forwards; }
+.lancement.joue .l-marque small { animation: l-monte-doux .7s cubic-bezier(.2, .8, .2, 1) .85s forwards; }
+.lancement.joue .l-nuit::before { animation: l-lueur .5s ease-out 1s forwards; }
+.lancement.joue .l-jour { animation: l-aube .9s cubic-bezier(.6, 0, .25, 1) 1.15s forwards; }
+@keyframes l-trace { to { stroke-dashoffset: 0; } }
+@keyframes l-pose { to { transform: scale(1); } }
+@keyframes l-monte { to { opacity: 1; transform: none; } }
+@keyframes l-monte-doux { to { opacity: .62; transform: none; } }
+@keyframes l-lueur { to { opacity: 1; } }
+@keyframes l-aube { to { clip-path: circle(150vmax at var(--cx, 50%) var(--cy, 40%)); } }
+
+/* Le départ : les mots s'effacent, le sommet monte et se fond, l'accueil arrive ligne par ligne */
+.lancement.parti { opacity: 0; visibility: hidden; }
+.lancement.parti .l-marque b, .lancement.parti .l-marque small { transition: opacity .3s, transform .5s; opacity: 0 !important; transform: translateY(-6px); }
+.lancement.parti .l-marque svg { transition: transform .75s cubic-bezier(.5, 0, .2, 1); transform: translateY(-22px) scale(.82); }
+html.entree .ecran > * { animation: l-entree .7s cubic-bezier(.2, .8, .2, 1) both; }
+html.entree .ecran > :nth-child(2) { animation-delay: .07s; }
+html.entree .ecran > :nth-child(3) { animation-delay: .14s; }
+html.entree .ecran > :nth-child(4) { animation-delay: .21s; }
+html.entree .ecran > :nth-child(n+5) { animation-delay: .28s; }
+@keyframes l-entree { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* Mouvements réduits : le jour d'emblée, un simple fondu */
+.lancement.calme .l-jour { clip-path: none; animation: none; }
+.lancement.calme .l-crete, .lancement.calme .l-sol { stroke-dashoffset: 0; animation: none; }
+.lancement.calme .l-point { transform: none; animation: none; }
+.lancement.calme .l-marque b { opacity: 1; transform: none; animation: none; }
+.lancement.calme .l-marque small { opacity: .62; transform: none; animation: none; }
+@media (prefers-reduced-motion: reduce) { html.entree .ecran > * { animation: none; } }
+@media (orientation: landscape) and (max-height: 520px) { .l-marque { gap: 12px; } .l-marque svg { width: 52px; height: 52px; } .l-nuit, .l-jour { padding-bottom: 4vh; } }

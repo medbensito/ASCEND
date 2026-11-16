@@ -36,25 +36,15 @@
       <path d="M12 78L36 51l11 12 24-34 13 17"/><circle cx="71" cy="18" r="4.2" fill="currentColor" stroke="none"/>
       <path d="M12 86h72" stroke-width="1.3" opacity=".4"/></svg>`;
   }
-  // Lancement : un arc de lumière, un monolithe, une silhouette au sommet
-  function sceneLancement() {
-    return `<svg class="scene" viewBox="0 0 390 844" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs>
-      <linearGradient id="sc-arc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity=".95"/><stop offset=".8" stop-color="#ffe9cf" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-      <linearGradient id="sc-mono" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2b2b30"/><stop offset=".5" stop-color="#101012"/><stop offset="1" stop-color="#050506"/></linearGradient>
-      <linearGradient id="sc-eau" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16161a"/><stop offset="1" stop-color="#030304"/></linearGradient>
-      <radialGradient id="sc-halo" cx="62%" cy="52%" r="60%"><stop offset="0" stop-color="#cfd0e0" stop-opacity=".28"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
-      <filter id="sc-flou" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter></defs>
-      <rect width="390" height="844" fill="url(#sc-halo)"/>
-      <circle cx="560" cy="330" r="372" fill="none" stroke="url(#sc-arc)" stroke-width="9" filter="url(#sc-flou)" opacity=".8"/>
-      <circle cx="560" cy="330" r="372" fill="none" stroke="url(#sc-arc)" stroke-width="1.6"/>
-      <path d="M0 640L60 590l38 26 52-58 46 44 40-30 54 46 100-52v90H0z" fill="#0b0b0d"/>
-      <path d="M306 396l42-18 16 8v264h-58z" fill="url(#sc-mono)"/><path d="M306 396l42-18v272h-42z" fill="#fff" opacity=".05"/><path d="M348 378v272" stroke="#fff" stroke-opacity=".35" stroke-width=".8"/>
-      <rect y="650" width="390" height="194" fill="url(#sc-eau)"/>
-      <path d="M306 650h58v120l-58 30z" fill="#fff" opacity=".035"/>
-      <path d="M40 650l70-64 44 10 58-38 40 14 52 78z" fill="#070708"/><path d="M110 586l44 10 58-38" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".9"/>
-      <path d="M40 650h224l-40 26-150 8z" fill="#050506"/>
-      <g fill="#020203"><circle cx="203" cy="524" r="4.2"/><path d="M198 530h10l3 20-2 8h-3l-1-12-2 12h-4l-2-8z"/><path d="M198 531c-9 6-13 16-12 26l12-8z"/></g>
-      <path d="M150 710h90M120 742h60M214 726h110M90 780h150" stroke="#fff" stroke-opacity=".1" stroke-width="1"/></svg>`;
+  // Lancement : de la nuit à l'aube. Deux calques identiques, la nuit (encre) et le jour (ivoire) ;
+  // la crête se dessine, le point se pose au sommet, puis le jour s'ouvre depuis ce point.
+  function lancementHTML() {
+    const marque = `<div class="l-marque"><svg viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round">
+        <path class="l-sol" d="M12 86h72" stroke-width="1.3"/>
+        <path class="l-crete" d="M12 78L36 51l11 12 24-34 13 17"/>
+        <circle class="l-point" cx="71" cy="18" r="4.2" fill="currentColor" stroke="none"/></svg>
+      <b>ASCEND</b><small>Make everyday matter.</small></div>`;
+    return `<div class="l-nuit">${marque}</div><div class="l-jour">${marque}</div>`;
   }
   // Emblème : un cristal qui se pare à chaque palier (Éclat, Cristal, Étoile, Constellation, Nova)
   let nEmb = 0;

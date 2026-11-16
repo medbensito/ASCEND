@@ -415,14 +415,19 @@
   } catch (e) { /* stockage indisponible */ }
   crediter();
   if (S.minuteur) { avancerMinuteur(); demarrerTic(); }
-  // Écran de lancement : le A d'ASCEND, le temps d'un souffle
-  const L0 = $('#lancement');
-  L0.innerHTML = `${sceneLancement()}<div class="marque">${logo()}<b>ASCEND</b><small>Make everyday matter.</small></div>`;
+  // Écran de lancement : de la nuit à l'aube (environ 2 s), puis l'accueil arrive en douceur
+  const L0 = $('#lancement'), calme = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  L0.innerHTML = lancementHTML();
+  if (calme) L0.classList.add('calme');
   if (V.conf.actif) verrouiller(true);
   render();
-  setTimeout(() => L0.classList.add('parti'), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 1100);
-  setTimeout(() => L0.remove(), 1800);
-  setTimeout(accueillir, 1300);
+  const pt = L0.querySelector('.l-nuit .l-point');
+  if (pt) { const r = pt.getBoundingClientRect(); L0.style.setProperty('--cx', (r.left + r.width / 2) + 'px'); L0.style.setProperty('--cy', (r.top + r.height / 2) + 'px'); }
+  L0.classList.add('joue');
+  const T = calme ? 400 : 2000;
+  setTimeout(() => { L0.classList.add('parti'); document.documentElement.classList.add('entree'); }, T);
+  setTimeout(() => { L0.remove(); document.documentElement.classList.remove('entree'); }, T + 1100);
+  setTimeout(accueillir, T + 300);
   if (erreurStockage) dire('Attention : le téléphone refuse d\'enregistrer. Libère de la place.');
   synchroniser();
   if (S.coffre.actif) setTimeout(() => envoyerCoffre(), 5000);
