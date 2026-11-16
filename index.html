@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>ASCEND</title>
 <meta name="description" content="ASCEND : ton développement personnel et ton JOMO, jour après jour. Make everyday matter.">
-<meta name="theme-color" content="#050506">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#f6f3ec">
+<meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ASCEND">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icones/favicon-32.png">
@@ -1770,6 +1770,9 @@ html.entree .ecran > :nth-child(n+5) { animation-delay: .28s; }
 @media (prefers-reduced-motion: reduce) { html.entree .ecran > * { animation: none; } }
 @media (orientation: landscape) and (max-height: 520px) { .l-marque { gap: 12px; } .l-marque svg { width: 52px; height: 52px; } .l-nuit, .l-jour { padding-bottom: 4vh; } }
 
+/* Édition 33 : derrière tout, l'ivoire (la barre du haut de l'iPhone s'y fond) */
+html { background: #f6f3ec; }
+
 </style>
 </head>
 <body>
@@ -1910,7 +1913,7 @@ html.entree .ecran > :nth-child(n+5) { animation-delay: .28s; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 32;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 33;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -6468,6 +6471,9 @@ html.entree .ecran > :nth-child(n+5) { animation-delay: .28s; }
   render();
   const pt = L0.querySelector('.l-nuit .l-point');
   if (pt) { const r = pt.getBoundingClientRect(); L0.style.setProperty('--cx', (r.left + r.width / 2) + 'px'); L0.style.setProperty('--cy', (r.top + r.height / 2) + 'px'); }
+  // La barre du haut suit le lancement : encre pendant la nuit, ivoire dès que le jour s'ouvre
+  const teinte = $('meta[name="theme-color"]'), poser = c => { if (teinte) teinte.setAttribute('content', c); };
+  if (!calme) { poser('#1a1814'); setTimeout(() => poser('#f6f3ec'), 1350); }
   L0.classList.add('joue');
   const T = calme ? 400 : 2000;
   setTimeout(() => { L0.classList.add('parti'); document.documentElement.classList.add('entree'); }, T);

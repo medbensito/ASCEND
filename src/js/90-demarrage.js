@@ -423,6 +423,9 @@
   render();
   const pt = L0.querySelector('.l-nuit .l-point');
   if (pt) { const r = pt.getBoundingClientRect(); L0.style.setProperty('--cx', (r.left + r.width / 2) + 'px'); L0.style.setProperty('--cy', (r.top + r.height / 2) + 'px'); }
+  // La barre du haut suit le lancement : encre pendant la nuit, ivoire dès que le jour s'ouvre
+  const teinte = $('meta[name="theme-color"]'), poser = c => { if (teinte) teinte.setAttribute('content', c); };
+  if (!calme) { poser('#1a1814'); setTimeout(() => poser('#f6f3ec'), 1350); }
   L0.classList.add('joue');
   const T = calme ? 400 : 2000;
   setTimeout(() => { L0.classList.add('parti'); document.documentElement.classList.add('entree'); }, T);
