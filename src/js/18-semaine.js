@@ -118,8 +118,8 @@
       const prevu = Math.max(1, o.el.fin - o.el.debut), reste = prevu - depuis, avance = Math.max(4, Math.min(100, Math.round(depuis / prevu * 100)));
       return `<section class="carte mnt encours" style="--c:${lk.couleur};--avance:${avance}%" aria-labelledby="mnt-titre">
         <div class="mnt-ligne"><span class="mnt-capsule" aria-hidden="true"><i>${lk.icone}</i></span>
-          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="En cours : ${esc(o.el.titre)}, commencée à ${hhmm(o.el.debut)}, depuis ${duree(depuis)}. Ouvrir"><span class="quoi" aria-hidden="true"><span class="mnt-titre" id="mnt-titre"><i class="mnt-pouls"></i>En cours · ${reste > 0 ? "encore " + duree(reste) : "depuis " + duree(depuis)}</span><b>${esc(o.el.titre)}</b><small>${esc(lk.nom)}${prevue(o) ? ` · +${valeur(o.el)} points` : ''}</small></span></button>
-          <button type="button" class="bouton petit mnt-go" data-action="terminer" data-focus="mnt-go">${ICONE.coche} Terminé</button></div></section>`;
+          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="En cours : ${esc(o.el.titre)}, commencée à ${hhmm(o.el.debut)}, depuis ${duree(depuis)}. Ouvrir"><span class="quoi" aria-hidden="true"><span class="mnt-titre" id="mnt-titre">En cours · ${reste > 0 ? "encore " + duree(reste) : "depuis " + duree(depuis)}</span><b>${esc(o.el.titre)}</b><small>${esc(lk.nom)}${prevue(o) ? ` · +${valeur(o.el)} points` : ''}</small></span></button>
+          <button type="button" class="bouton petit mnt-go" data-action="terminer" data-focus="mnt-go">Terminé</button></div></section>`;
     }
     const jour = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait));
     const fixes = jour.filter(o => !o.el.flou && o.el.fin > now), souples = jour.filter(o => o.el.flou && o.el.type === 'tache' && !S.partis[o.cle]);

@@ -119,13 +119,13 @@
         <span class="titre-mini" aria-hidden="true">📈 Semaine</span><b aria-hidden="true">${pc}<small> %</small></b>
         <small aria-hidden="true">${d == null ? 'des objectifs' : `<b class="${d > .005 ? 'hausse' : d < -.005 ? 'baisse' : ''}">${d > 0 ? '+' : ''}${Math.round(d * 100)} %</b> de points`}</small></button>`;
   }
+  // L'accueil, comme la maquette D : bonjour, le cadran, « Maintenant », puis « Ensuite »
   function vueAccueil() {
-    const auj = aujourdhui(), P = palier(), suiv = palierSuivant(), g = gainDuJour(auj);
-    const occs = duJour(auj), habs = S.habitudes.filter(h => habitudeDue(h, auj));
-    const prevues = minutesPrevues(auj), plafond = S.reglages.plafond;
-    const M = S.minuteur, sd = serieDetail(), s = sd.n, foc = focusEntre(auj, auj);
-    const dur = difficile(auj), resteT = occs.filter(o => o.el.type === 'tache' && !o.fait && o.el.debut > minNow()).length;
-    const val = aValider();
+    const auj = aujourdhui(), g = gainDuJour(auj);
+    const occs = duJour(auj).filter(o => !(S.enCours && S.enCours.cle === o.cle && !o.fait));
+    const habs = S.habitudes.filter(h => habitudeDue(h, auj));
+    const restent = occs.filter(o => !(o.el.type === 'tache' && o.fait) && !S.partis[o.cle]).length + habs.filter(h => !h.faits[auj]).length;
+    const ordre = l => l.filter(o => !o.fait).concat(l.filter(o => o.fait));
     return `
       <header class="tete salut">
         <div><p class="sur-titre">${esc(cap(jourLong(auj)))}</p><h1>Bonjour ${esc(S.profil.prenom || '')}.</h1></div>
@@ -134,18 +134,37 @@
       <section class="points cadran-zone" aria-labelledby="tes-points">
         <h2 class="masque" id="tes-points">Tes points et ta journée</h2>
         ${cadran(auj, g, pastilleNiveau())}
-        <p class="niveau rec-sous">${pastilleRecompenses()}</p>
       </section>
       ${carteMaintenant()}
       <section aria-labelledby="auj-titre">
-        <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
-        <div class="lignes">
-          ${occs.map(o => ligneOcc(o, true)).join('')}
+        <div class="section-tete"><h2 id="auj-titre">Ensuite</h2><span class="note">${restent ? pluriel(restent, 'restante') + " aujourd'hui" : "Tout est fait aujourd'hui"}</span></div>
+        <div class="lignes ensuite">
+          ${ordre(occs).map(ligneEnsuite).join('')}
           ${habs.map(h => ligneHabitude(h, auj, true)).join('')}
           ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
         </div>
-        ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
-      </section>
+      </section>`;
+  }
+  // Une ligne d'« Ensuite » : la pastille, le titre, l'heure à droite, la case
+  function ligneEnsuite(o) {
+    const el = o.el, l = look(el);
+    const quand = el.type === 'evenement' && el.flou ? 'Journée' : el.flou ? (el.moment ? CONFIG.moments[el.moment].nom : 'Sans heure') : hhmm(el.debut);
+    const coche = el.type === 'tache' ? rondCoche(o.cle, o.fait, `${el.titre} : ${o.fait ? 'faite' : 'à faire'}`, 'data-cocher') : '<span class="sans-case" aria-hidden="true"></span>';
+    return `<div class="carte ligne ensuite ${el.type}${o.fait ? ' faite' : ''}${U.repere === o.cle ? ' repere' : ''}" style="--c:${l.couleur}"${el.type === 'tache' ? ` data-glisse="${o.cle}"` : ''}>
+      <button type="button" class="ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}" data-focus="o${o.cle}">
+        <span class="tuile ${el.type}" style="--c:${l.couleur}" aria-hidden="true">${o.fait ? ICONE.coche : l.icone}</span>
+        <span class="quoi" aria-hidden="true"><b>${esc(el.titre)}</b></span><span class="quand" aria-hidden="true">${quand}</span></button>${coche}</div>`;
+  }
+  // Ce qui accompagne la journée (énergie, coach, alertes, priorités, série, focus, identités) : sur la page Progression
+  function cartesDuJour() {
+    const auj = aujourdhui(), occs = duJour(auj), habs = S.habitudes.filter(h => habitudeDue(h, auj));
+    const prevues = minutesPrevues(auj), plafond = S.reglages.plafond;
+    const M = S.minuteur, sd = serieDetail(), s = sd.n, foc = focusEntre(auj, auj);
+    const dur = difficile(auj), resteT = occs.filter(o => o.el.type === 'tache' && !o.fait && o.el.debut > minNow()).length;
+    const val = aValider();
+    return `
+      <p class="niveau rec-sous">${pastilleRecompenses()}</p>
+      ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
       ${carteEnergie(false)}
       ${carteCoach()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
@@ -171,3 +190,4 @@
       ${carteIdentites()}
       ${carteEnergie(true)}`;
   }
+

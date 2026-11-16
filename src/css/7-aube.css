@@ -402,3 +402,29 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
 .pf-item { border-left: 1px solid var(--filet); }
 .pf-item .tuile + span b, .pf-item b { font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.1; }
 .pf-b b, .pf-item button b { font-family: var(--police); font-size: 13px; font-weight: 650; }
+
+/* ===== Édition 28 : l'accueil exactement comme la maquette ===== */
+.cadran { width: min(236px, 66vw); }
+.cadran-centre b { font-size: 54px; }
+.cadran-centre .niveau .embleme { display: none; }
+.cadran-centre .niveau > button { padding: 0 12px; min-height: 30px; border: 1px solid var(--filet); background: none; }
+.cadran-centre .niveau b { font-size: 15px; }
+/* « Ensuite » : pastille ronde, titre à empattements, l'heure à droite, la case */
+.lignes.ensuite { margin-top: -6px; }
+.lignes.ensuite > .ligne { min-height: 52px; padding: 4px 0; gap: 12px; }
+.ligne.ensuite .ouvrir { gap: 12px; min-height: 44px; }
+.ligne.ensuite .tuile { width: 32px; height: 32px; }
+.ligne.ensuite .quoi b { font-size: 21px; }
+.ligne.ensuite .quand { flex: none; font-size: 13px; font-weight: 500; color: var(--doux); font-variant-numeric: tabular-nums; }
+.ligne.ensuite .rond-coche { width: 24px; height: 24px; margin: 0 10px 0 2px; }
+.ligne.ensuite .rond-coche svg { width: 13px; height: 13px; }
+.ligne.ensuite .sans-case { width: 36px; flex: none; }
+.section-tete .note { font-size: 12px; color: var(--doux); }
+/* Progression : « Ta journée » en tête */
+.du-jour { display: grid; gap: 14px; }
+.du-jour .duo { margin-top: 2px; }
+/* Point sur l'onglet Progression quand une réponse t'attend */
+.onglet { position: relative; }
+.point-tab { position: absolute; top: 6px; left: calc(50% + 8px); width: 9px; height: 9px; border-radius: 50%; background: var(--rouge); box-shadow: 0 0 0 2px var(--fond); }
+.ligne.ensuite:not(.faite) .tuile { font-size: 0; }
+.ligne.ensuite .tuile.evenement { background: none; }

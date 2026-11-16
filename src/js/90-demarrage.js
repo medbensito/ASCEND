@@ -1,7 +1,9 @@
   // ---------- Rendu ----------
   const ONGLETS = [['accueil', 'Accueil'], ['calendrier', 'Calendrier'], ['objectifs', 'Objectifs'], ['progression', 'Progression']];
   function renderOnglets() {
-    const onglet = ([id, nom]) => `<button type="button" class="onglet" data-onglet="${id}"${U.onglet === id ? ' aria-current="page"' : ''} data-focus="tab-${id}">${ICONE[id]}<span>${nom}</span></button>`;
+    // Une réponse t'attend (moment sans écran à valider, tâches pas faites) : un point sur Progression, où sont ces cartes
+    const attend = aValider().length + pasFaites().length > 0;
+    const onglet = ([id, nom]) => `<button type="button" class="onglet" data-onglet="${id}"${U.onglet === id ? ' aria-current="page"' : ''} data-focus="tab-${id}"${id === 'progression' && attend ? ` aria-label="${nom}, une réponse t'attend"` : ''}>${ICONE[id]}<span>${nom}</span>${id === 'progression' && attend ? '<i class="point-tab" aria-hidden="true"></i>' : ''}</button>`;
     $('#onglets').innerHTML = ONGLETS.slice(0, 2).map(onglet).join('') + `<button type="button" class="onglet-plus" data-action="ajouter" data-focus="plus" aria-label="Ajouter une tâche">${ICONE.plus}</button>` + ONGLETS.slice(2).map(onglet).join('');
   }
   function signatureFocus() { const a = document.activeElement; return a && a.dataset && a.dataset.focus ? a.dataset.focus : null; }

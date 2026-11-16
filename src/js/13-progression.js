@@ -50,6 +50,7 @@
     return `
       <header class="tete"><div><h1>Progression</h1><p>Deviens la meilleure version.</p></div>
         <span class="icone-bouton" aria-hidden="true" style="border:0;background:none;color:#efe9df">${ICONE.progression}</span></header>
+      <section class="du-jour" aria-labelledby="dj-titre"><div class="section-tete"><h2 id="dj-titre">Ta journée</h2></div>${cartesDuJour()}</section>
       <button type="button" class="carte b-entree" data-action="bilan" data-focus="bilan">
         <span class="tuile" style="--c:#e8e2d8" aria-hidden="true">🗓️</span><span class="quoi"><b>Bilan de la semaine</b><small>${lundiParDefaut() === lundiDe(auj) ? 'Semaine en cours' : 'Semaine'} ${texteSemaine(lundiParDefaut())}</small></span>${ICONE.droite}</button>
       <div class="segments" role="group" aria-label="Période">

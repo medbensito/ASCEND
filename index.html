@@ -1602,6 +1602,32 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
 .pf-item .tuile + span b, .pf-item b { font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.1; }
 .pf-b b, .pf-item button b { font-family: var(--police); font-size: 13px; font-weight: 650; }
 
+/* ===== Édition 28 : l'accueil exactement comme la maquette ===== */
+.cadran { width: min(236px, 66vw); }
+.cadran-centre b { font-size: 54px; }
+.cadran-centre .niveau .embleme { display: none; }
+.cadran-centre .niveau > button { padding: 0 12px; min-height: 30px; border: 1px solid var(--filet); background: none; }
+.cadran-centre .niveau b { font-size: 15px; }
+/* « Ensuite » : pastille ronde, titre à empattements, l'heure à droite, la case */
+.lignes.ensuite { margin-top: -6px; }
+.lignes.ensuite > .ligne { min-height: 52px; padding: 4px 0; gap: 12px; }
+.ligne.ensuite .ouvrir { gap: 12px; min-height: 44px; }
+.ligne.ensuite .tuile { width: 32px; height: 32px; }
+.ligne.ensuite .quoi b { font-size: 21px; }
+.ligne.ensuite .quand { flex: none; font-size: 13px; font-weight: 500; color: var(--doux); font-variant-numeric: tabular-nums; }
+.ligne.ensuite .rond-coche { width: 24px; height: 24px; margin: 0 10px 0 2px; }
+.ligne.ensuite .rond-coche svg { width: 13px; height: 13px; }
+.ligne.ensuite .sans-case { width: 36px; flex: none; }
+.section-tete .note { font-size: 12px; color: var(--doux); }
+/* Progression : « Ta journée » en tête */
+.du-jour { display: grid; gap: 14px; }
+.du-jour .duo { margin-top: 2px; }
+/* Point sur l'onglet Progression quand une réponse t'attend */
+.onglet { position: relative; }
+.point-tab { position: absolute; top: 6px; left: calc(50% + 8px); width: 9px; height: 9px; border-radius: 50%; background: var(--rouge); box-shadow: 0 0 0 2px var(--fond); }
+.ligne.ensuite:not(.faite) .tuile { font-size: 0; }
+.ligne.ensuite .tuile.evenement { background: none; }
+
 </style>
 </head>
 <body>
@@ -1742,7 +1768,7 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 27;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 28;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -2637,13 +2663,13 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
         <span class="titre-mini" aria-hidden="true">📈 Semaine</span><b aria-hidden="true">${pc}<small> %</small></b>
         <small aria-hidden="true">${d == null ? 'des objectifs' : `<b class="${d > .005 ? 'hausse' : d < -.005 ? 'baisse' : ''}">${d > 0 ? '+' : ''}${Math.round(d * 100)} %</b> de points`}</small></button>`;
   }
+  // L'accueil, comme la maquette D : bonjour, le cadran, « Maintenant », puis « Ensuite »
   function vueAccueil() {
-    const auj = aujourdhui(), P = palier(), suiv = palierSuivant(), g = gainDuJour(auj);
-    const occs = duJour(auj), habs = S.habitudes.filter(h => habitudeDue(h, auj));
-    const prevues = minutesPrevues(auj), plafond = S.reglages.plafond;
-    const M = S.minuteur, sd = serieDetail(), s = sd.n, foc = focusEntre(auj, auj);
-    const dur = difficile(auj), resteT = occs.filter(o => o.el.type === 'tache' && !o.fait && o.el.debut > minNow()).length;
-    const val = aValider();
+    const auj = aujourdhui(), g = gainDuJour(auj);
+    const occs = duJour(auj).filter(o => !(S.enCours && S.enCours.cle === o.cle && !o.fait));
+    const habs = S.habitudes.filter(h => habitudeDue(h, auj));
+    const restent = occs.filter(o => !(o.el.type === 'tache' && o.fait) && !S.partis[o.cle]).length + habs.filter(h => !h.faits[auj]).length;
+    const ordre = l => l.filter(o => !o.fait).concat(l.filter(o => o.fait));
     return `
       <header class="tete salut">
         <div><p class="sur-titre">${esc(cap(jourLong(auj)))}</p><h1>Bonjour ${esc(S.profil.prenom || '')}.</h1></div>
@@ -2652,18 +2678,37 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
       <section class="points cadran-zone" aria-labelledby="tes-points">
         <h2 class="masque" id="tes-points">Tes points et ta journée</h2>
         ${cadran(auj, g, pastilleNiveau())}
-        <p class="niveau rec-sous">${pastilleRecompenses()}</p>
       </section>
       ${carteMaintenant()}
       <section aria-labelledby="auj-titre">
-        <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
-        <div class="lignes">
-          ${occs.map(o => ligneOcc(o, true)).join('')}
+        <div class="section-tete"><h2 id="auj-titre">Ensuite</h2><span class="note">${restent ? pluriel(restent, 'restante') + " aujourd'hui" : "Tout est fait aujourd'hui"}</span></div>
+        <div class="lignes ensuite">
+          ${ordre(occs).map(ligneEnsuite).join('')}
           ${habs.map(h => ligneHabitude(h, auj, true)).join('')}
           ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
         </div>
-        ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
-      </section>
+      </section>`;
+  }
+  // Une ligne d'« Ensuite » : la pastille, le titre, l'heure à droite, la case
+  function ligneEnsuite(o) {
+    const el = o.el, l = look(el);
+    const quand = el.type === 'evenement' && el.flou ? 'Journée' : el.flou ? (el.moment ? CONFIG.moments[el.moment].nom : 'Sans heure') : hhmm(el.debut);
+    const coche = el.type === 'tache' ? rondCoche(o.cle, o.fait, `${el.titre} : ${o.fait ? 'faite' : 'à faire'}`, 'data-cocher') : '<span class="sans-case" aria-hidden="true"></span>';
+    return `<div class="carte ligne ensuite ${el.type}${o.fait ? ' faite' : ''}${U.repere === o.cle ? ' repere' : ''}" style="--c:${l.couleur}"${el.type === 'tache' ? ` data-glisse="${o.cle}"` : ''}>
+      <button type="button" class="ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}" data-focus="o${o.cle}">
+        <span class="tuile ${el.type}" style="--c:${l.couleur}" aria-hidden="true">${o.fait ? ICONE.coche : l.icone}</span>
+        <span class="quoi" aria-hidden="true"><b>${esc(el.titre)}</b></span><span class="quand" aria-hidden="true">${quand}</span></button>${coche}</div>`;
+  }
+  // Ce qui accompagne la journée (énergie, coach, alertes, priorités, série, focus, identités) : sur la page Progression
+  function cartesDuJour() {
+    const auj = aujourdhui(), occs = duJour(auj), habs = S.habitudes.filter(h => habitudeDue(h, auj));
+    const prevues = minutesPrevues(auj), plafond = S.reglages.plafond;
+    const M = S.minuteur, sd = serieDetail(), s = sd.n, foc = focusEntre(auj, auj);
+    const dur = difficile(auj), resteT = occs.filter(o => o.el.type === 'tache' && !o.fait && o.el.debut > minNow()).length;
+    const val = aValider();
+    return `
+      <p class="niveau rec-sous">${pastilleRecompenses()}</p>
+      ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
       ${carteEnergie(false)}
       ${carteCoach()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
@@ -2689,6 +2734,7 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
       ${carteIdentites()}
       ${carteEnergie(true)}`;
   }
+
   // ---------- Calendrier ----------
   // En-tête (style Aube) : un sur-titre (la date, la charge), le grand titre, les onglets à droite ; flèches et loupe en haut
   function vueCalendrier() {
@@ -3066,6 +3112,7 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
     return `
       <header class="tete"><div><h1>Progression</h1><p>Deviens la meilleure version.</p></div>
         <span class="icone-bouton" aria-hidden="true" style="border:0;background:none;color:#efe9df">${ICONE.progression}</span></header>
+      <section class="du-jour" aria-labelledby="dj-titre"><div class="section-tete"><h2 id="dj-titre">Ta journée</h2></div>${cartesDuJour()}</section>
       <button type="button" class="carte b-entree" data-action="bilan" data-focus="bilan">
         <span class="tuile" style="--c:#e8e2d8" aria-hidden="true">🗓️</span><span class="quoi"><b>Bilan de la semaine</b><small>${lundiParDefaut() === lundiDe(auj) ? 'Semaine en cours' : 'Semaine'} ${texteSemaine(lundiParDefaut())}</small></span>${ICONE.droite}</button>
       <div class="segments" role="group" aria-label="Période">
@@ -3935,8 +3982,8 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
       const prevu = Math.max(1, o.el.fin - o.el.debut), reste = prevu - depuis, avance = Math.max(4, Math.min(100, Math.round(depuis / prevu * 100)));
       return `<section class="carte mnt encours" style="--c:${lk.couleur};--avance:${avance}%" aria-labelledby="mnt-titre">
         <div class="mnt-ligne"><span class="mnt-capsule" aria-hidden="true"><i>${lk.icone}</i></span>
-          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="En cours : ${esc(o.el.titre)}, commencée à ${hhmm(o.el.debut)}, depuis ${duree(depuis)}. Ouvrir"><span class="quoi" aria-hidden="true"><span class="mnt-titre" id="mnt-titre"><i class="mnt-pouls"></i>En cours · ${reste > 0 ? "encore " + duree(reste) : "depuis " + duree(depuis)}</span><b>${esc(o.el.titre)}</b><small>${esc(lk.nom)}${prevue(o) ? ` · +${valeur(o.el)} points` : ''}</small></span></button>
-          <button type="button" class="bouton petit mnt-go" data-action="terminer" data-focus="mnt-go">${ICONE.coche} Terminé</button></div></section>`;
+          <button type="button" class="ouvrir" data-ouvrir="${o.cle}" data-focus="mnt" aria-label="En cours : ${esc(o.el.titre)}, commencée à ${hhmm(o.el.debut)}, depuis ${duree(depuis)}. Ouvrir"><span class="quoi" aria-hidden="true"><span class="mnt-titre" id="mnt-titre">En cours · ${reste > 0 ? "encore " + duree(reste) : "depuis " + duree(depuis)}</span><b>${esc(o.el.titre)}</b><small>${esc(lk.nom)}${prevue(o) ? ` · +${valeur(o.el)} points` : ''}</small></span></button>
+          <button type="button" class="bouton petit mnt-go" data-action="terminer" data-focus="mnt-go">Terminé</button></div></section>`;
     }
     const jour = duJour(auj).filter(o => !(o.el.type === 'tache' && o.fait));
     const fixes = jour.filter(o => !o.el.flou && o.el.fin > now), souples = jour.filter(o => o.el.flou && o.el.type === 'tache' && !S.partis[o.cle]);
@@ -5858,7 +5905,9 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
   // ---------- Rendu ----------
   const ONGLETS = [['accueil', 'Accueil'], ['calendrier', 'Calendrier'], ['objectifs', 'Objectifs'], ['progression', 'Progression']];
   function renderOnglets() {
-    const onglet = ([id, nom]) => `<button type="button" class="onglet" data-onglet="${id}"${U.onglet === id ? ' aria-current="page"' : ''} data-focus="tab-${id}">${ICONE[id]}<span>${nom}</span></button>`;
+    // Une réponse t'attend (moment sans écran à valider, tâches pas faites) : un point sur Progression, où sont ces cartes
+    const attend = aValider().length + pasFaites().length > 0;
+    const onglet = ([id, nom]) => `<button type="button" class="onglet" data-onglet="${id}"${U.onglet === id ? ' aria-current="page"' : ''} data-focus="tab-${id}"${id === 'progression' && attend ? ` aria-label="${nom}, une réponse t'attend"` : ''}>${ICONE[id]}<span>${nom}</span>${id === 'progression' && attend ? '<i class="point-tab" aria-hidden="true"></i>' : ''}</button>`;
     $('#onglets').innerHTML = ONGLETS.slice(0, 2).map(onglet).join('') + `<button type="button" class="onglet-plus" data-action="ajouter" data-focus="plus" aria-label="Ajouter une tâche">${ICONE.plus}</button>` + ONGLETS.slice(2).map(onglet).join('');
   }
   function signatureFocus() { const a = document.activeElement; return a && a.dataset && a.dataset.focus ? a.dataset.focus : null; }
