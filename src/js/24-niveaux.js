@@ -10,8 +10,8 @@
     if (lookPose === p.id) return;
     lookPose = p.id;
     const st = document.documentElement.style;
-    st.setProperty('--accent', degrade(p));
-    st.setProperty('--accent-texte', p.texte);
+    st.setProperty('--accent', p.encre || '#1a1814');          // style Aube : l'accent est une encre profonde, posée sur l'ivoire
+    st.setProperty('--accent-texte', p.encre || '#1a1814');
     st.setProperty('--arc', p.arc);
   }
 

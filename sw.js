@@ -1,7 +1,7 @@
 // ASCEND : service worker. Garde l'app disponible hors ligne et affiche les rappels.
 // Réseau d'abord : en ligne, on reçoit toujours la dernière version ; hors ligne, la copie en cache prend le relais.
 // À chaque nouvelle version de l'app, changer le nom du cache ci-dessous.
-const CACHE = 'ascend-25';
+const CACHE = 'ascend-26';
 const FICHIERS = [
   './',
   './index.html',
@@ -10,7 +10,10 @@ const FICHIERS = [
   './icones/icone-512.png',
   './icones/icone-maskable-512.png',
   './icones/apple-touch-icon.png',
-  './icones/favicon-32.png'
+  './icones/favicon-32.png',
+  './polices/instrument-serif.woff2',
+  './polices/instrument-serif-italique.woff2',
+  './polices/inter.woff2'
 ];
 
 self.addEventListener('install', e => {

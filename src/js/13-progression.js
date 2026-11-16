@@ -2,8 +2,8 @@
   function anneau(fraction, taille) {
     const r = 64, c = 2 * Math.PI * r, f = fraction == null ? 0 : Math.max(0, Math.min(1, fraction));
     return `<svg viewBox="0 0 160 160" aria-hidden="true"><defs><linearGradient id="ga${taille || ''}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6e0d5"/><stop offset="1" stop-color="#e8e2d8"/></linearGradient></defs>
-      <circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(255, 255, 255, .08)" stroke-width="13"/>
-      <circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#ga${taille || ''})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}"${f > 0 ? '' : ' opacity="0"'} style="filter:drop-shadow(0 0 6px rgba(255, 255, 255, .35))"/></svg>`;
+      <circle cx="80" cy="80" r="${r}" fill="none" stroke="rgba(26, 24, 20, .08)" stroke-width="13"/>
+      <circle cx="80" cy="80" r="${r}" fill="none" stroke="url(#ga${taille || ''})" stroke-width="13" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(1)} ${c.toFixed(1)}"${f > 0 ? '' : ' opacity="0"'} style="filter:drop-shadow(0 0 6px rgba(26, 24, 20, .35))"/></svg>`;
   }
   // Points gagnés jour par jour (ou semaine par semaine sur 90 jours) : barres, valeur la plus haute écrite
   function graphePoints(jours) {
@@ -23,7 +23,7 @@
     }).join('');
     const etiquette = max > 1 && iMax >= 0 ? `<text x="${Math.min(280, Math.max(20, iMax * l + l / 2)).toFixed(1)}" y="${(104 - groupes[iMax].v / max * 92 - 5).toFixed(1)}" text-anchor="middle" fill="#efe9e0" font-size="11" font-weight="600">${nombre(max)}</text>` : '';
     return `<svg class="courbe-pts" viewBox="0 0 300 108" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9e3d9"/><stop offset="1" stop-color="#e6e0d5"/></linearGradient></defs>
-        <line x1="0" y1="104.5" x2="300" y2="104.5" stroke="rgba(255, 255, 255, .125)"/>${barres}${etiquette}</svg>
+        <line x1="0" y1="104.5" x2="300" y2="104.5" stroke="rgba(26, 24, 20, .125)"/>${barres}${etiquette}</svg>
       <div class="legende-courbe" aria-hidden="true"><span>${fmt(groupes[0].de, { day: 'numeric', month: 'short' })}</span><span>${parSemaine ? 'par semaine' : 'par jour'}</span><span>aujourd'hui</span></div>
       <table class="masque"><caption>Points gagnés ${parSemaine ? 'par semaine' : 'par jour'}</caption><tbody>${groupes.map(g => `<tr><th scope="row">${esc(g.nom)}</th><td>${g.v} points</td></tr>`).join('')}</tbody></table>`;
   }

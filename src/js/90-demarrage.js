@@ -190,7 +190,7 @@
   const ECRAN = $('#ecran');
   ECRAN.addEventListener('pointerdown', e => {
     if (G || (e.pointerType === 'mouse' && e.button !== 0)) return;
-    if (e.target.closest('.rond-coche')) return;
+    if (e.target.closest('.rond-coche, .trou')) return;
     const tactile = e.pointerType !== 'mouse';
     const cols = e.target.closest('.colonnes');
     if (!cols) {
@@ -269,6 +269,7 @@
     if (d.aller) return allerA(d.aller);
     if (d.choisir) { U.date = d.choisir; U.garderDefilement = true; return render(); }
     if (d.ouvrirJour) return allerA(d.ouvrirJour, 'jour');
+    if (d.planifier) { const [k, debut] = d.planifier.split('|'); return ouvrirTache(null, { date: k, debut: +debut, fin: Math.min(+debut + CONFIG.duree, 1440) }); }
     if (clicSemaine(d)) return;
     if (d.caser) return ouvrirCaser(d.caser);
     const a = d.action;

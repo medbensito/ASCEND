@@ -36,27 +36,27 @@
     const ob = el.objectif && S.objectifs.find(x => x.id === el.objectif);
     return `${plage(el)} · ${cat(el.cat).nom}${!o.fait && courage(el) ? ` · 🔥 repoussée ${el.reports} fois` : ''}${!o.fait && S.partis[o.cle] ? ' · laissée partir' : ''}${ob ? ' · 🎯 ' + ob.titre : ''}`;
   }
-  // Ligne d'un élément. cocheGauche : la case à gauche (accueil), sinon à droite après l'icône (calendrier)
-  function ligneOcc(o, cocheGauche) {
+  // Ligne d'un élément (style Aube) : la pastille de couleur, le titre et ses détails, les points, la case à droite.
+  // Un événement a une pastille en pointillés et pas de case ; une tâche faite, une pastille cochée.
+  function ligneOcc(o) {
     const el = o.el, l = look(el);
     const coche = el.type === 'tache' ? rondCoche(o.cle, o.fait, `${el.titre} : ${o.fait ? 'faite' : 'à faire'}`, 'data-cocher') : '';
     const ouvrir = `<button type="button" class="ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}" data-focus="o${o.cle}">
-        ${cocheGauche ? '' : `<span class="tuile" style="--c:${l.couleur}" aria-hidden="true">${l.icone}</span>`}
+        <span class="tuile ${el.type}" style="--c:${l.couleur}" aria-hidden="true">${o.fait ? ICONE.coche : l.icone}</span>
         <span class="quoi" aria-hidden="true"><b>${esc(el.titre)}</b><small>${esc(sousTitre(o))}</small></span>${ptsElement(o)}</button>`;
-    return `<div class="carte ligne${o.fait ? ' faite' : ''}${U.repere === o.cle ? ' repere' : ''}" style="--c:${l.couleur}"${el.type === 'tache' ? ` data-glisse="${o.cle}"` : ''}>
-      ${cocheGauche ? (coche || `<span class="tuile petite" style="--c:${l.couleur}" aria-hidden="true">${l.icone}</span>`) : ''}${ouvrir}${cocheGauche ? '' : coche}</div>`;
+    return `<div class="carte ligne ${el.type}${o.fait ? ' faite' : ''}${U.repere === o.cle ? ' repere' : ''}" style="--c:${l.couleur}"${el.type === 'tache' ? ` data-glisse="${o.cle}"` : ''}>
+      ${ouvrir}${coche}</div>`;
   }
   function ligneHabitude(h, k, cocheGauche) {
     const fait = !!h.faits[k], c = cat(h.cat), s = serieHabitude(h);
     const p = S.payes[cleHab(h, k)];
     const pts = p && p.pts ? `<span class="pts gagne" aria-hidden="true">+${p.pts}</span>` : `<span class="pts" aria-hidden="true">+${ptsHabitude(h, k)} pts</span>`;
     const coche = rondCoche(h.id + '|' + k, fait, `${titreHabitude(h, k)}, habitude : ${fait ? 'faite' : 'à faire'}`, 'data-habitude');
-    return `<div class="carte ligne${fait ? ' faite' : ''}" style="--c:${c.couleur}">
-      ${cocheGauche ? coche : ''}
+    return `<div class="carte ligne habitude${fait ? ' faite' : ''}" style="--c:${c.couleur}">
       <button type="button" class="ouvrir" data-ouvrir-hab="${h.id}" aria-label="${esc(h.titre)}, habitude ${esc(c.nom)}, série de ${pluriel(s, 'jour')}, ${fait ? 'faite' : 'à faire'} : ouvrir" data-focus="oh${h.id}">
-        ${cocheGauche ? '' : `<span class="tuile" style="--c:${c.couleur}" aria-hidden="true">${c.icone}</span>`}
+        <span class="tuile" style="--c:${c.couleur}" aria-hidden="true">${fait ? ICONE.coche : c.icone}</span>
         <span class="quoi" aria-hidden="true"><b>${esc(titreHabitude(h, k))}</b><small>${difficile(k) ? 'Version mini' : 'Habitude'} · ${esc(c.nom)}${s ? ` · 🔥 ${s} j` : ''}</small></span>${pts}</button>
-      ${cocheGauche ? '' : coche}</div>`;
+      ${coche}</div>`;
   }
 
   // ---------- Accueil ----------
@@ -81,6 +81,25 @@
       <path d="${doux}" fill="none" stroke="url(#cp-l)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
       <circle cx="${fin[0].toFixed(1)}" cy="${fin[1].toFixed(1)}" r="1.6" fill="#fff"/></svg>`;
   }
+  // Le cadran de la journée (style Aube × Orbite) : de 6 h à minuit, un arc de couleur par élément prévu,
+  // le temps déjà passé en fin trait intérieur, le point de maintenant ; tes points au centre.
+  function cadran(k, g) {
+    const A = 6 * 60, L = 18 * 60, R = 104, C = 2 * Math.PI * R, r = 88, c = 2 * Math.PI * r, now = minNow();
+    const pos = m => Math.max(0, Math.min(1, (m - A) / L));
+    const occs = duJour(k).filter(o => !o.el.flou);
+    const arcs = occs.map(o => { const d = pos(o.el.debut), f = pos(o.el.fin), lg = Math.max((f - d) * C - 3, 3);
+      return `<circle cx="120" cy="120" r="${R}" class="arc ${o.el.type}${o.fait ? ' fait' : ''}" style="--c:${look(o.el).couleur}" stroke-dasharray="${lg.toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-d * C).toFixed(1)}"/>`; }).join('');
+    const t = pos(now), ang = t * 2 * Math.PI;
+    const px = 120 + R * Math.sin(ang), py = 120 - R * Math.cos(ang);
+    const n = occs.length;
+    return `<div class="cadran" role="img" aria-label="${nombre(S.points)} points, ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : 'aucun point'} aujourd'hui. Ta journée de 6 h à minuit : ${n ? pluriel(n, 'élément') + ' à heure fixe' : 'rien à heure fixe'}, il est ${hhmm(now)}.">
+      <svg viewBox="0 0 240 240" aria-hidden="true"><g transform="rotate(-90 120 120)" fill="none">
+        <circle cx="120" cy="120" r="${R}" class="piste"/>${arcs}
+        <circle cx="120" cy="120" r="${r}" class="piste-fine"/>${t > 0 ? `<circle cx="120" cy="120" r="${r}" class="passe" stroke-dasharray="${(t * c).toFixed(1)} ${c.toFixed(1)}"/>` : ''}</g>
+        ${t > 0 && t < 1 ? `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="8" class="point-now"/>` : ''}</svg>
+      <div class="cadran-centre" aria-hidden="true"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b><small>points · ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : '+0'} aujourd'hui</small></div>
+    </div>`;
+  }
   function aValider() {
     const auj = aujourdhui(), res = [];
     for (let i = CONFIG.validation; i >= 0; i--) duJour(decaler(auj, -i)).forEach(o => { if (o.el.type === 'sansecran' && etatSansEcran(o) === 'a-valider') res.push(o); });
@@ -104,15 +123,13 @@
     const val = aValider();
     return `
       <header class="tete salut">
-        <div><h1>Bonjour ${esc(S.profil.prenom || '')}</h1><p>Continue d'avancer.</p></div>
+        <div><p class="sur-titre">${esc(cap(jourLong(auj)))}</p><h1>Bonjour ${esc(S.profil.prenom || '')}.</h1></div>
         <button type="button" class="avatar" data-action="profil" aria-label="Profil et réglages" data-focus="profil">${esc((S.profil.initiales || '?').slice(0, 2))}</button>
       </header>
-      <section class="points" aria-labelledby="tes-points">
-        <h2 class="masque" id="tes-points">Tes points</h2>
-        <p class="total"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b><small>pts</small>
-          <span class="${g ? '' : 'zero'}">${g > 0 ? ICONE.hausse : ''}${g ? (g > 0 ? '+' : '') + nombre(g) : '+0'}<span class="masque"> aujourd'hui</span></span></p>
-        ${courbePoints()}
-        <div class="niveau-rang"><p class="niveau palier"><button type="button" data-action="niveaux" data-focus="niveaux" aria-label="Niveau ${niveauIdx() + 1}, ${P.nom}${suiv ? `, encore ${nombre(suiv.seuil - S.points)} points avant ${suiv.nom}` : ''}. Voir les niveaux et les looks">${embleme(P.id)}<b aria-hidden="true">Niveau ${niveauIdx() + 1} · ${P.nom}</b>${suiv ? `<small aria-hidden="true">encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</button></p>
+      <section class="points cadran-zone" aria-labelledby="tes-points">
+        <h2 class="masque" id="tes-points">Tes points et ta journée</h2>
+        ${cadran(auj, g)}
+        <div class="niveau-rang"><p class="niveau palier"><button type="button" data-action="niveaux" data-focus="niveaux" aria-label="Niveau ${niveauIdx() + 1}, ${P.nom}${suiv ? `, encore ${nombre(suiv.seuil - S.points)} points avant ${suiv.nom}` : ''}. Voir les niveaux et les looks">${embleme(P.id)}<b aria-hidden="true">${P.nom}, niveau ${niveauIdx() + 1}</b>${suiv ? `<small aria-hidden="true">encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</button></p>
         <p class="niveau">${pastilleRecompenses()}</p></div>
       </section>
       ${carteMaintenant()}

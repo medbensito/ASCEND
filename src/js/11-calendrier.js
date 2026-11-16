@@ -82,22 +82,26 @@
     if (groupe.length) fermer();
     return res;
   }
-  // Le rectangle d'un élément dans la grille : barre de couleur, titre, heures ; grand, il montre aussi la durée et les points
+  // Un élément dans la grille (style Aube × Orbite) : une capsule de la couleur de sa catégorie, haute comme sa durée,
+  // le titre et l'heure à côté, la case à droite. En cours, la capsule se remplit ; faite, elle pâlit et se coche ;
+  // un événement est une capsule en pointillés, sans case.
   function bloc(g) {
     const o = g.o, el = o.el, l = look(el);
     const haut = el.debut / 60 * H, hauteur = Math.max((el.fin - el.debut) / 60 * H, HMIN);
-    const court = hauteur < 42, grand = hauteur >= 76;
+    const court = hauteur < 58, grand = hauteur >= 92;
     const choisi = U.selection === o.cle;
     const etat = el.type === 'libre' ? etatLibre(o) : el.type === 'sansecran' ? etatSansEcran(o) : null;
     const p = S.payes[o.cle], e = S.enCours && S.enCours.cle === o.cle && !o.fait;
-    const pied = el.type === 'tache' && !o.fait ? `${duree(el.fin - el.debut)}${prevue(o) ? ` · +${valeur(el)} pts` : ''}` : el.type !== 'tache' ? duree(el.fin - el.debut) : '';
+    const fait = el.type === 'tache' && o.fait;
+    const avance = e ? Math.max(4, Math.min(100, Math.round((Date.now() - S.enCours.debut) / 6e4 / Math.max(1, el.fin - el.debut) * 100))) : 0;
+    const heures = e ? 'En cours · depuis ' + hhmm(el.debut) : `${hhmm(el.debut)} – ${finTexte(el.fin)}${etat ? ' · ' + (el.type === 'libre' ? ETAT_LIBRE[etat] : ETAT_ECRAN[etat]) : el.type === 'evenement' ? ' · Événement' : ''}`;
+    const detail = el.type === 'tache' ? `${esc(l.nom)}${p && p.pts ? ` · +${p.pts} gagnés` : !o.fait && prevue(o) ? ` · +${valeur(el)} pts` : ''}` : '';
     return `<div class="bloc ${el.type}${etat === 'grignote' ? ' grignote' : ''}${o.fait ? ' fait' : ''}${court ? ' court' : ''}${grand ? ' grand' : ''}${e ? ' encours' : ''}${choisi ? ' choisi' : ''}${U.repere === o.cle ? ' repere' : ''}" data-cle="${o.cle}"
-        style="top:${haut}px;height:${hauteur}px;left:calc(${g.col / g.n * 100}% + 2px);width:calc(${100 / g.n}% - 4px);--c:${l.couleur}">
+        style="top:${haut}px;height:${hauteur}px;left:calc(${g.col / g.n * 100}% + 2px);width:calc(${100 / g.n}% - 4px);--c:${l.couleur}${e ? `;--avance:${avance}%` : ''}">
       <button type="button" class="b-ouvrir" data-ouvrir="${o.cle}" aria-label="${esc(description(o))}${e ? ', en cours' : ''}" data-focus="o${o.cle}"></button>
+      <span class="b-capsule" aria-hidden="true"><i>${fait ? ICONE.coche : l.icone}</i></span>
+      <span class="b-texte" aria-hidden="true"><small>${heures}</small><b>${esc(el.titre)}</b>${grand && detail ? `<em>${detail}</em>` : ''}</span>
       ${el.type === 'tache' ? rondCoche(o.cle, o.fait, `${el.titre} : ${o.fait ? 'faite' : 'à faire'}`, 'data-cocher') : ''}
-      <span class="b-texte" aria-hidden="true"><b><i class="b-ic">${l.icone}</i> ${esc(el.titre)}</b><small>${e ? 'En cours · depuis ' + hhmm(el.debut) : `${hhmm(el.debut)}${court ? '' : ' – ' + finTexte(el.fin)}${etat ? ' · ' + (el.type === 'libre' ? ETAT_LIBRE[etat] : ETAT_ECRAN[etat]) : ''}${!court && !grand && el.type === 'tache' && !o.fait && prevue(o) ? `<i class="b-plus"> · +${valeur(el)} pts</i>` : ''}`}</small></span>
-      ${grand && pied && !(p && p.pts) ? `<span class="b-pied" aria-hidden="true">${pied}</span>` : ''}
-      ${p && p.pts ? `<span class="gain" aria-hidden="true">+${p.pts}</span>` : ''}
       <span class="bord" data-bord="bas" aria-hidden="true"></span>
       ${choisi ? '<span class="poignee haut" data-bord="haut" aria-hidden="true"></span><span class="poignee bas" data-bord="bas" aria-hidden="true"></span>' : ''}
     </div>`;
@@ -106,21 +110,40 @@
     const hauteur = Math.max((b.fin - b.debut) / 60 * H, HMIN);
     return `<div class="bloc brouillon${hauteur < 42 ? ' court' : ''}" data-brouillon="1" style="top:${b.debut / 60 * H}px;height:${hauteur}px;left:2px;width:calc(100% - 4px)">
       <button type="button" class="b-ouvrir" data-action="remplir" aria-label="Nouvelle plage de ${hhmm(b.debut)} à ${finTexte(b.fin)} : toucher pour la remplir" data-focus="brouillon"></button>
-      <span class="b-texte" aria-hidden="true"><b>Nouvelle</b><small>${hhmm(b.debut)} – ${finTexte(b.fin)}</small></span>
+      <span class="b-capsule" aria-hidden="true"></span><span class="b-texte" aria-hidden="true"><small>${hhmm(b.debut)} – ${finTexte(b.fin)}</small><b>Nouvelle</b></span>
       <span class="poignee haut" data-bord="haut" aria-hidden="true"></span><span class="poignee bas" data-bord="bas" aria-hidden="true"></span>
     </div>`;
   }
+  // Créneaux libres d'au moins une heure, entre 7 h et 23 h (à partir de maintenant aujourd'hui) : on propose d'y planifier
+  function trousDuJour(k) {
+    const auj = aujourdhui();
+    if (k < auj) return [];
+    const debutJ = k === auj ? Math.max(7 * 60, Math.ceil(minNow() / 30) * 30) : 7 * 60, finJ = 23 * 60;
+    const pris = duJour(k).filter(o => !o.el.flou && o.el.type !== 'libre').map(o => [o.el.debut, Math.max(o.el.fin, o.el.debut + 30)]).sort((a, b) => a[0] - b[0]);
+    const trous = [];
+    let t = debutJ;
+    pris.forEach(([d, f]) => { if (d - t >= 60) trous.push([t, Math.min(d, finJ)]); t = Math.max(t, f); });
+    if (finJ - t >= 60) trous.push([t, finJ]);
+    return trous.filter(([d, f]) => f - d >= 60 && d < finJ);
+  }
   function grille(jours) {
     const auj = aujourdhui(), mn = jours.includes(auj) ? minNow() : -99;
+    const seul = jours.length === 1 && !PLAGE.ajuste, k1 = jours[0];
     let h = '';
     for (let i = 1; i < 24; i++) h += `${Math.abs(i * 60 - mn) < 14 ? '' : `<div class="heure" style="top:${i * H}px">${hhmm(i * 60)}</div>`}<div class="trait-h" style="top:${i * H}px"></div>`;
     const cols = jours.map(k => {
       const blocs = disposer(duJour(k).filter(o => !o.el.flou)).map(bloc).join('');
       const br = U.brouillon && U.brouillon.k === k ? blocBrouillon(U.brouillon) : '';
-      return `<div class="colonne${k === auj ? ' auj' : ''}" data-jour="${k}">${blocs}${br}</div>`;
+      // Le fil : plein pour ce qui est passé, en pointillés pour la suite
+      const passe = k < auj ? 1440 : k > auj ? 0 : mn;
+      const fil = seul ? `<span class="fil" aria-hidden="true" style="--passe:${passe / 60 * H}px"></span>` : '';
+      const moments = seul ? Object.values(CONFIG.moments).map(m => `<span class="moment-g" aria-hidden="true" style="top:${m.a / 60 * H}px">${m.nom}</span>`).join('') : '';
+      const trous = seul && !U.brouillon ? trousDuJour(k).map(([d, f]) => `<button type="button" class="trou" data-planifier="${k}|${d}|${f}" style="top:${d / 60 * H + 6}px" data-focus="t${k}${d}"
+          aria-label="${duree(f - d)} de libre ${k === auj ? "aujourd'hui" : quandJour(k)} à partir de ${hhmm(d)} : planifier ici">${duree(f - d)} libre <u>Planifier ici</u></button>`).join('') : '';
+      return `<div class="colonne${k === auj ? ' auj' : ''}" data-jour="${k}">${fil}${moments}${trous}${blocs}${br}</div>`;
     }).join('');
     const ligne = mn < 0 ? '' : `<div class="maintenant" style="top:${mn / 60 * H}px"><span>${hhmm(mn)}</span></div>`;
-    return `<div class="grille">${h}<div class="colonnes" style="--n:${jours.length}" role="group" aria-label="Grille horaire : toucher un créneau vide pour y poser une plage">${cols}</div>${ligne}</div><div class="bas-espace"></div>`;
+    return `<div class="grille${seul ? ' fil-jour' : ''}">${h}<div class="colonnes" style="--n:${jours.length}" role="group" aria-label="Grille horaire : toucher un créneau vide pour y poser une plage">${cols}</div>${ligne}</div><div class="bas-espace"></div>`;
   }
   function bandeSemaine(k) {
     const l = lundiDe(k), auj = aujourdhui();
@@ -178,7 +201,7 @@
   const joursPaysage = () => S.vueCal === 'semaine' ? Array.from({ length: 7 }, (_, i) => decaler(lundiDe(U.date), i)) : [U.date];
   function reglerHeure(ajuste) {
     PLAGE.ajuste = ajuste;
-    if (!ajuste) { H = CONFIG.heure; HMIN = 30; }
+    if (!ajuste) { H = CONFIG.heure; HMIN = 44; }
     else {
       const jours = joursPaysage();
       const l = [].concat(...jours.map(k => duJour(k).filter(o => !o.el.flou).map(o => o.el)));

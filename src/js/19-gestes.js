@@ -73,6 +73,7 @@
     if (!AD.open) AD.showModal();
   }
   AD.addEventListener('click', async e => {
+    if (U.avaler && Date.now() - U.avaler < 800) { U.avaler = 0; e.preventDefault(); return; }   // le doigt de l'appui long se lève : ce clic n'est pas un choix dans le menu
     const j = e.target.closest('[data-a-jour]'), po = e.target.closest('[data-a-poser]'), du = e.target.closest('[data-a-duree]'), ca = e.target.closest('[data-a-cat]'), b = e.target.closest('[data-a]');
     if (du || ca) { const x = S.aCaser.find(y => y.id === A.caser); if (!x) return; if (du) x.duree = +du.dataset.aDuree; else x.cat = ca.dataset.aCat; sauver(); return ouvrirCaser(x.id); }
     if (po) {

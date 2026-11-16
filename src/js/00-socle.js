@@ -2,7 +2,7 @@
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 25;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 26;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -11,7 +11,7 @@
     difficilesParSemaine: 2,
     courage: { reports: 2, bonus: .5 },   // une tâche repoussée 2 fois ou plus rapporte 50 % de plus une fois faite
     absence: 3,            // jours sans ouvrir l'app avant l'accueil « content de te revoir »
-    heure: 60,             // px par heure dans la grille (= --H)
+    heure: 64,             // px par heure dans la grille (= --H)
     pas: 15,               // minutes : les plages se calent au quart d'heure
     duree: 60,             // durée proposée pour une nouvelle plage
     ouverture: 7,          // heure en haut de la grille à l'ouverture
@@ -19,25 +19,25 @@
     points: { libre: 30, sansecran: 40, evenement: 0, libresParJour: 2, libreMin: 30, bonusObjectif: 5, bonusSemaine: .5 },
     validation: 3,         // jours pour dire si un moment sans écran a été tenu
     rappels: { horizon: 14, heureSauvegarde: 19 * 60 },
-    // Dix niveaux. Chacun débloque un look : c = dégradé de l'accent, texte = couleur des textes d'accent, arc = teinte des arcs de lumière
+    // Dix niveaux. Chacun débloque un look : c = ses couleurs (emblème, pastille), encre = la couleur des boutons et des accents sur l'ivoire, arc = teinte de lumière
     // Planifier par moment : la tâche se fait « le matin », sans heure précise (a, b = bornes du moment, en minutes)
     moments: { matin: { nom: 'Matin', ce: 'Ce matin', icone: '🌅', a: 6 * 60, b: 12 * 60 }, aprem: { nom: 'Après-midi', ce: 'Cet après-midi', icone: '☀️', a: 12 * 60, b: 18 * 60 }, soir: { nom: 'Soir', ce: 'Ce soir', icone: '🌙', a: 18 * 60, b: 24 * 60 } },
     sansFin: 5000,         // après le dernier niveau, un niveau de plus tous les 5 000 points (Zénith II, III…)
     paliers: [
-      { id: 'eclat', nom: 'Éclat', seuil: 0, look: 'Platine', c: ['#faf7f2', '#ddd5c8', '#bdb2a2'], texte: '#e4d3b3', arc: '255, 236, 210' },
-      { id: 'lueur', nom: 'Lueur', seuil: 250, look: 'Argent', c: ['#ffffff', '#dbe0ea', '#aab2c2'], texte: '#d3dae8', arc: '214, 224, 245' },
-      { id: 'cristal', nom: 'Cristal', seuil: 500, look: 'Glacier', c: ['#f1f9ff', '#bfdcf5', '#8db9e2'], texte: '#b9d8f5', arc: '170, 212, 255' },
-      { id: 'prisme', nom: 'Prisme', seuil: 1000, look: 'Améthyste', c: ['#f7f1ff', '#d6c4f8', '#aa94e2'], texte: '#d5c4f8', arc: '200, 170, 255' },
-      { id: 'etoile', nom: 'Étoile', seuil: 1500, look: 'Or', c: ['#fff7dc', '#f1d68c', '#d0aa52'], texte: '#f1d68c', arc: '255, 214, 130' },
-      { id: 'comete', nom: 'Comète', seuil: 2500, look: 'Jade', c: ['#ecfff8', '#a9ecd7', '#70ceb3'], texte: '#a9ecd7', arc: '130, 235, 200' },
-      { id: 'constellation', nom: 'Constellation', seuil: 4000, look: 'Saphir', c: ['#eff3ff', '#b6c5ff', '#8498ee'], texte: '#bac8ff', arc: '140, 165, 255' },
-      { id: 'aurore', nom: 'Aurore', seuil: 6000, look: 'Or rose', c: ['#fff1ee', '#f8c5be', '#e29c99'], texte: '#f8c5be', arc: '255, 170, 165' },
-      { id: 'nova', nom: 'Nova', seuil: 10000, look: 'Ambre', c: ['#fff2de', '#ffca8c', '#f19c54'], texte: '#ffca8c', arc: '255, 170, 90' },
-      { id: 'zenith', nom: 'Zénith', seuil: 15000, look: 'Iris', c: ['#ffffff', '#ffe7b3', '#f6bbd9', '#b9c5ff'], texte: '#ffe7b3', arc: '225, 185, 255' }
+      { id: 'eclat', nom: 'Éclat', seuil: 0, look: 'Platine', c: ['#faf7f2', '#ddd5c8', '#bdb2a2'], texte: '#e4d3b3', arc: '255, 236, 210', encre: '#1a1814' },
+      { id: 'lueur', nom: 'Lueur', seuil: 250, look: 'Argent', c: ['#ffffff', '#dbe0ea', '#aab2c2'], texte: '#d3dae8', arc: '214, 224, 245', encre: '#39414f' },
+      { id: 'cristal', nom: 'Cristal', seuil: 500, look: 'Glacier', c: ['#f1f9ff', '#bfdcf5', '#8db9e2'], texte: '#b9d8f5', arc: '170, 212, 255', encre: '#1f4f7a' },
+      { id: 'prisme', nom: 'Prisme', seuil: 1000, look: 'Améthyste', c: ['#f7f1ff', '#d6c4f8', '#aa94e2'], texte: '#d5c4f8', arc: '200, 170, 255', encre: '#4a2f86' },
+      { id: 'etoile', nom: 'Étoile', seuil: 1500, look: 'Or', c: ['#fff7dc', '#f1d68c', '#d0aa52'], texte: '#f1d68c', arc: '255, 214, 130', encre: '#6b4a0d' },
+      { id: 'comete', nom: 'Comète', seuil: 2500, look: 'Jade', c: ['#ecfff8', '#a9ecd7', '#70ceb3'], texte: '#a9ecd7', arc: '130, 235, 200', encre: '#145c49' },
+      { id: 'constellation', nom: 'Constellation', seuil: 4000, look: 'Saphir', c: ['#eff3ff', '#b6c5ff', '#8498ee'], texte: '#bac8ff', arc: '140, 165, 255', encre: '#263a85' },
+      { id: 'aurore', nom: 'Aurore', seuil: 6000, look: 'Or rose', c: ['#fff1ee', '#f8c5be', '#e29c99'], texte: '#f8c5be', arc: '255, 170, 165', encre: '#8a3a36' },
+      { id: 'nova', nom: 'Nova', seuil: 10000, look: 'Ambre', c: ['#fff2de', '#ffca8c', '#f19c54'], texte: '#ffca8c', arc: '255, 170, 90', encre: '#87430f' },
+      { id: 'zenith', nom: 'Zénith', seuil: 15000, look: 'Iris', c: ['#ffffff', '#ffe7b3', '#f6bbd9', '#b9c5ff'], texte: '#ffe7b3', arc: '225, 185, 255', encre: '#4b3a8f' }
     ]
   };
   let H = CONFIG.heure;                    // px par heure ; téléphone couché, la vue Jour l'ajuste pour montrer toute la journée
-  let HMIN = 30;                           // hauteur minimale d'un bloc
+  let HMIN = 44;                           // hauteur minimale d'un bloc
   const PLAGE = { a: 0, b: 24, dispo: 0, ajuste: false };
   const PALETTE = ['#ff4d6d', '#ffb547', '#7b6cff', '#d78bff', '#ff5e7a', '#4f8bff', '#3ee08f', '#2fd3c5', '#57c3ff', '#ff8a3d', '#f5d547', '#9aa3d9'];
   const NOMS_COULEURS = { '#ff4d6d': 'Rouge', '#ffb547': 'Orange', '#7b6cff': 'Violet', '#d78bff': 'Mauve', '#ff5e7a': 'Rose', '#4f8bff': 'Bleu', '#3ee08f': 'Vert', '#2fd3c5': 'Turquoise', '#57c3ff': 'Ciel', '#ff8a3d': 'Mandarine', '#f5d547': 'Jaune', '#9aa3d9': 'Gris' };
