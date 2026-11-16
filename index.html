@@ -1627,6 +1627,16 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
 .point-tab { position: absolute; top: 6px; left: calc(50% + 8px); width: 9px; height: 9px; border-radius: 50%; background: var(--rouge); box-shadow: 0 0 0 2px var(--fond); }
 .ligne.ensuite:not(.faite) .tuile { font-size: 0; }
 .ligne.ensuite .tuile.evenement { background: none; }
+
+/* ===== Édition 34 : la carte « Ensuite » passe à l'ivoire, teintée de la couleur de la tâche ===== */
+.mnt { background: color-mix(in srgb, var(--c) 9%, #fbf9f4); color: var(--encre); border: 1px solid color-mix(in srgb, var(--c) 30%, #ddd6c8); box-shadow: 0 10px 28px rgba(70, 55, 30, .07); }
+.mnt.encours { box-shadow: 0 10px 28px rgba(70, 55, 30, .07); }
+.mnt.encours .mnt-capsule { background: linear-gradient(180deg, color-mix(in srgb, var(--c) 88%, #1a1814) 0 var(--avance), color-mix(in srgb, var(--c) 28%, #f6f3ec) var(--avance)); }
+.mnt-titre { color: color-mix(in srgb, var(--c) 42%, #1a1814); }
+.mnt-ligne .quoi b { color: var(--encre); }
+.mnt-ligne .quoi small, .mnt-ligne .pts { color: var(--doux); }
+.mnt-go, .mnt .bouton { background: var(--encre); color: var(--ivoire); }
+.mnt-pouls { background: color-mix(in srgb, var(--c) 80%, #1a1814); }
 /* ===== Édition 30 : le calendrier couché au style D (ivoire, encre, empattements) ===== */
 
 /* En-tête : comme debout, sur une seule rangée */
@@ -1913,7 +1923,7 @@ html { background: #f6f3ec; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 33;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 34;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
