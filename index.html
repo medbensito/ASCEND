@@ -1504,6 +1504,104 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
 #fete h2 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--ivoire); }
 .bloc.court .rond-coche { width: 28px; height: 28px; margin-top: 0; }
 
+/* ===== Édition 27 : au plus près des maquettes D ===== */
+/* En-tête du calendrier : sur-titre, grand titre, onglets à droite */
+.cal-entete { display: grid; gap: 2px; }
+.cal-haut { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; }
+.cal-haut .sur-titre { margin: 0 !important; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-outils { display: flex; align-items: center; gap: 2px; flex: none; }
+.cal-outils .lien { font-size: 13px; min-height: 40px; padding: 0 6px; }
+.icone-bouton.petit { width: 40px; height: 40px; border: 0; background: none; }
+.icone-bouton.petit svg { width: 19px; height: 19px; }
+.cal-titre { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.cal-titre h1 { font-family: var(--serif); font-weight: 400; font-size: 46px; line-height: 1; letter-spacing: -.01em; min-width: 0; }
+.onglets-vue.segments { display: flex; border: 0; flex: none; gap: 2px; padding-bottom: 2px; }
+.onglets-vue.segments button { min-height: 44px; padding: 0 8px; font-size: 14px; background: none; }
+.onglets-vue.segments button[aria-pressed="true"] { box-shadow: none; text-decoration: underline; text-underline-offset: 7px; text-decoration-thickness: 2px; }
+@media (max-width: 359px) { .cal-titre h1 { font-size: 36px; } .onglets-vue.segments button { padding: 0 5px; font-size: 13px; } }
+/* Bande des jours : un filet dessus et dessous, le jour choisi à l'encre, la barre des couleurs du jour */
+.bande { grid-template-columns: repeat(7, minmax(0, 1fr)); margin-top: 4px; }
+.jour-b { min-height: 62px; gap: 3px; padding: 6px 0 8px; }
+.jour-b i { width: 0; height: 3px; border-radius: 2px; }
+.jour-b i.plein { background: var(--doux); }
+.jour-b[aria-pressed="true"] i { outline: 1px solid rgba(246, 243, 236, .5); }
+.cal-jour { gap: 10px; }
+/* Mois */
+.mois-carte { padding-top: 8px; }
+/* Accueil : le niveau dans le cadran, les récompenses dessous */
+.cadran { width: min(250px, 70vw); }
+.cadran-centre { gap: 3px; }
+.cadran-centre .niveau { margin-top: 8px; }
+.cadran-centre .niveau > button { min-height: 32px; padding: 0 12px 0 4px; gap: 6px; background: var(--fond); }
+.cadran-centre .niveau small { display: none; }
+.cadran-centre .niveau b { font-size: 15.5px; }
+.cadran-centre .niveau .embleme { width: 22px; height: 22px; }
+.rec-sous { margin-top: -2px; }
+.rec-sous .rec-pastille { min-height: 32px; font-size: 12px; background: none; border: 0; color: var(--doux); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(26, 24, 20, .3); }
+.rec-sous .rec-pastille.pret { background: var(--accent); color: var(--sur-accent); text-decoration: none; border-radius: 999px; }
+/* Pastille d'une ligne : un rond comme sur la maquette */
+.tuile { width: 32px; height: 32px; border-radius: 50%; font-size: 15px; }
+.cal-entete { grid-template-columns: minmax(0, 1fr); }
+.cal-titre { flex-wrap: wrap; row-gap: 0; }
+.cal-titre h1 { font-size: clamp(34px, 10.5vw, 44px); }
+.cal-titre h1 .an { font-size: .55em; color: var(--doux); }
+.onglets-vue.segments { margin-left: auto; }
+.onglets-vue.segments button { padding: 0 6px; font-size: 13.5px; }
+.jour-liste-tete h2 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 24px; line-height: 1.1; }
+
+/* ===== Écrans secondaires (édition 27) ===== */
+/* Feuilles et pages : ivoire uni, sans arcs de lumière */
+dialog.feuille, html dialog.feuille.page, dialog.minuteur, dialog#verrou { background: var(--fond) !important; background-image: none !important; }
+html dialog.feuille.page::backdrop { background: var(--fond); }
+dialog.feuille:not(.page) { border: 1px solid var(--filet); box-shadow: 0 -10px 40px rgba(26, 24, 20, .14); }
+.f-haut { border-bottom: 1px solid var(--filet); }
+.f-haut h2 { font-size: 24px; }
+/* Titres de section dans les feuilles : italique à empattements */
+dialog h3, .section-titre { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 24px; letter-spacing: 0; color: var(--encre); }
+/* Petits libellés des formulaires : capitales espacées */
+.etiquette { font-size: 11px; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; color: var(--doux); margin: 0 0 8px 2px; }
+.etiquette .sous { text-transform: none; letter-spacing: 0; font-size: 12px; }
+/* Champs : à plat, filet fin */
+.champ-nom, .groupe { background: var(--carte); border: 1px solid var(--filet); box-shadow: none; }
+.champ-nom input { font-family: var(--serif); font-size: 22px; }
+.champ-nom input::placeholder { font-family: var(--serif); font-style: italic; color: #8a8276; }
+.rang input[type="date"], .rang input[type="time"], .rang select, .rang input[type="number"], .rang input[type="text"] { background: var(--fond); border: 1px solid var(--filet); color: var(--encre); }
+/* Puces (choix) : pilules à filet, la choisie à l'encre */
+.puce { background: none; border: 1px solid var(--filet); color: var(--encre); box-shadow: none; }
+.puce[aria-pressed="true"], .puce[aria-checked="true"] { background: var(--accent); color: var(--sur-accent); border-color: transparent; box-shadow: none; }
+/* Les grands nombres : à empattements */
+.serie-carte b, .anneau .val b, .b-pts b, .r-solde b, .n-tete b, .mini b, .sem-haut b, .m-anneau .temps b, .temps b { font-family: var(--serif); font-weight: 400; letter-spacing: 0; }
+.serie-carte b { font-size: 40px; }
+.b-pts b { font-size: 44px; }
+.anneau .val b { font-size: 44px; }
+.r-solde b { font-size: 52px; }
+.n-tete b { font-size: 34px; }
+/* Objectifs à long terme : titre à empattements, barre d'encre */
+.obj-carte .haut b { font-family: var(--serif); font-weight: 400; font-size: 23px; line-height: 1.1; }
+.obj-carte .pc { font-family: var(--serif); font-size: 24px; }
+.barre-obj { background: var(--carte-3); }
+.barre-obj i { background: var(--accent); box-shadow: none; }
+/* Cartes : à plat */
+.serie-carte, .obj-carte, .b-entree, .pf-item, .r-ligne, .idt-carte { box-shadow: none; }
+.anneau .piste, .anneau circle:first-child { stroke: var(--carte-3); }
+dialog h3 { font-size: 24px !important; font-weight: 400 !important; line-height: 1.15; }
+#profil .f-corps b[style*="font-size:18px"] { font-family: var(--serif); font-weight: 400; font-size: 26px !important; }
+/* Interrupteur : rail clair, à l'encre une fois activé, le rond toujours ivoire */
+.interrupteur i { background: var(--carte-3); border: 1px solid var(--filet); box-shadow: none; }
+.interrupteur i::after { background: #fff; box-shadow: 0 1px 3px rgba(26, 24, 20, .3); }
+.interrupteur input:checked + i { background: var(--accent); border-color: transparent; box-shadow: none; }
+.interrupteur input:checked + i::after { background: var(--ivoire); }
+dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
+#m-titre, dialog.minuteur h2 { font-family: var(--serif); font-weight: 400; font-size: 26px; }
+/* Une tâche courte (portrait) : l'heure au-dessus du titre, comme les autres */
+.defile:not(.ajuste) .bloc.court .b-texte { flex-direction: column; align-items: stretch; justify-content: center; gap: 0; padding: 0; }
+.defile:not(.ajuste) .bloc.court .b-texte small { order: -1; font-size: 11.5px; line-height: 1.2; }
+.defile:not(.ajuste) .bloc.court .b-texte b { font-size: 19px; line-height: 1.1; }
+/* Tâches pas faites : à plat, le titre à empattements */
+.pf-item { border-left: 1px solid var(--filet); }
+.pf-item .tuile + span b, .pf-item b { font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.1; }
+.pf-b b, .pf-item button b { font-family: var(--police); font-size: 13px; font-weight: 650; }
+
 </style>
 </head>
 <body>
@@ -1644,7 +1742,7 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 26;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 27;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -2503,7 +2601,12 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
   }
   // Le cadran de la journée (style Aube × Orbite) : de 6 h à minuit, un arc de couleur par élément prévu,
   // le temps déjà passé en fin trait intérieur, le point de maintenant ; tes points au centre.
-  function cadran(k, g) {
+  // La pastille du niveau, au centre du cadran
+  function pastilleNiveau() {
+    const P = palier(), suiv = palierSuivant();
+    return `<p class="niveau palier"><button type="button" data-action="niveaux" data-focus="niveaux" aria-label="Niveau ${niveauIdx() + 1}, ${P.nom}${suiv ? `, encore ${nombre(suiv.seuil - S.points)} points avant ${suiv.nom}` : ''}. Voir les niveaux et les looks">${embleme(P.id)}<b aria-hidden="true">${P.nom}, niveau ${niveauIdx() + 1}</b>${suiv ? `<small aria-hidden="true">encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</button></p>`;
+  }
+  function cadran(k, g, niveau) {
     const A = 6 * 60, L = 18 * 60, R = 104, C = 2 * Math.PI * R, r = 88, c = 2 * Math.PI * r, now = minNow();
     const pos = m => Math.max(0, Math.min(1, (m - A) / L));
     const occs = duJour(k).filter(o => !o.el.flou);
@@ -2512,12 +2615,12 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
     const t = pos(now), ang = t * 2 * Math.PI;
     const px = 120 + R * Math.sin(ang), py = 120 - R * Math.cos(ang);
     const n = occs.length;
-    return `<div class="cadran" role="img" aria-label="${nombre(S.points)} points, ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : 'aucun point'} aujourd'hui. Ta journée de 6 h à minuit : ${n ? pluriel(n, 'élément') + ' à heure fixe' : 'rien à heure fixe'}, il est ${hhmm(now)}.">
+    return `<div class="cadran"><span class="masque">${nombre(S.points)} points, ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : 'aucun point'} aujourd'hui. Ta journée de 6 h à minuit : ${n ? pluriel(n, 'élément') + ' à heure fixe' : 'rien à heure fixe'}, il est ${hhmm(now)}.</span>
       <svg viewBox="0 0 240 240" aria-hidden="true"><g transform="rotate(-90 120 120)" fill="none">
         <circle cx="120" cy="120" r="${R}" class="piste"/>${arcs}
         <circle cx="120" cy="120" r="${r}" class="piste-fine"/>${t > 0 ? `<circle cx="120" cy="120" r="${r}" class="passe" stroke-dasharray="${(t * c).toFixed(1)} ${c.toFixed(1)}"/>` : ''}</g>
         ${t > 0 && t < 1 ? `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="8" class="point-now"/>` : ''}</svg>
-      <div class="cadran-centre" aria-hidden="true"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b><small>points · ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : '+0'} aujourd'hui</small></div>
+      <div class="cadran-centre"><b class="${U.reaction ? 'monte' : ''}" aria-hidden="true">${nombre(S.points)}</b><small aria-hidden="true">points · ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : '+0'} aujourd'hui</small>${niveau || ''}</div>
     </div>`;
   }
   function aValider() {
@@ -2548,11 +2651,19 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
       </header>
       <section class="points cadran-zone" aria-labelledby="tes-points">
         <h2 class="masque" id="tes-points">Tes points et ta journée</h2>
-        ${cadran(auj, g)}
-        <div class="niveau-rang"><p class="niveau palier"><button type="button" data-action="niveaux" data-focus="niveaux" aria-label="Niveau ${niveauIdx() + 1}, ${P.nom}${suiv ? `, encore ${nombre(suiv.seuil - S.points)} points avant ${suiv.nom}` : ''}. Voir les niveaux et les looks">${embleme(P.id)}<b aria-hidden="true">${P.nom}, niveau ${niveauIdx() + 1}</b>${suiv ? `<small aria-hidden="true">encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</button></p>
-        <p class="niveau">${pastilleRecompenses()}</p></div>
+        ${cadran(auj, g, pastilleNiveau())}
+        <p class="niveau rec-sous">${pastilleRecompenses()}</p>
       </section>
       ${carteMaintenant()}
+      <section aria-labelledby="auj-titre">
+        <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
+        <div class="lignes">
+          ${occs.map(o => ligneOcc(o, true)).join('')}
+          ${habs.map(h => ligneHabitude(h, auj, true)).join('')}
+          ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
+        </div>
+        ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
+      </section>
       ${carteEnergie(false)}
       ${carteCoach()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
@@ -2564,15 +2675,6 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
         <div class="boutons${resteT ? ' deux' : ''}">${resteT ? `<button type="button" class="bouton petit" data-action="alleger" data-focus="alleger">Reporter ${resteT > 1 ? 'mes ' + resteT + ' tâches' : 'ma tâche'} à demain</button>` : ''}
           <button type="button" class="bouton petit secondaire" data-action="fin-difficile" data-focus="dur">Finalement, ça va</button></div></section>` : ''}
       ${cartePasFaites()}
-      <section aria-labelledby="auj-titre">
-        <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
-        <div class="lignes">
-          ${occs.map(o => ligneOcc(o, true)).join('')}
-          ${habs.map(h => ligneHabitude(h, auj, true)).join('')}
-          ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
-        </div>
-        ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
-      </section>
       ${cartePriorites()}
       ${rappelChange()}
       <div class="duo${carteSemaine() ? ' trio' : ''}">
@@ -2588,21 +2690,49 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
       ${carteEnergie(true)}`;
   }
   // ---------- Calendrier ----------
+  // En-tête (style Aube) : un sur-titre (la date, la charge), le grand titre, les onglets à droite ; flèches et loupe en haut
   function vueCalendrier() {
     const v = S.vueCal === 'jour' ? 'jour' : S.vueCal === 'mois' ? 'mois' : 'semaine';
+    const k = U.date, auj = aujourdhui(), pl = S.reglages.plafond;
+    let sur, titre, nav, surCourant;
+    if (v === 'jour') {
+      const m = minutesPrevues(k);
+      titre = cap(JOURS_LONGS[(parse(k).getDay() + 6) % 7]);
+      sur = `${fmt(k, { day: 'numeric', month: 'long' })} · ${duree(m)} sur ${duree(pl)}`;
+      nav = 'Jour'; surCourant = k === auj;
+    } else if (v === 'semaine') {
+      const l = lundiDe(k), la = lundiDe(auj);
+      let tot = 0; for (let i = 0; i < 7; i++) tot += minutesPrevues(decaler(l, i));
+      titre = l === la ? 'Cette semaine' : l === decaler(la, 7) ? 'La semaine prochaine' : l === decaler(la, -7) ? 'La semaine passée' : 'Semaine';
+      const dim = decaler(l, 6), court = d => fmt(d, { month: 'short' });
+      sur = `${l.slice(0, 7) === dim.slice(0, 7) ? parse(l).getDate() : parse(l).getDate() + ' ' + court(l)} – ${parse(dim).getDate()} ${court(dim)} · ${duree(tot)} prévues`;
+      nav = 'Semaine'; surCourant = l === la;
+    } else {
+      titre = cap(parse(k).toLocaleDateString('fr-FR', { month: 'long' }));
+      sur = 'Le mois';
+      nav = 'Mois'; surCourant = k.slice(0, 7) === auj.slice(0, 7);
+    }
+    const f = nav === 'Semaine' ? 'e' : '';
     return `
-      <header class="tete">
-        <div><h1>Calendrier</h1><p>Planifie. Organise. Réussis.</p></div>
-        <div class="actions-tete">
-          <button type="button" class="icone-bouton" data-action="chercher" aria-label="Chercher" aria-keyshortcuts="/" data-focus="chercher">${ICONE.loupe}</button>
-          <button type="button" class="icone-bouton" data-action="aujourdhui" aria-label="Aujourd'hui" data-focus="auj">${ICONE.calendrier}</button>
+      <header class="cal-entete" data-jour="${esc(v === 'jour' ? (k === auj ? "Aujourd'hui" : jourLong(k)) : '')}">
+        <div class="cal-haut">
+          <p class="sur-titre" ${v === 'semaine' ? 'id="sem-sur"' : ''}>${esc(sur)}</p>
+          <div class="cal-outils">
+            ${surCourant ? '' : `<button type="button" class="lien fort" data-action="aujourdhui" data-focus="auj">Aujourd'hui</button>`}
+            <button type="button" class="icone-bouton petit" data-nav="-1" aria-label="${nav} précédent${f}" data-focus="nav-1">${ICONE.gauche}</button>
+            <button type="button" class="icone-bouton petit" data-nav="1" aria-label="${nav} suivant${f}" data-focus="nav1">${ICONE.droite}</button>
+            <button type="button" class="icone-bouton petit" data-action="chercher" aria-label="Chercher" aria-keyshortcuts="/" data-focus="chercher">${ICONE.loupe}</button>
+          </div>
+        </div>
+        <div class="cal-titre">
+          <h1 id="${v === 'semaine' ? 'sem-nom' : v === 'mois' ? 'mois-nom' : 'jour-nom'}" aria-live="polite">${esc(titre)}${v === 'mois' ? ` <span class="an">${parse(k).getFullYear()}</span>` : ''}</h1>
+          <div class="segments onglets-vue" role="group" aria-label="Affichage">
+            <button type="button" aria-pressed="${v === 'semaine'}" data-vue-cal="semaine" data-focus="vc-semaine" aria-label="Semaine">Sem.</button>
+            <button type="button" aria-pressed="${v === 'jour'}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+            <button type="button" aria-pressed="${v === 'mois'}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
+          </div>
         </div>
       </header>
-      <div class="segments" role="group" aria-label="Affichage">
-        <button type="button" aria-pressed="${v === 'semaine'}" data-vue-cal="semaine" data-focus="vc-semaine">Semaine</button>
-        <button type="button" aria-pressed="${v === 'jour'}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
-        <button type="button" aria-pressed="${v === 'mois'}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
-      </div>
       ${v === 'mois' ? vueMois() : v === 'jour' ? vueJour() : vueSemaine()}`;
   }
 
@@ -2628,12 +2758,7 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
     const occs = duJour(k), habs = S.habitudes.filter(h => habitudeDue(h, k));
     const m = minutesPrevues(k);
     return `
-      <section class="carte" aria-labelledby="mois-nom">
-        <div class="cal-tete">
-          <button type="button" class="icone-bouton" data-nav="-1" aria-label="Mois précédent" data-focus="nav-1">${ICONE.gauche}</button>
-          <h2 id="mois-nom" aria-live="polite">${esc(nom)}</h2>
-          <button type="button" class="icone-bouton" data-nav="1" aria-label="Mois suivant" data-focus="nav1">${ICONE.droite}</button>
-        </div>
+      <section class="carte mois-carte" aria-labelledby="mois-nom">
         <div class="mois-grille" data-balayage="mois">
           ${JOURS_COURTS.map((j, i) => `<span class="jsem" aria-hidden="true" title="${JOURS_LONGS[i]}">${j}</span>`).join('')}
           ${cases}
@@ -2737,25 +2862,20 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
   function bandeSemaine(k) {
     const l = lundiDe(k), auj = aujourdhui();
     return Array.from({ length: 7 }, (_, i) => {
-      const d = decaler(l, i), n = duJour(d).length;
+      const d = decaler(l, i), occs = duJour(d), n = occs.length;
+      const couleurs = [];
+      occs.forEach(o => { const c = look(o.el).couleur; if (!couleurs.includes(c) && o.el.type !== 'evenement') couleurs.push(c); });
+      const c3 = couleurs.slice(0, 3), w = c3.length ? 8 + c3.length * 6 : 0;
+      const barre = c3.length ? `linear-gradient(90deg, ${c3.map((c, j) => `${c} ${j * 100 / c3.length}% ${(j + 1) * 100 / c3.length}%`).join(', ')})` : 'none';
       return `<button type="button" class="jour-b${d === auj ? ' auj' : ''}" data-aller="${d}" aria-pressed="${d === k}" data-focus="j${d}"
         aria-label="${jourLong(d)}${d === auj ? ", aujourd'hui" : ''}${n ? ', ' + pluriel(n, 'élément') : ''}">
-        <span aria-hidden="true">${JOURS_COURTS[i]}</span><b aria-hidden="true">${parse(d).getDate()}</b><i class="${n ? 'plein' : ''}" aria-hidden="true"></i></button>`;
+        <span aria-hidden="true">${JOURS_COURTS[i]}</span><b aria-hidden="true">${parse(d).getDate()}</b><i class="${n ? 'plein' : ''}" style="width:${w}px;background:${barre}" aria-hidden="true"></i></button>`;
     }).join('');
   }
   function vueJour() {
-    const k = U.date, m = minutesPrevues(k), pl = S.reglages.plafond;
+    const k = U.date;
     return `<div class="cal-jour">
-      <div class="bande">
-        <button type="button" class="fleche" data-saut="-7" aria-label="Semaine précédente" data-focus="s-7">${ICONE.gauche}</button>
-        ${bandeSemaine(k)}
-        <button type="button" class="fleche" data-saut="7" aria-label="Semaine suivante" data-focus="s7">${ICONE.droite}</button>
-      </div>
-      <div class="jour-entete">
-        <h2 aria-live="polite">${k === aujourdhui() ? "Aujourd'hui" : jourLong(k)}</h2>
-        <div class="jauge${m > pl ? ' depasse' : ''}" role="img" aria-label="${duree(m)} de tâches prévues sur un plafond de ${duree(pl)}${m > pl ? ' : journée chargée' : ''}">
-          <small aria-hidden="true"><b>${duree(m)}</b> / ${duree(pl)}</small><span class="barre" aria-hidden="true"><i style="width:${Math.min(100, m / pl * 100)}%"></i></span></div>
-      </div>
+      <div class="bande" data-balayage="jour">${bandeSemaine(k)}</div>
       ${duJour(k).some(o => o.el.flou) ? `<div class="flou-zone" role="group" aria-label="Dans la journée">${duJour(k).filter(o => o.el.flou).map(o => ligneOcc(o, true)).join('')}</div>` : ''}
       <div class="defile" data-defile="jour">${grille([k])}</div>
       <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>
@@ -3784,11 +3904,6 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
       </section>`;
     }
     return `
-      <div class="cal-tete sem-nav">
-        <button type="button" class="icone-bouton" data-nav="-1" aria-label="Semaine précédente" data-focus="nav-1">${ICONE.gauche}</button>
-        <h2 id="sem-nom" aria-live="polite">${lundi === lundiDe(auj) ? 'Cette semaine' : cap(texteSemaine(lundi))}<small>${lundi === lundiDe(auj) ? texteSemaine(lundi) : lundi === decaler(lundiDe(auj), 7) ? 'La semaine prochaine' : lundi === decaler(lundiDe(auj), -7) ? 'La semaine passée' : ''}</small></h2>
-        <button type="button" class="icone-bouton" data-nav="1" aria-label="Semaine suivante" data-focus="nav1">${ICONE.droite}</button>
-      </div>
       ${bandeauSemaine(lundi)}
       <div class="sem-heures" aria-hidden="true"><span>6 h</span><span>12 h</span><span>18 h</span><span>24 h</span></div>
       <div class="sem-jours">${jours}</div>

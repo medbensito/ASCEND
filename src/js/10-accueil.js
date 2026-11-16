@@ -83,7 +83,12 @@
   }
   // Le cadran de la journée (style Aube × Orbite) : de 6 h à minuit, un arc de couleur par élément prévu,
   // le temps déjà passé en fin trait intérieur, le point de maintenant ; tes points au centre.
-  function cadran(k, g) {
+  // La pastille du niveau, au centre du cadran
+  function pastilleNiveau() {
+    const P = palier(), suiv = palierSuivant();
+    return `<p class="niveau palier"><button type="button" data-action="niveaux" data-focus="niveaux" aria-label="Niveau ${niveauIdx() + 1}, ${P.nom}${suiv ? `, encore ${nombre(suiv.seuil - S.points)} points avant ${suiv.nom}` : ''}. Voir les niveaux et les looks">${embleme(P.id)}<b aria-hidden="true">${P.nom}, niveau ${niveauIdx() + 1}</b>${suiv ? `<small aria-hidden="true">encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</button></p>`;
+  }
+  function cadran(k, g, niveau) {
     const A = 6 * 60, L = 18 * 60, R = 104, C = 2 * Math.PI * R, r = 88, c = 2 * Math.PI * r, now = minNow();
     const pos = m => Math.max(0, Math.min(1, (m - A) / L));
     const occs = duJour(k).filter(o => !o.el.flou);
@@ -92,12 +97,12 @@
     const t = pos(now), ang = t * 2 * Math.PI;
     const px = 120 + R * Math.sin(ang), py = 120 - R * Math.cos(ang);
     const n = occs.length;
-    return `<div class="cadran" role="img" aria-label="${nombre(S.points)} points, ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : 'aucun point'} aujourd'hui. Ta journée de 6 h à minuit : ${n ? pluriel(n, 'élément') + ' à heure fixe' : 'rien à heure fixe'}, il est ${hhmm(now)}.">
+    return `<div class="cadran"><span class="masque">${nombre(S.points)} points, ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : 'aucun point'} aujourd'hui. Ta journée de 6 h à minuit : ${n ? pluriel(n, 'élément') + ' à heure fixe' : 'rien à heure fixe'}, il est ${hhmm(now)}.</span>
       <svg viewBox="0 0 240 240" aria-hidden="true"><g transform="rotate(-90 120 120)" fill="none">
         <circle cx="120" cy="120" r="${R}" class="piste"/>${arcs}
         <circle cx="120" cy="120" r="${r}" class="piste-fine"/>${t > 0 ? `<circle cx="120" cy="120" r="${r}" class="passe" stroke-dasharray="${(t * c).toFixed(1)} ${c.toFixed(1)}"/>` : ''}</g>
         ${t > 0 && t < 1 ? `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="8" class="point-now"/>` : ''}</svg>
-      <div class="cadran-centre" aria-hidden="true"><b class="${U.reaction ? 'monte' : ''}">${nombre(S.points)}</b><small>points · ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : '+0'} aujourd'hui</small></div>
+      <div class="cadran-centre"><b class="${U.reaction ? 'monte' : ''}" aria-hidden="true">${nombre(S.points)}</b><small aria-hidden="true">points · ${g > 0 ? '+' + nombre(g) : g < 0 ? nombre(g) : '+0'} aujourd'hui</small>${niveau || ''}</div>
     </div>`;
   }
   function aValider() {
@@ -128,11 +133,19 @@
       </header>
       <section class="points cadran-zone" aria-labelledby="tes-points">
         <h2 class="masque" id="tes-points">Tes points et ta journée</h2>
-        ${cadran(auj, g)}
-        <div class="niveau-rang"><p class="niveau palier"><button type="button" data-action="niveaux" data-focus="niveaux" aria-label="Niveau ${niveauIdx() + 1}, ${P.nom}${suiv ? `, encore ${nombre(suiv.seuil - S.points)} points avant ${suiv.nom}` : ''}. Voir les niveaux et les looks">${embleme(P.id)}<b aria-hidden="true">${P.nom}, niveau ${niveauIdx() + 1}</b>${suiv ? `<small aria-hidden="true">encore ${nombre(suiv.seuil - S.points)} pts</small>` : ''}</button></p>
-        <p class="niveau">${pastilleRecompenses()}</p></div>
+        ${cadran(auj, g, pastilleNiveau())}
+        <p class="niveau rec-sous">${pastilleRecompenses()}</p>
       </section>
       ${carteMaintenant()}
+      <section aria-labelledby="auj-titre">
+        <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
+        <div class="lignes">
+          ${occs.map(o => ligneOcc(o, true)).join('')}
+          ${habs.map(h => ligneHabitude(h, auj, true)).join('')}
+          ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
+        </div>
+        ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
+      </section>
       ${carteEnergie(false)}
       ${carteCoach()}
       ${prevues > plafond ? `<div class="carte alerte" role="note"><span class="ic" aria-hidden="true">⚠️</span><p><b>Journée chargée : ${duree(prevues)} prévues</b> pour un plafond de ${duree(plafond)}. Allège ta journée ou garde un moment pour toi.</p></div>` : ''}
@@ -144,15 +157,6 @@
         <div class="boutons${resteT ? ' deux' : ''}">${resteT ? `<button type="button" class="bouton petit" data-action="alleger" data-focus="alleger">Reporter ${resteT > 1 ? 'mes ' + resteT + ' tâches' : 'ma tâche'} à demain</button>` : ''}
           <button type="button" class="bouton petit secondaire" data-action="fin-difficile" data-focus="dur">Finalement, ça va</button></div></section>` : ''}
       ${cartePasFaites()}
-      <section aria-labelledby="auj-titre">
-        <div class="section-tete"><h2 id="auj-titre">Aujourd'hui</h2><button type="button" class="lien" data-action="voir-tout" data-focus="voir-tout">Voir tout ${ICONE.fleche}</button></div>
-        <div class="lignes">
-          ${occs.map(o => ligneOcc(o, true)).join('')}
-          ${habs.map(h => ligneHabitude(h, auj, true)).join('')}
-          ${!occs.length && !habs.length ? '<p class="carte vide">Rien de prévu aujourd\'hui. Ajoute une tâche, une habitude… ou garde la journée pour toi.</p>' : ''}
-        </div>
-        ${!dur && (habs.some(h => !h.faits[auj]) || resteT) ? `<button type="button" class="lien dur-lien" data-action="difficile" data-focus="dur">🌧️ Journée difficile ? Passe en version mini</button>` : ''}
-      </section>
       ${cartePriorites()}
       ${rappelChange()}
       <div class="duo${carteSemaine() ? ' trio' : ''}">

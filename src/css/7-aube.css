@@ -304,3 +304,101 @@ mark { background: #f1dfae; color: var(--encre); border-radius: 3px; }
 #fete .fe-sur { color: #e7c27a; }
 #fete h2 { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--ivoire); }
 .bloc.court .rond-coche { width: 28px; height: 28px; margin-top: 0; }
+
+/* ===== Édition 27 : au plus près des maquettes D ===== */
+/* En-tête du calendrier : sur-titre, grand titre, onglets à droite */
+.cal-entete { display: grid; gap: 2px; }
+.cal-haut { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; }
+.cal-haut .sur-titre { margin: 0 !important; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-outils { display: flex; align-items: center; gap: 2px; flex: none; }
+.cal-outils .lien { font-size: 13px; min-height: 40px; padding: 0 6px; }
+.icone-bouton.petit { width: 40px; height: 40px; border: 0; background: none; }
+.icone-bouton.petit svg { width: 19px; height: 19px; }
+.cal-titre { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.cal-titre h1 { font-family: var(--serif); font-weight: 400; font-size: 46px; line-height: 1; letter-spacing: -.01em; min-width: 0; }
+.onglets-vue.segments { display: flex; border: 0; flex: none; gap: 2px; padding-bottom: 2px; }
+.onglets-vue.segments button { min-height: 44px; padding: 0 8px; font-size: 14px; background: none; }
+.onglets-vue.segments button[aria-pressed="true"] { box-shadow: none; text-decoration: underline; text-underline-offset: 7px; text-decoration-thickness: 2px; }
+@media (max-width: 359px) { .cal-titre h1 { font-size: 36px; } .onglets-vue.segments button { padding: 0 5px; font-size: 13px; } }
+/* Bande des jours : un filet dessus et dessous, le jour choisi à l'encre, la barre des couleurs du jour */
+.bande { grid-template-columns: repeat(7, minmax(0, 1fr)); margin-top: 4px; }
+.jour-b { min-height: 62px; gap: 3px; padding: 6px 0 8px; }
+.jour-b i { width: 0; height: 3px; border-radius: 2px; }
+.jour-b i.plein { background: var(--doux); }
+.jour-b[aria-pressed="true"] i { outline: 1px solid rgba(246, 243, 236, .5); }
+.cal-jour { gap: 10px; }
+/* Mois */
+.mois-carte { padding-top: 8px; }
+/* Accueil : le niveau dans le cadran, les récompenses dessous */
+.cadran { width: min(250px, 70vw); }
+.cadran-centre { gap: 3px; }
+.cadran-centre .niveau { margin-top: 8px; }
+.cadran-centre .niveau > button { min-height: 32px; padding: 0 12px 0 4px; gap: 6px; background: var(--fond); }
+.cadran-centre .niveau small { display: none; }
+.cadran-centre .niveau b { font-size: 15.5px; }
+.cadran-centre .niveau .embleme { width: 22px; height: 22px; }
+.rec-sous { margin-top: -2px; }
+.rec-sous .rec-pastille { min-height: 32px; font-size: 12px; background: none; border: 0; color: var(--doux); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(26, 24, 20, .3); }
+.rec-sous .rec-pastille.pret { background: var(--accent); color: var(--sur-accent); text-decoration: none; border-radius: 999px; }
+/* Pastille d'une ligne : un rond comme sur la maquette */
+.tuile { width: 32px; height: 32px; border-radius: 50%; font-size: 15px; }
+.cal-entete { grid-template-columns: minmax(0, 1fr); }
+.cal-titre { flex-wrap: wrap; row-gap: 0; }
+.cal-titre h1 { font-size: clamp(34px, 10.5vw, 44px); }
+.cal-titre h1 .an { font-size: .55em; color: var(--doux); }
+.onglets-vue.segments { margin-left: auto; }
+.onglets-vue.segments button { padding: 0 6px; font-size: 13.5px; }
+.jour-liste-tete h2 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 24px; line-height: 1.1; }
+
+/* ===== Écrans secondaires (édition 27) ===== */
+/* Feuilles et pages : ivoire uni, sans arcs de lumière */
+dialog.feuille, html dialog.feuille.page, dialog.minuteur, dialog#verrou { background: var(--fond) !important; background-image: none !important; }
+html dialog.feuille.page::backdrop { background: var(--fond); }
+dialog.feuille:not(.page) { border: 1px solid var(--filet); box-shadow: 0 -10px 40px rgba(26, 24, 20, .14); }
+.f-haut { border-bottom: 1px solid var(--filet); }
+.f-haut h2 { font-size: 24px; }
+/* Titres de section dans les feuilles : italique à empattements */
+dialog h3, .section-titre { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 24px; letter-spacing: 0; color: var(--encre); }
+/* Petits libellés des formulaires : capitales espacées */
+.etiquette { font-size: 11px; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; color: var(--doux); margin: 0 0 8px 2px; }
+.etiquette .sous { text-transform: none; letter-spacing: 0; font-size: 12px; }
+/* Champs : à plat, filet fin */
+.champ-nom, .groupe { background: var(--carte); border: 1px solid var(--filet); box-shadow: none; }
+.champ-nom input { font-family: var(--serif); font-size: 22px; }
+.champ-nom input::placeholder { font-family: var(--serif); font-style: italic; color: #8a8276; }
+.rang input[type="date"], .rang input[type="time"], .rang select, .rang input[type="number"], .rang input[type="text"] { background: var(--fond); border: 1px solid var(--filet); color: var(--encre); }
+/* Puces (choix) : pilules à filet, la choisie à l'encre */
+.puce { background: none; border: 1px solid var(--filet); color: var(--encre); box-shadow: none; }
+.puce[aria-pressed="true"], .puce[aria-checked="true"] { background: var(--accent); color: var(--sur-accent); border-color: transparent; box-shadow: none; }
+/* Les grands nombres : à empattements */
+.serie-carte b, .anneau .val b, .b-pts b, .r-solde b, .n-tete b, .mini b, .sem-haut b, .m-anneau .temps b, .temps b { font-family: var(--serif); font-weight: 400; letter-spacing: 0; }
+.serie-carte b { font-size: 40px; }
+.b-pts b { font-size: 44px; }
+.anneau .val b { font-size: 44px; }
+.r-solde b { font-size: 52px; }
+.n-tete b { font-size: 34px; }
+/* Objectifs à long terme : titre à empattements, barre d'encre */
+.obj-carte .haut b { font-family: var(--serif); font-weight: 400; font-size: 23px; line-height: 1.1; }
+.obj-carte .pc { font-family: var(--serif); font-size: 24px; }
+.barre-obj { background: var(--carte-3); }
+.barre-obj i { background: var(--accent); box-shadow: none; }
+/* Cartes : à plat */
+.serie-carte, .obj-carte, .b-entree, .pf-item, .r-ligne, .idt-carte { box-shadow: none; }
+.anneau .piste, .anneau circle:first-child { stroke: var(--carte-3); }
+dialog h3 { font-size: 24px !important; font-weight: 400 !important; line-height: 1.15; }
+#profil .f-corps b[style*="font-size:18px"] { font-family: var(--serif); font-weight: 400; font-size: 26px !important; }
+/* Interrupteur : rail clair, à l'encre une fois activé, le rond toujours ivoire */
+.interrupteur i { background: var(--carte-3); border: 1px solid var(--filet); box-shadow: none; }
+.interrupteur i::after { background: #fff; box-shadow: 0 1px 3px rgba(26, 24, 20, .3); }
+.interrupteur input:checked + i { background: var(--accent); border-color: transparent; box-shadow: none; }
+.interrupteur input:checked + i::after { background: var(--ivoire); }
+dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
+#m-titre, dialog.minuteur h2 { font-family: var(--serif); font-weight: 400; font-size: 26px; }
+/* Une tâche courte (portrait) : l'heure au-dessus du titre, comme les autres */
+.defile:not(.ajuste) .bloc.court .b-texte { flex-direction: column; align-items: stretch; justify-content: center; gap: 0; padding: 0; }
+.defile:not(.ajuste) .bloc.court .b-texte small { order: -1; font-size: 11.5px; line-height: 1.2; }
+.defile:not(.ajuste) .bloc.court .b-texte b { font-size: 19px; line-height: 1.1; }
+/* Tâches pas faites : à plat, le titre à empattements */
+.pf-item { border-left: 1px solid var(--filet); }
+.pf-item .tuile + span b, .pf-item b { font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.1; }
+.pf-b b, .pf-item button b { font-family: var(--police); font-size: 13px; font-weight: 650; }

@@ -1,19 +1,47 @@
   // ---------- Calendrier ----------
+  // En-tête (style Aube) : un sur-titre (la date, la charge), le grand titre, les onglets à droite ; flèches et loupe en haut
   function vueCalendrier() {
     const v = S.vueCal === 'jour' ? 'jour' : S.vueCal === 'mois' ? 'mois' : 'semaine';
+    const k = U.date, auj = aujourdhui(), pl = S.reglages.plafond;
+    let sur, titre, nav, surCourant;
+    if (v === 'jour') {
+      const m = minutesPrevues(k);
+      titre = cap(JOURS_LONGS[(parse(k).getDay() + 6) % 7]);
+      sur = `${fmt(k, { day: 'numeric', month: 'long' })} · ${duree(m)} sur ${duree(pl)}`;
+      nav = 'Jour'; surCourant = k === auj;
+    } else if (v === 'semaine') {
+      const l = lundiDe(k), la = lundiDe(auj);
+      let tot = 0; for (let i = 0; i < 7; i++) tot += minutesPrevues(decaler(l, i));
+      titre = l === la ? 'Cette semaine' : l === decaler(la, 7) ? 'La semaine prochaine' : l === decaler(la, -7) ? 'La semaine passée' : 'Semaine';
+      const dim = decaler(l, 6), court = d => fmt(d, { month: 'short' });
+      sur = `${l.slice(0, 7) === dim.slice(0, 7) ? parse(l).getDate() : parse(l).getDate() + ' ' + court(l)} – ${parse(dim).getDate()} ${court(dim)} · ${duree(tot)} prévues`;
+      nav = 'Semaine'; surCourant = l === la;
+    } else {
+      titre = cap(parse(k).toLocaleDateString('fr-FR', { month: 'long' }));
+      sur = 'Le mois';
+      nav = 'Mois'; surCourant = k.slice(0, 7) === auj.slice(0, 7);
+    }
+    const f = nav === 'Semaine' ? 'e' : '';
     return `
-      <header class="tete">
-        <div><h1>Calendrier</h1><p>Planifie. Organise. Réussis.</p></div>
-        <div class="actions-tete">
-          <button type="button" class="icone-bouton" data-action="chercher" aria-label="Chercher" aria-keyshortcuts="/" data-focus="chercher">${ICONE.loupe}</button>
-          <button type="button" class="icone-bouton" data-action="aujourdhui" aria-label="Aujourd'hui" data-focus="auj">${ICONE.calendrier}</button>
+      <header class="cal-entete" data-jour="${esc(v === 'jour' ? (k === auj ? "Aujourd'hui" : jourLong(k)) : '')}">
+        <div class="cal-haut">
+          <p class="sur-titre" ${v === 'semaine' ? 'id="sem-sur"' : ''}>${esc(sur)}</p>
+          <div class="cal-outils">
+            ${surCourant ? '' : `<button type="button" class="lien fort" data-action="aujourdhui" data-focus="auj">Aujourd'hui</button>`}
+            <button type="button" class="icone-bouton petit" data-nav="-1" aria-label="${nav} précédent${f}" data-focus="nav-1">${ICONE.gauche}</button>
+            <button type="button" class="icone-bouton petit" data-nav="1" aria-label="${nav} suivant${f}" data-focus="nav1">${ICONE.droite}</button>
+            <button type="button" class="icone-bouton petit" data-action="chercher" aria-label="Chercher" aria-keyshortcuts="/" data-focus="chercher">${ICONE.loupe}</button>
+          </div>
+        </div>
+        <div class="cal-titre">
+          <h1 id="${v === 'semaine' ? 'sem-nom' : v === 'mois' ? 'mois-nom' : 'jour-nom'}" aria-live="polite">${esc(titre)}${v === 'mois' ? ` <span class="an">${parse(k).getFullYear()}</span>` : ''}</h1>
+          <div class="segments onglets-vue" role="group" aria-label="Affichage">
+            <button type="button" aria-pressed="${v === 'semaine'}" data-vue-cal="semaine" data-focus="vc-semaine" aria-label="Semaine">Sem.</button>
+            <button type="button" aria-pressed="${v === 'jour'}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
+            <button type="button" aria-pressed="${v === 'mois'}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
+          </div>
         </div>
       </header>
-      <div class="segments" role="group" aria-label="Affichage">
-        <button type="button" aria-pressed="${v === 'semaine'}" data-vue-cal="semaine" data-focus="vc-semaine">Semaine</button>
-        <button type="button" aria-pressed="${v === 'jour'}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
-        <button type="button" aria-pressed="${v === 'mois'}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
-      </div>
       ${v === 'mois' ? vueMois() : v === 'jour' ? vueJour() : vueSemaine()}`;
   }
 
@@ -39,12 +67,7 @@
     const occs = duJour(k), habs = S.habitudes.filter(h => habitudeDue(h, k));
     const m = minutesPrevues(k);
     return `
-      <section class="carte" aria-labelledby="mois-nom">
-        <div class="cal-tete">
-          <button type="button" class="icone-bouton" data-nav="-1" aria-label="Mois précédent" data-focus="nav-1">${ICONE.gauche}</button>
-          <h2 id="mois-nom" aria-live="polite">${esc(nom)}</h2>
-          <button type="button" class="icone-bouton" data-nav="1" aria-label="Mois suivant" data-focus="nav1">${ICONE.droite}</button>
-        </div>
+      <section class="carte mois-carte" aria-labelledby="mois-nom">
         <div class="mois-grille" data-balayage="mois">
           ${JOURS_COURTS.map((j, i) => `<span class="jsem" aria-hidden="true" title="${JOURS_LONGS[i]}">${j}</span>`).join('')}
           ${cases}
@@ -148,25 +171,20 @@
   function bandeSemaine(k) {
     const l = lundiDe(k), auj = aujourdhui();
     return Array.from({ length: 7 }, (_, i) => {
-      const d = decaler(l, i), n = duJour(d).length;
+      const d = decaler(l, i), occs = duJour(d), n = occs.length;
+      const couleurs = [];
+      occs.forEach(o => { const c = look(o.el).couleur; if (!couleurs.includes(c) && o.el.type !== 'evenement') couleurs.push(c); });
+      const c3 = couleurs.slice(0, 3), w = c3.length ? 8 + c3.length * 6 : 0;
+      const barre = c3.length ? `linear-gradient(90deg, ${c3.map((c, j) => `${c} ${j * 100 / c3.length}% ${(j + 1) * 100 / c3.length}%`).join(', ')})` : 'none';
       return `<button type="button" class="jour-b${d === auj ? ' auj' : ''}" data-aller="${d}" aria-pressed="${d === k}" data-focus="j${d}"
         aria-label="${jourLong(d)}${d === auj ? ", aujourd'hui" : ''}${n ? ', ' + pluriel(n, 'élément') : ''}">
-        <span aria-hidden="true">${JOURS_COURTS[i]}</span><b aria-hidden="true">${parse(d).getDate()}</b><i class="${n ? 'plein' : ''}" aria-hidden="true"></i></button>`;
+        <span aria-hidden="true">${JOURS_COURTS[i]}</span><b aria-hidden="true">${parse(d).getDate()}</b><i class="${n ? 'plein' : ''}" style="width:${w}px;background:${barre}" aria-hidden="true"></i></button>`;
     }).join('');
   }
   function vueJour() {
-    const k = U.date, m = minutesPrevues(k), pl = S.reglages.plafond;
+    const k = U.date;
     return `<div class="cal-jour">
-      <div class="bande">
-        <button type="button" class="fleche" data-saut="-7" aria-label="Semaine précédente" data-focus="s-7">${ICONE.gauche}</button>
-        ${bandeSemaine(k)}
-        <button type="button" class="fleche" data-saut="7" aria-label="Semaine suivante" data-focus="s7">${ICONE.droite}</button>
-      </div>
-      <div class="jour-entete">
-        <h2 aria-live="polite">${k === aujourdhui() ? "Aujourd'hui" : jourLong(k)}</h2>
-        <div class="jauge${m > pl ? ' depasse' : ''}" role="img" aria-label="${duree(m)} de tâches prévues sur un plafond de ${duree(pl)}${m > pl ? ' : journée chargée' : ''}">
-          <small aria-hidden="true"><b>${duree(m)}</b> / ${duree(pl)}</small><span class="barre" aria-hidden="true"><i style="width:${Math.min(100, m / pl * 100)}%"></i></span></div>
-      </div>
+      <div class="bande" data-balayage="jour">${bandeSemaine(k)}</div>
       ${duJour(k).some(o => o.el.flou) ? `<div class="flou-zone" role="group" aria-label="Dans la journée">${duJour(k).filter(o => o.el.flou).map(o => ligneOcc(o, true)).join('')}</div>` : ''}
       <div class="defile" data-defile="jour">${grille([k])}</div>
       <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>

@@ -87,11 +87,6 @@
       </section>`;
     }
     return `
-      <div class="cal-tete sem-nav">
-        <button type="button" class="icone-bouton" data-nav="-1" aria-label="Semaine précédente" data-focus="nav-1">${ICONE.gauche}</button>
-        <h2 id="sem-nom" aria-live="polite">${lundi === lundiDe(auj) ? 'Cette semaine' : cap(texteSemaine(lundi))}<small>${lundi === lundiDe(auj) ? texteSemaine(lundi) : lundi === decaler(lundiDe(auj), 7) ? 'La semaine prochaine' : lundi === decaler(lundiDe(auj), -7) ? 'La semaine passée' : ''}</small></h2>
-        <button type="button" class="icone-bouton" data-nav="1" aria-label="Semaine suivante" data-focus="nav1">${ICONE.droite}</button>
-      </div>
       ${bandeauSemaine(lundi)}
       <div class="sem-heures" aria-hidden="true"><span>6 h</span><span>12 h</span><span>18 h</span><span>24 h</span></div>
       <div class="sem-jours">${jours}</div>
