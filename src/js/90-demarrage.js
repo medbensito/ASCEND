@@ -1,5 +1,5 @@
   // ---------- Rendu ----------
-  const ONGLETS = [['accueil', 'Accueil'], ['calendrier', 'Calendrier'], ['objectifs', 'Objectifs'], ['progression', 'Progression']];
+  const ONGLETS = [['accueil', 'Accueil'], ['calendrier', 'Agenda'], ['objectifs', 'Objectifs'], ['progression', 'Progrès']];
   function renderOnglets() {
     // Une réponse t'attend (moment sans écran à valider, tâches pas faites) : un point sur Progression, où sont ces cartes
     const attend = aValider().length + pasFaites().length > 0;
