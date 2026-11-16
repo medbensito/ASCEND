@@ -202,7 +202,7 @@
     const rangs = jours.length / 7;
     // Combien de tâches tiennent dans une case : le numéro du jour (et « +N » à côté), puis une ligne par tâche
     const hApp = ($('.app') || {}).clientHeight || window.innerHeight;
-    const place = Math.max(1, Math.floor(((hApp - 78) / rangs - 4 - 8 - 18) / 17));
+    const place = Math.max(1, Math.floor(((hApp - 82) / rangs - 6 - 22) / 16));
     const cases = jours.map(j => {
       const occs = duJour(j), charge = minutesPrevues(j) > S.reglages.plafond;
       const montrees = occs.slice(0, place);
@@ -210,7 +210,7 @@
       return `<button type="button" class="case-m${j.slice(0, 7) !== k.slice(0, 7) ? ' dehors' : ''}${j === auj ? ' auj' : ''}"${j === k ? ' aria-current="date"' : ''} data-ouvrir-jour="${j}" data-focus="pm${j}"
           aria-label="${jourLong(j)}${j === auj ? ", aujourd'hui" : ''}${occs.length ? ' : ' + occs.map(o => `${o.el.titre} à ${hhmm(o.el.debut)}${o.fait ? ', faite' : ''}`).join(' ; ') : ', rien de prévu'}${charge ? ', journée chargée' : ''}. Voir la journée">
         <span class="n" aria-hidden="true"><span>${parse(j).getDate()}</span>${reste ? `<em class="encore">+${reste}</em>` : ''}${charge ? '<i>⚠︎</i>' : ''}</span>
-        ${montrees.map(o => `<span class="chip${o.fait ? ' fait' : ''}" style="--c:${look(o.el).couleur}" aria-hidden="true">${o.el.type === 'tache' ? '' : look(o.el).icone + ' '}${esc(o.el.titre)}</span>`).join('')}</button>`;
+        ${montrees.map(o => `<span class="chip${o.fait ? ' fait' : ''}${o.el.type === 'evenement' ? ' ev' : ''}" style="--c:${look(o.el).couleur}" aria-hidden="true"><i></i>${esc(o.el.titre)}</span>`).join('')}</button>`;
     }).join('');
     return `<div class="pay-mois" style="--rangs:${rangs}" data-balayage="mois">${JOURS_LONGS.map(n => `<span class="jsem" aria-hidden="true">${n.slice(0, 3)}</span>`).join('')}${cases}</div>`;
   }
@@ -234,25 +234,35 @@
   }
   function vuePaysage() {
     const sem = S.vueCal === 'semaine', jour = S.vueCal === 'jour', k = U.date, auj = aujourdhui();
-    const titre = sem ? 'Semaine ' + texteSemaine(lundiDe(k)) : jour ? (k === auj ? "Aujourd'hui · " : '') + jourLong(k) : cap(parse(k).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }));
+    const nomMois = cap(parse(k).toLocaleDateString('fr-FR', { month: 'long' }));
+    const titre = sem ? esc('Semaine ' + texteSemaine(lundiDe(k))) : jour ? esc((k === auj ? "Aujourd'hui · " : '') + jourLong(k)) : `${esc(nomMois)} <span class="an">${parse(k).getFullYear()}</span>`;
     const nomNav = sem ? 'Semaine' : jour ? 'Jour' : 'Mois';
-    const m = minutesPrevues(k), pl = S.reglages.plafond;
+    const pl = S.reglages.plafond;
+    let sur, courant, charge = false;
+    if (jour) { const m = minutesPrevues(k); charge = m > pl; sur = `${duree(m)} sur ${duree(pl)}${charge ? ' · chargée' : ''}`; courant = k === auj; }
+    else if (sem) { let tot = 0; for (const j of joursPaysage()) tot += minutesPrevues(j); sur = `${duree(tot)} prévues`; courant = lundiDe(k) === lundiDe(auj); }
+    else { const n = (() => { let c = 0; const d = parse(k); for (let i = 1; i <= 31; i++) { const j = dk(new Date(d.getFullYear(), d.getMonth(), i)); if (j.slice(0, 7) !== k.slice(0, 7)) break; c += duJour(j).length; } return c; })();
+      sur = n ? `${n} prévu${n > 1 ? 's' : ''} ce mois` : 'Le mois'; courant = k.slice(0, 7) === auj.slice(0, 7); }
     return `<h1 class="masque">Calendrier</h1>
       <div class="pay"${jour ? ' data-balayage="jour"' : ''}>
-        <div class="pay-barre">
-          <button type="button" class="icone-bouton" data-nav="-1" aria-label="${nomNav} précédent${sem ? 'e' : ''}" data-focus="nav-1">${ICONE.gauche}</button>
-          <h2 aria-live="polite">${esc(titre)}</h2>
-          <button type="button" class="icone-bouton" data-nav="1" aria-label="${nomNav} suivant${sem ? 'e' : ''}" data-focus="nav1">${ICONE.droite}</button>
-          ${jour ? `<div class="jauge${m > pl ? ' depasse' : ''}" role="img" aria-label="${duree(m)} de tâches prévues sur un plafond de ${duree(pl)}${m > pl ? ' : journée chargée' : ''}"><small aria-hidden="true"><b>${duree(m)}</b> / ${duree(pl)}</small><span class="barre" aria-hidden="true"><i style="width:${Math.min(100, m / pl * 100)}%"></i></span></div>` : ''}
-          <div class="segments" role="group" aria-label="Affichage">
-            <button type="button" aria-pressed="${sem}" data-vue-cal="semaine" data-focus="vc-semaine">Sem.</button>
+        <header class="pay-barre">
+          <div class="pay-titre">
+            <p class="sur-titre${charge ? ' charge' : ''}">${esc(sur)}</p>
+            <h2 aria-live="polite">${titre}</h2>
+          </div>
+          <div class="segments onglets-vue" role="group" aria-label="Affichage">
+            <button type="button" aria-pressed="${sem}" data-vue-cal="semaine" data-focus="vc-semaine" aria-label="Semaine">Sem.</button>
             <button type="button" aria-pressed="${jour}" data-vue-cal="jour" data-focus="vc-jour">Jour</button>
             <button type="button" aria-pressed="${!jour && !sem}" data-vue-cal="mois" data-focus="vc-mois">Mois</button>
           </div>
-          <button type="button" class="icone-bouton" data-action="aujourdhui" aria-label="Aujourd'hui" data-focus="auj">${ICONE.calendrier}</button>
-          <button type="button" class="icone-bouton" data-action="chercher" aria-label="Chercher" data-focus="chercher">${ICONE.loupe}</button>
-        </div>
-        ${sem ? `<div class="sem7-tete" aria-hidden="true">${joursPaysage().map((j, i) => { const m7 = minutesPrevues(j), fl = duJour(j).filter(o => o.el.flou).length; return `<span class="${j === auj ? 'auj' : ''}${m7 > pl ? ' charge' : ''}">${JOURS_COURTS_3[i]} <b>${parse(j).getDate()}</b>${fl ? `<i>+${fl}</i>` : ''}</span>`; }).join('')}</div>
+          <div class="cal-outils">
+            <button type="button" class="lien fort${courant ? ' courant' : ''}" data-action="aujourdhui" data-focus="auj">Aujourd'hui</button>
+            <button type="button" class="icone-bouton petit" data-nav="-1" aria-label="${nomNav} précédent${sem ? 'e' : ''}" data-focus="nav-1">${ICONE.gauche}</button>
+            <button type="button" class="icone-bouton petit" data-nav="1" aria-label="${nomNav} suivant${sem ? 'e' : ''}" data-focus="nav1">${ICONE.droite}</button>
+            <button type="button" class="icone-bouton petit" data-action="chercher" aria-label="Chercher" data-focus="chercher">${ICONE.loupe}</button>
+          </div>
+        </header>
+        ${sem ? `<div class="sem7-tete" aria-hidden="true">${joursPaysage().map((j, i) => { const m7 = minutesPrevues(j), fl = duJour(j).filter(o => o.el.flou).length; return `<span class="${[j === auj ? 'auj' : '', j === k ? 'choisi' : '', m7 > pl ? 'charge' : ''].filter(Boolean).join(' ')}"><small>${JOURS_COURTS_3[i]}</small> <b>${parse(j).getDate()}</b>${fl ? `<i>+${fl}</i>` : ''}</span>`; }).join('')}</div>
           <div class="defile ajuste sem7" data-defile="jour">${grille(joursPaysage())}</div>`
           : jour ? `<div class="defile ajuste" data-defile="jour">${grille([k])}</div>
           <button type="button" class="fab" data-action="ajouter" aria-label="Ajouter une tâche" data-focus="fab">${ICONE.plus}</button>` : moisPaysage()}
