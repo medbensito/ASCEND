@@ -83,3 +83,7 @@ html.paysage .sem7 .bloc .b-texte b, html.paysage .sem7 .bloc.court .b-texte b, 
 .case-m .chip.ev i { background: none; box-shadow: inset 0 0 0 1.5px var(--c); }
 .case-m .chip.fait { color: var(--doux); }
 .case-m .chip.fait i { opacity: .45; }
+
+/* Le logo (icône F · Le sommet) : à l'ivoire sur le lancement, à l'encre sur le verrou */
+.lancement .marque svg { color: #f6f3ec; }
+.vr-logo { color: var(--encre); }

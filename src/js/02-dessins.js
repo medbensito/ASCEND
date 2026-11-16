@@ -30,12 +30,11 @@
 
   // Le A d'ASCEND : deux pentes et un sommet
   let nLogo = 0;
+  // Le sommet : une ligne de crête qui monte vers un point (dessiné en couleur du texte)
   function logo() {
-    const n = ++nLogo;
-    return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs>
-      <linearGradient id="la${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#8d8d96"/></linearGradient>
-      <linearGradient id="lb${n}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9d9de"/><stop offset="1" stop-color="#4a4a52"/></linearGradient></defs>
-      <path d="M50 8L12 92h13L50 36z" fill="url(#la${n})"/><path d="M50 8v28l25 56h13z" fill="url(#lb${n})"/><path d="M50 58l10 22-10-7-10 7z" fill="url(#la${n})" opacity=".9"/></svg>`;
+    return `<svg viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="4.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M12 78L36 51l11 12 24-34 13 17"/><circle cx="71" cy="18" r="4.2" fill="currentColor" stroke="none"/>
+      <path d="M12 86h72" stroke-width="1.3" opacity=".4"/></svg>`;
   }
   // Lancement : un arc de lumière, un monolithe, une silhouette au sommet
   function sceneLancement() {
