@@ -1637,6 +1637,22 @@ dialog h3 { text-transform: none !important; letter-spacing: 0 !important; }
 .mnt-ligne .quoi small, .mnt-ligne .pts { color: var(--doux); }
 .mnt-go, .mnt .bouton { background: var(--encre); color: var(--ivoire); }
 .mnt-pouls { background: color-mix(in srgb, var(--c) 80%, #1a1814); }
+
+/* ===== Édition 35 : plus de blocs noirs ===== */
+/* Emblèmes : un disque à l'encre du niveau (vert pour Comète, bleu pour Cristal…) plutôt que noir */
+.n-embleme { background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--e, #1a1814) 78%, #f6f3ec), var(--e, #1a1814) 72%); }
+.niveau .embleme { background: var(--accent, #1a1814); }
+/* Célébration : le jour ivoire, les rayons et le disque à la couleur du niveau */
+dialog#fete, dialog#fete::backdrop { background: #f6f3ec; color: var(--encre); }
+#fete .fe-rayons { background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--e-fete, var(--accent)) 16%, transparent) 0 5deg, transparent 5deg 20deg); }
+#fete .fe-embleme { border-radius: 50%; padding: 18px; background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--e, #1a1814) 74%, #f6f3ec), var(--e, #1a1814) 72%);
+  filter: none; box-shadow: 0 0 0 10px color-mix(in srgb, var(--e, #1a1814) 10%, transparent), 0 24px 60px color-mix(in srgb, var(--e, #1a1814) 32%, transparent); }
+#fete .fe-sur { color: var(--accent-texte); }
+#fete h2 { color: var(--encre); }
+#fete #fe-texte, #fete .fe-suite, #fete .fe-chiffres small { color: var(--doux); }
+#fete .fe-chiffres li { background: #fbf9f4; border-color: var(--trait); }
+#fete .bouton { background: var(--encre); color: var(--ivoire); }
+#fete .lien { color: var(--encre); }
 /* ===== Édition 30 : le calendrier couché au style D (ivoire, encre, empattements) ===== */
 
 /* En-tête : comme debout, sur une seule rangée */
@@ -1923,7 +1939,7 @@ html { background: #f6f3ec; }
   'use strict';
   // ASCEND : développement personnel et JOMO. Une seule page, données sur l'appareil (localStorage).
   const VERSION = 1;                       // format des données (export, sauvegarde)
-  const EDITION = 34;                      // édition de l'app, comme le cache du service worker (ascend-21)
+  const EDITION = 35;                      // édition de l'app, comme le cache du service worker (ascend-21)
   const CLE = 'ascend-v1';
 
   // ---------- Réglages fixes ----------
@@ -5268,7 +5284,7 @@ html { background: #f6f3ec; }
     const pc = suiv ? Math.max(2, Math.round((S.points - P.seuil) / (suiv.seuil - P.seuil) * 100)) : 100;
     $('#n-corps').innerHTML = `
       <section class="carte n-tete" aria-label="Niveau ${i + 1}, ${P.nom}. ${nombre(S.points)} points${suiv ? `, encore ${nombre(suiv.seuil - S.points)} avant ${suiv.nom}` : ''}">
-        <span class="n-embleme" aria-hidden="true">${embleme(P.id)}</span>
+        <span class="n-embleme" style="--e:${P.encre || '#1a1814'}" aria-hidden="true">${embleme(P.id)}</span>
         <div aria-hidden="true"><small>Niveau ${i + 1}${i <= DERNIER ? ` sur ${CONFIG.paliers.length}` : ''}</small><b>${P.nom}</b>
           <span class="barre-obj"><i style="width:${pc}%"></i></span>
           <span class="note">${suiv ? `Encore ${nombre(suiv.seuil - S.points)} pts avant ${suiv.nom}` : 'Le sommet. Tu y es.'}</span></div>
@@ -5279,7 +5295,7 @@ html { background: #f6f3ec; }
         const ouvert = n <= S.niveauMax, mis = p.id === porte.id;
         return `<button type="button" class="carte n-ligne${ouvert ? '' : ' ferme'}${mis ? ' mis' : ''}" data-n-look="${p.id}" data-focus="nl${n}" aria-pressed="${mis}"${ouvert ? '' : ' aria-disabled="true"'}
           aria-label="Niveau ${n + 1}, ${p.nom}, look ${p.look}. ${ouvert ? (mis ? 'Porté' : 'Débloqué, toucher pour le porter') : `Verrouillé, à ${nombre(p.seuil)} points`}">
-          <span class="n-embleme petit" aria-hidden="true">${embleme(p.id)}</span>
+          <span class="n-embleme petit" style="--e:${p.encre || '#1a1814'}" aria-hidden="true">${embleme(p.id)}</span>
           <span class="quoi" aria-hidden="true"><b>${p.nom}</b><small>Niveau ${n + 1} · ${nombre(p.seuil)} pts</small></span>
           <span class="n-look" aria-hidden="true"><i style="background:${degrade(p)}"></i>${p.look}</span>
           <span class="n-etat" aria-hidden="true">${mis ? ICONE.coche : ouvert ? '' : '🔒'}</span></button>`; }).join('')}</div></div>
@@ -5319,7 +5335,7 @@ html { background: #f6f3ec; }
     appliquerLook(P);
     FD.querySelector('#fe-corps').innerHTML = `
       <div class="fe-rayons" aria-hidden="true"></div>
-      <div class="fe-embleme" aria-hidden="true">${embleme(P.id)}</div>
+      <div class="fe-embleme" style="--e:${P.encre || '#1a1814'}" aria-hidden="true">${embleme(P.id)}</div>
       <p class="fe-sur">Niveau ${i + 1}</p>
       <h2 id="fe-titre">${P.nom}</h2>
       <p id="fe-texte">${nombre(P.seuil)} points franchis. ${nouveaux > 1 ? `Tes niveaux t'ont débloqué ${nouveaux} looks, jusqu'au look ${P.look}.` : nouveaux === 1 ? `Tu débloques le look ${P.look}.` : `Au-delà du sommet, tu continues de monter. Le look ${P.look} te suit.`}</p>

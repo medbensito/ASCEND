@@ -23,7 +23,7 @@
     const pc = suiv ? Math.max(2, Math.round((S.points - P.seuil) / (suiv.seuil - P.seuil) * 100)) : 100;
     $('#n-corps').innerHTML = `
       <section class="carte n-tete" aria-label="Niveau ${i + 1}, ${P.nom}. ${nombre(S.points)} points${suiv ? `, encore ${nombre(suiv.seuil - S.points)} avant ${suiv.nom}` : ''}">
-        <span class="n-embleme" aria-hidden="true">${embleme(P.id)}</span>
+        <span class="n-embleme" style="--e:${P.encre || '#1a1814'}" aria-hidden="true">${embleme(P.id)}</span>
         <div aria-hidden="true"><small>Niveau ${i + 1}${i <= DERNIER ? ` sur ${CONFIG.paliers.length}` : ''}</small><b>${P.nom}</b>
           <span class="barre-obj"><i style="width:${pc}%"></i></span>
           <span class="note">${suiv ? `Encore ${nombre(suiv.seuil - S.points)} pts avant ${suiv.nom}` : 'Le sommet. Tu y es.'}</span></div>
@@ -34,7 +34,7 @@
         const ouvert = n <= S.niveauMax, mis = p.id === porte.id;
         return `<button type="button" class="carte n-ligne${ouvert ? '' : ' ferme'}${mis ? ' mis' : ''}" data-n-look="${p.id}" data-focus="nl${n}" aria-pressed="${mis}"${ouvert ? '' : ' aria-disabled="true"'}
           aria-label="Niveau ${n + 1}, ${p.nom}, look ${p.look}. ${ouvert ? (mis ? 'Porté' : 'Débloqué, toucher pour le porter') : `Verrouillé, à ${nombre(p.seuil)} points`}">
-          <span class="n-embleme petit" aria-hidden="true">${embleme(p.id)}</span>
+          <span class="n-embleme petit" style="--e:${p.encre || '#1a1814'}" aria-hidden="true">${embleme(p.id)}</span>
           <span class="quoi" aria-hidden="true"><b>${p.nom}</b><small>Niveau ${n + 1} · ${nombre(p.seuil)} pts</small></span>
           <span class="n-look" aria-hidden="true"><i style="background:${degrade(p)}"></i>${p.look}</span>
           <span class="n-etat" aria-hidden="true">${mis ? ICONE.coche : ouvert ? '' : '🔒'}</span></button>`; }).join('')}</div></div>
@@ -74,7 +74,7 @@
     appliquerLook(P);
     FD.querySelector('#fe-corps').innerHTML = `
       <div class="fe-rayons" aria-hidden="true"></div>
-      <div class="fe-embleme" aria-hidden="true">${embleme(P.id)}</div>
+      <div class="fe-embleme" style="--e:${P.encre || '#1a1814'}" aria-hidden="true">${embleme(P.id)}</div>
       <p class="fe-sur">Niveau ${i + 1}</p>
       <h2 id="fe-titre">${P.nom}</h2>
       <p id="fe-texte">${nombre(P.seuil)} points franchis. ${nouveaux > 1 ? `Tes niveaux t'ont débloqué ${nouveaux} looks, jusqu'au look ${P.look}.` : nouveaux === 1 ? `Tu débloques le look ${P.look}.` : `Au-delà du sommet, tu continues de monter. Le look ${P.look} te suit.`}</p>
